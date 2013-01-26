@@ -9,7 +9,7 @@ Peking Solar Decathlon 2013 - UIUC
 
 - `cd SD2013-UIUC/server`
 - `virtualenv2 .`
-- `bin/pip install -f requirements.txt`
+- `bin/pip install -r requirements.txt`
 
 ### Running
 
