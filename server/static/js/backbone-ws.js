@@ -23,9 +23,9 @@ function uid() {
 var CollectionWS = Backbone.Collection.extend({
   sync: function(method, collection, options) {
     var socket = collection.getSocket();
-    switch method {
+    switch (method) {
       case "read":
-        // Return an array of models for this collection
+        // Return an array  of models for this collection
         var tid = uid();
         socket.send("fetch", {tid: tid});
         socket.once(tid, function(response) {
@@ -54,7 +54,7 @@ var CollectionWS = Backbone.Collection.extend({
 var ModelWS = Backbone.Collection.extend({
   sync: function(method, model, options) {
     var socket = model.getSocket();
-    switch method {
+    switch (method) {
       case "update":
         // send local changes to the server
         var tid = uid();
