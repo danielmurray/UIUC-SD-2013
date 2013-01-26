@@ -13,5 +13,6 @@ Peking Solar Decathlon 2013 - UIUC
 
 ### Running
 
+- `cd SD2013-UIUC/server`
 - `bin/python2 app.py`
 
