@@ -5,7 +5,7 @@ Peking Solar Decathlon 2013 - UIUC
 
 ## Setup
 
-### Install pip and virtualenv2
+### Install pip and virtualenv
 
 - `cd SD2013-UIUC/server`
 - `virtualenv2 .`
