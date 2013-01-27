@@ -1,0 +1,4 @@
+*.pyc
+server/lib
+server/bin
+server/include
