@@ -12,7 +12,7 @@
  * with the result of the update operation {success: true/false}.
  */
 
-function s4() {
+function S4() {
   return (((1+Math.random())*0x10000)|0).toString(16).substring(1);
 }
 
@@ -27,13 +27,14 @@ var CollectionWS = Backbone.Collection.extend({
       case "read":
         // Return an array  of models for this collection
         var tid = uid();
-        socket.send("fetch", {tid: tid});
+        socket.emit("fetch", {tid: tid});
         socket.once(tid, function(response) {
           console.log(tid, response);
           if (response.success) {
-            options.success(response.data);
+            options.success(collection, response.data, options);
           }
         });
+        break;
       default:
         console.error("Invalid sync call on collection", collection, method);
     }
@@ -41,17 +42,18 @@ var CollectionWS = Backbone.Collection.extend({
 
   getSocket: function() {
     if (!this._socketio) {
-      this._socketio = socketio.connect(this.url);
+      this._socketio = io.connect(this.url);
+      var obj = this;
       this._socketio.on("update", function(data) {
         // data contains an array of model objects to be updated
-        this.add(data, {merge: true});
+        obj.add(data, {merge: true});
       });
     }
     return this._socketio;
   }
 });
 
-var ModelWS = Backbone.Collection.extend({
+var ModelWS = Backbone.Model.extend({
   sync: function(method, model, options) {
     var socket = model.getSocket();
     switch (method) {
@@ -65,6 +67,7 @@ var ModelWS = Backbone.Collection.extend({
             options.success(response.data);
           }
         });
+        break;
       default:
         console.error("Invalid sync call on model", model, method);
     }
@@ -78,7 +81,7 @@ var ModelWS = Backbone.Collection.extend({
       this._socketio = io.connect(this.urlRoot);
       this._socketio.on("update", function(data) {
         // data contains the model object
-        this.add(data, {merge: true});
+        this.set(data);
       });
     }
   }
