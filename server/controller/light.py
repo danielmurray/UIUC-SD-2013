@@ -25,7 +25,7 @@ light_mapping = [
 class EchoIncoming(WebSocketClientProtocol):
     def __init__(self, parent, *args, **kwargs):
       self.parent = parent
-      WebSocketClientProtocol.__init__(*args, **kwargs)
+      #WebSocketClientProtocol.__init__(*args, **kwargs)
 
     def onMessage(self,msg, binary):
       if '{"s":' in msg:
@@ -62,10 +62,10 @@ class EchoIncoming(WebSocketClientProtocol):
           if light['n'] == tmp_dict['n']: #we found the damn light
             light['v'] = tmp_dict['v']
             #convert keys properly
-            light['current'] = int(light['v'])
+            light['current'] = float(light['v'])
             light['id'] = light['n']
             # {id: None, name: "", current: 0}
-            parent.update(light)
+            self.parent.update(light)
 
 
     def updateLight(self, data):
