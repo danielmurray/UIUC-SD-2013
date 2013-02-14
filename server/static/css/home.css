@@ -1,0 +1,64 @@
+#viewport{
+    width:900px;
+    height:600px;
+}
+
+#tabletview{
+    position: relative;
+}
+
+#sidebar{
+    z-index:1;
+    position: absolute;
+    top:0;
+    left:0;
+    width:240px;
+    height: 600px;
+    background-color: #BCBCBC;
+}
+
+#pagewrapper{
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 660px;
+    height: 600px;
+}
+
+#page{
+    position: relative;
+}
+
+#logoholder{
+
+}
+
+#logo{
+    width: 200px;
+    height: 175px;
+    margin: 20px 0 0 20px;
+}
+
+#controlwrapper{
+    position: absolute;
+    left:20px;
+    top: 210px;
+    height: 360px;
+    width: 200px;
+}
+
+#floorplan{
+    position: absolute;
+    z-index:1;
+    left: 15px;
+    top: 25px;
+}
+
+#template{
+    margin-top: -5px;
+    margin-left: -7px;
+    position: absolute;
+    height:310px;
+    width:367px;
+    display: none;
+}

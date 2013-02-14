@@ -1,0 +1,27 @@
+@font-face{
+    font-family: "neou";
+    src: url("../Images/neou-t.ttf");
+}
+
+/*background: -webkit-gradient(linear, left top, left bottom, from(#AF3C3C), to(#2C0606)) no-repeat center center fixed;
+        -webkit-background-size: cover;
+*/
+*{
+    margin:0;  
+}
+
+html,
+body{ 
+    height: 100%;
+    position:relative;
+    font-family: "neou";
+    color: whitesmoke;
+    -webkit-user-select: none; 
+}
+
+#viewport{
+    background: -webkit-gradient(linear, left top, left bottom, from(#fff), to(#04BCE4)) no-repeat center center fixed;
+    -webkit-background-size: cover;
+    height:100%;
+    margin: 0 auto;
+}

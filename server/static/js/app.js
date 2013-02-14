@@ -2,103 +2,98 @@
  * Main JS app
  */
 
-
 // MODELS
-var Light = ModelWS.extend({
-  defaults: function() {
-    return {
-      on: false,
-      location: "none",
-      name: "unnamed"
-    }
-  }
-});
 
-// COLLECTIONS
-var LightList = CollectionWS.extend({
-  url: "/light",
-
-  model: Light,
-
-  // sort lights by name
-  comparator: function(event) {
-    return event.get("name");
-  }
-});
-
-var Lights = new LightList();
 
 // VIEWS
-var BaseView = Backbone.View.extend({
-  assign: function(view, selector) {
-    view.setElement(this.$(selector)).render();
-  }
+var homecontrol = Backbone.View.extend({
+	el: '#controlwrapper',
+    initialize: function() {
+        this.template = loadTemplate("/static/views/homecontrol.html");
+
+    },
+	render: function () {
+        this.$el = $(this.$el.selector);            //IS THIS BAD?
+        
+        data = {
+            "power":{
+                "production" : Math.random() * 15.5,
+                "consumption" : Math.random() * 15.5
+            }
+
+        }
+
+        var renderedTemplate = this.template( data );
+        this.$el.html(renderedTemplate)
+
+	}
 });
 
-var LightListView = BaseView.extend({
-  tagName: "div",
-  events: {
-    "click" : "toggle"
-  },
-  initialize: function() {
-    var tpl = $('#lightlistview-template').html();
-    this.template = _.template(tpl);
-  },
-  render: function() {
-    //var data = this.model.toJSON();
-    this.$el.html(this.template());
-    return this;
-  },
-  toggle: function(event) {
-    this.model.set("on") = !this.model.get("on");
-  }
+var home = Backbone.View.extend({
+    el: '#viewport',
+    initialize: function() {
+        this.template = loadTemplate("/static/views/home.html");      
+        //this.dictionary = loadData("/static/dictionary.json");
+        
+        this.homeController = new homecontrol();
+        //this.homeController.parentView = this;        //failed attempt to properly nest views
+        //this.$el.append(this.homeController.$el);
+        
+
+        this.floorPlanController = new floorplan( );
+        var that = this;
+        this.floorPlanController.on('navigate', function(string) {
+            that.trigger("navigate", string);
+        })
+        //this.floorPlanController.parentView = this;   //failed attempt to properly nest views
+        //this.$el.append(this.floorPlanController.$el);
+    },
+    render: function ( id ) {
+        var that = this;
+        var renderedTemplate = this.template( this.dictionary );
+        this.$el.html(renderedTemplate)
+
+        this.floorPlanController.render(1.8, id);
+
+    }
 });
 
 $(function() {
-  var Router = Backbone.Router.extend({
-    routes: {
-      "lights": "lightList",
-      "*path": "default"
-    }
-  });
+    var Router = Backbone.Router.extend({
+    	routes: {
+    		'': 'home',
+            'light/:id': 'light'
+    	}
+    })
 
-  var AppRouter = new Router();
+    window.lights = new LightCollection()
+    window.lights.fetch();
 
-  var AppView = BaseView.extend({
-    el: $("#mainview"),
-    events: {
-      "click #lightViewButton": "showLightView"
-    },
-    initialize: function() {
-      var tpl = $('#mainview-template').html();
-      this.template = _.template(tpl);
-    },
-    showLightView: function(e) {
-      e.preventDefault();
-      AppRouter.navigate("/lights", {trigger: true});
-    },
-    render: function() {
-      this.$el.html(this.template());
-      if (this.subview) {
-        this.assign(this.subview, "content");
-      }
-      return this;
-    },
-    display: function(subview) {
-      this.subview = subview;
-      this.render();
-    }
-  });
-  var MainAppView = new AppView();
+    console.log(window.lights)
+    var homePage = new home();
 
-  // ROUTER (CONTROLLER)
-  AppRouter.on("route:default", function(path) {
-    MainAppView.display();
-  });
+    var router = new Router();
+    router.on('route:home', function (){
+    	homePage.render();
+        homePage.homeController.render();
+        /*
+        homePage.okay = setInterval(function(){
+            homePage.homeController.render();
+        },1000);
+        */
+    });
 
-  AppRouter.on("route:lightList", function() {
-    var lightView = new LightListView({collection: Lights});
-    MainAppView.display(lightView);
-  });
-  Backbone.history.start({pushState: false, hashChange: true});
+    router.on('route:light', function (id){
+        homePage.render(id);
+        homePage.floorPlanController.lightControllers[id].render();
+        /*
+        window.clearInterval(homePage.okay)
+        */
+    });
+
+    homePage.on("navigate", function(string) {
+      router.navigate( string, {trigger: true});
+    });
+
+    Backbone.history.start();
 });

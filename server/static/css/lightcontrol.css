@@ -1,0 +1,65 @@
+#lightcontroller{
+	position: relative;
+	background-color: #E41C44;
+	height: inherit;
+	width: 190px;
+	padding: 10px 0px 0px 10px;
+}
+
+#maincontroller{
+	position: absolute;
+	top: 35px;
+	left: 0px;
+	height: 340px;
+	width: inherit;
+}
+
+.lightbutton{
+	position: absolute;
+	height: 40px;
+	width: 180px;
+	text-align: center;
+	left: 10px;
+	border-radius: 5px;
+}
+
+.lightbutton h4{
+	line-height: 40px;
+	vertical-align: middle;
+}
+
+#toggleon{
+	background-color: #f6a828;
+	top: 0px;
+}
+
+#toggleoff{
+	background-color: rgb(134, 134, 134);
+	bottom: 20px;
+}
+
+#lightdimmer{
+	background: rgb(134, 134, 134);
+	position: absolute;
+	top: 50px;
+	left: 9px;
+	height: 215px;
+	width: 180px;
+}
+
+#lightdimmer .ui-slider-handle {
+    width: 188px;
+}
+
+#childrenlist{
+	background-color: #04BCE4;
+	position: absolute;
+	top: 255px;
+	height: 105px;
+	width: 180px;
+}
+
+
+#childrenheader{
+	margin: -15px 0 0 5px;
+}
