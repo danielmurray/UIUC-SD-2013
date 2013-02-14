@@ -140,7 +140,7 @@ class LightController(BackboneCollection):
           print "Doing something"
           protocol = hmac.new(r.json()['LL']['value'].decode("hex"), "admin:admin", digestmod=hashlib.sha1).digest().encode("hex")
           factory = WebSocketClientFactory("ws://"+LOX_ADDR+"/ws/",protocols = [protocol], debug=True)
-          factory.protocol = proxy
+          factory.protocol = self.proxy
           connectWS(factory)
           reactor.run()
       else:
