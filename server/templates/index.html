@@ -14,12 +14,13 @@
         <link rel="icon" href="/static/images/favicon.ico"> 
         <link href="/static/css/style.css" rel="stylesheet" type="text/css">
         <link href="/static/css/ui-lightness/jquery-ui.min.css" rel="stylesheet" type="text/css">
+        <link href="/static/css/home.css" rel="stylesheet" type="text/css">
+        <link href="/static/css/homecontrol.css" rel="stylesheet" type="text/css">
+        <link href="/static/css/lightcontrol.css" rel="stylesheet" type="text/css">
     </head>
     <body>
          <div id="viewport"></div>
     </body>
-
-    <script src="/static/views/home.html" type="text/template" id="home-template"></script>
 
     <script src="/static/js/lib/jquery.min.js"></script>
     <script src="/static/js/lib/underscore.js"></script>
@@ -33,9 +34,20 @@
     <script src="/static/js/lib/customlib.js"></script>
     
     <script src="/static/js/backbone-ws.js"></script>
+    <!--
     <script src="/static/js/lighting.js"></script>
     <script src="/static/js/data.js"></script>
 
     <script src="/static/js/app.js"></script>
+    -->
 
+    <script src="/static/js/models.js"></script>
+    <script src="/static/js/collections.js"></script>
+    <script src="/static/js/views.js"></script>
+    <script src="/static/js/controller.js"></script>
+    {% if debug %}
+    <script src="/static/js/collections-test.js"></script>
+    {% else %}
+    <script src="/static/js/collections-prod.js"></script>
+    {% endif %}
 </html>

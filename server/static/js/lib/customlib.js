@@ -1,15 +1,21 @@
+var cachedTemplates = {};
 function loadTemplate(url) {
-   var text;
-   
-   $.ajax({
-       url: url,
-       success: function(t) {
-           //console.log(t);
-           text = t;
-       },
-       async: false
-    });
-  return _.template(text);
+  if (cachedTemplates[url]) {
+    return cachedTemplates[url];
+  }
+  var text;
+ 
+  $.ajax({
+   url: url,
+   success: function(t) {
+     //console.log(t);
+     text = t;
+   },
+   async: false
+  });
+  var tpl = _.template(text);
+  cachedTemplates[url] = tpl;
+  return tpl;
 }
 
 function loadData(url) {

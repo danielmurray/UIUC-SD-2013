@@ -1,3 +1,5 @@
+import geventreactor; geventreactor.install()
+from twisted.internet import reactor
 from flask import Flask, send_file, url_for, render_template, request, \
   session, redirect, flash, Markup, abort, Response
 from socketio.server import SocketIOServer
@@ -10,6 +12,7 @@ import controller
 import time
 import random
 from gevent import monkey; monkey.patch_all()
+import gevent
 
 import args
 
@@ -42,7 +45,7 @@ map(lambda x: x.add_client(eventLogger), [
 
 @app.route("/")
 def index():
-  return render_template("index.html")
+  return render_template("index.html", debug=request.args.get("debug", False))
 
 @app.route("/ws")
 def debugger():
@@ -64,7 +67,21 @@ def socket_path(remaining=None):
   }, request)
   return "end"
 
+def run_reactor():
+  try:
+    reactor.run()
+  except:
+    print("Reactor exception")
+  reactor.stop()
+
 if __name__ == '__main__':
   print "Starting up"
-  server = SocketIOServer(('', args.get("port")), app, transports=["websocket", "xhr-polling"])
-  server.serve_forever()
+  g = gevent.spawn(run_reactor)
+  try:
+    server = SocketIOServer(('', args.get("port")), app, transports=["websocket", "xhr-polling"])
+    server.serve_forever()
+  except KeyboardInterrupt, e:
+    print(e)
+  print("Killing twisted reactor...")
+  g.kill(block=True)
+  print("Done")

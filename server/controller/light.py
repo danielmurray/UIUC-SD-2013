@@ -2,7 +2,6 @@
 
 from ws import BackboneCollection
 import gevent
-from twisted.internet import reactor
 from autobahn.websocket import WebSocketClientFactory, WebSocketClientProtocol, connectWS
 import requests, random, hmac, hashlib, base64, json
 
@@ -25,6 +24,7 @@ light_mapping = [
 class EchoIncoming(WebSocketClientProtocol):
     def __init__(self, parent, *args, **kwargs):
       self.parent = parent
+      self.isClosed = False
       #WebSocketClientProtocol.__init__(*args, **kwargs)
 
     def onMessage(self,msg, binary):
@@ -63,7 +63,7 @@ class EchoIncoming(WebSocketClientProtocol):
             light['v'] = tmp_dict['v']
             #convert keys properly
             light['current'] = float(light['v'])
-            light['id'] = light['n']
+            light['id'] = light['name']
             # {id: None, name: "", current: 0}
             self.parent.update(light)
 
@@ -77,7 +77,7 @@ class EchoIncoming(WebSocketClientProtocol):
           uuid = each["UUID"]
           break
       if uuid == "-1":
-        print "Light not found"
+        print "Light not found", uuid
         return
       msg = "jdev/sps/io/"+uuid+"/"+str(v)
       self.sendMessage(msg)
@@ -89,9 +89,11 @@ class EchoIncoming(WebSocketClientProtocol):
         if v > 10:
           v = 0
         self.updateLight(n,v)
-      reactor.callLater(2,self.testDatShit)
+      gevent.Greenlet(self.testDatShit).start_later(2)
+      #reactor.callLater(2,self.testDatShit)
 
     def onOpen(self):
+        self.parent.isClosed = False
         # do someting
         #message = "dev/sps/io/BreadButton2/pulse"
         self.a = 0
@@ -101,7 +103,8 @@ class EchoIncoming(WebSocketClientProtocol):
 
     def custPing(self):
         self.sendMessage("jdev/sps/LoxAPPversion")
-        reactor.callLater(PING_TIME, self.custPing)
+        gevent.Greenlet(self.custPing).start_later(PING_TIME)
+        #reactor.callLater(PING_TIME, self.custPing)
 
     def initConnection(self):
         message = ["jdev/sps/LoxAPPversion","jdev/sps/getloxapp","jdev/sps/enablestatusupdate"]
@@ -109,14 +112,16 @@ class EchoIncoming(WebSocketClientProtocol):
             return
         self.sendMessage(message[self.a])
         self.a += 1
-        reactor.callLater(1,self.initConnection)
+        gevent.Greenlet(self.initConnection).start_later(1)
 
     def onClose(self, wasClean, code, reason):
+        self.parent.isClosed = True
         print "Socket Closed--- Was Clean:"+str(wasClean)+" Code:"+str(code) + " Reason:" +reason
 
 class LightControllerProxy:
   def __init__(self, parent):
     self.parent = parent
+    self.isClosed = False
 
   def __call__(self, *args, **kwargs):
     self.child = EchoIncoming(self.parent, *args, **kwargs)
@@ -142,11 +147,13 @@ class LightController(BackboneCollection):
           factory = WebSocketClientFactory("ws://"+LOX_ADDR+"/ws/",protocols = [protocol], debug=True)
           factory.protocol = self.proxy
           connectWS(factory)
-          reactor.run()
       else:
           print "FAIL!"+r.status_code
-      gevent.sleep(0) # don't block event loop
+      while not self.proxy.isClosed:
+        gevent.sleep(1) # don't block event loop
 
   def do_save(self, data):
-    self.proxy.child.updateLight(data)
-    pass
+    if self.proxy:
+      self.proxy.child.updateLight(data)
+    else:
+      print("ERROR: No proxy connected?!")
