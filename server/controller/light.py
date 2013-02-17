@@ -73,11 +73,11 @@ class EchoIncoming(WebSocketClientProtocol):
       v = str(data['current'])
       uuid = "-1"
       for each in light_mapping:
-        if str(n) == each['n']: #found the light
+        if str(n) == each['id']: #found the light
           uuid = each["UUID"]
           break
       if uuid == "-1":
-        print "Light not found", uuid
+        print "Light not found", n, light_mapping
         return
       msg = "jdev/sps/io/"+uuid+"/"+str(v)
       self.sendMessage(msg)
@@ -150,6 +150,7 @@ class LightController(BackboneCollection):
       else:
           print "FAIL!"+r.status_code
       while not self.proxy.isClosed:
+        print(".")
         gevent.sleep(1) # don't block event loop
 
   def do_save(self, data):

@@ -161,7 +161,7 @@ var HomeControlView = Backbone.View.extend({
 
 var LightControlView = BaseView.extend({
   el: 'div',
-  initialize: function() {
+  initialize: function(lights) {
     this.template = loadTemplate("/static/views/lightcontrol.html");
     this.dragging = false;
   },
@@ -171,6 +171,8 @@ var LightControlView = BaseView.extend({
       this.model = window.Lights.get(part);
       if (this.model) {
         this.listenTo(this.model, 'change', this.render);
+      } else {
+        console.log("Light model not found", part);
       }
     }
     return {}; // no subviews (yet)

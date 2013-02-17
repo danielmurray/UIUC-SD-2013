@@ -80,12 +80,21 @@ $(function() {
 
   // Only fetch non-debug collections
   var collections = [window.Lights];
-  for (var col in collections) {
-    if (collections[col].size() == 0) {
-      collections[col].fetch();
+  var waitingOn = collections.length;
+  var start = function() {
+    waitingOn = waitingOn - 1;
+    console.log("Waiting on", waitingOn);
+    if (waitingOn == 0) {
+      Backbone.history.start();
+      console.log("Started router", router);
     }
   }
 
-  Backbone.history.start();
-  console.log("Router", router);
+  for (var col in collections) {
+    if (collections[col].size() == 0) {
+      collections[col].fetch({
+        success: start
+      });
+    }
+  }
 });

@@ -67,21 +67,15 @@ def socket_path(remaining=None):
   }, request)
   return "end"
 
-def run_reactor():
-  try:
-    reactor.run()
-  except:
-    print("Reactor exception")
-  reactor.stop()
-
 if __name__ == '__main__':
+  import signal
   print "Starting up"
-  g = gevent.spawn(run_reactor)
-  try:
-    server = SocketIOServer(('', args.get("port")), app, transports=["websocket", "xhr-polling"])
-    server.serve_forever()
-  except KeyboardInterrupt, e:
-    print(e)
-  print("Killing twisted reactor...")
-  g.kill(block=True)
-  print("Done")
+  server = SocketIOServer(('', args.get("port")), app, transports=["websocket", "xhr-polling"])
+  
+  def stop_handler(signum, stackframe):
+      print "Got signal: %s" % signum
+      reactor.callFromThread(reactor.stop)
+      os.exit(-1)
+  signal.signal(signal.SIGINT, stop_handler)
+  g = gevent.spawn(reactor.run)
+  server.serve_forever()
