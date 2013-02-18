@@ -52,7 +52,7 @@ var FloorplanView = BaseView.extend({
   el: 'div',
   initialize: function() {
     this.template = loadTemplate("/static/views/floorplan.html");
-    this.floorplanpaths = loadData("/static/paths.json");
+    this.floorplanpaths = JSON.parse(loadData("/static/paths.json"));
     this.lightControllers = new Array();
     this.selectedroom = null;
   },
