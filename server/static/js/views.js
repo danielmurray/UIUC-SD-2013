@@ -29,22 +29,37 @@ var HomeView = BaseView.extend({
   },
   route: function(part, remaining) {
     console.log("HomeView routing to", part, remaining);
-    var mainview, sideview;
+    var mainview, headview;
     if (part == "control" || !part) {
       if (!part) {
         navigate("control", true); // don't trigger nav inside route
       }
       mainview = new FloorplanView();
-      sideview = new LightControlView();
+      headview = new HeaderView();
     }
     return {
-      "#floorplan": mainview,
-      "#controlwrapper": sideview
+      ".body": mainview,
+      ".header": headview
     };
   },
   render: function() {
     var renderedTemplate = this.template();
     this.$el.html(renderedTemplate);
+  }
+});
+
+var HeaderView = BaseView.extend({
+  el: "div",
+  initialize: function() {
+    this.template = loadTemplate("/static/views/header.html");
+    this.selected = undefined;
+  },
+  route: function(part, remaining) {
+    this.selected = part;
+    return {};
+  },
+  render: function() {
+    this.$el.html(this.template());
   }
 });
 

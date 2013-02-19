@@ -11,21 +11,27 @@ $(function() {
     currentViews: [], // each index holds a list of all views for that path part
     displayPart: function(level, currentView, remainingPath) {
       remainingPath = remainingPath.slice();
-      console.log("Displaying", level, currentView, remainingPath);
+      //console.log("Displaying", level, currentView, remainingPath);
       var part = remainingPath.shift();
       var subviews = currentView.route(part, remainingPath); // returns a dict
       currentView.render(); // re-render parent view before attaching children
-      var allCreatedViews = this.currentViews[level];
+      currentView.trigger("assign");
+      var allCreatedViews = this.currentViews;
+      
+      console.log(level, this.currentViews[level])
+
       for (var name in subviews) {
         var subview = subviews[name];
+
         allCreatedViews.push(subview);
         currentView.assign(subview, name);
         this.displayPart(level+1, subview, remainingPath);
       }
     },
     displayUrl: function(path) {
-      console.log("Displaying", path, this);
-      // split the path by "/"s, then recursively create the new views
+      //console.log("Displaying", path, this);
+      // split the path by "/"s, then recursively create the new view
+
       var pathParts = path.split("/");
       // find the path difference
       // []
@@ -41,9 +47,10 @@ $(function() {
 
       // tear down old views
       for (var teardownIdx = this.currentPath.length-1; teardownIdx >= diffIdx; teardownIdx--) {
-        console.log("Destroying view level", teardownIdx, this.currentPath[teardownIdx]);
+        //console.log("Destroying view level", teardownIdx, this.currentPath[teardownIdx]);
         for (var viewIdx in this.currentViews[teardownIdx]) {
           var view = this.currentViews[teardownIdx][viewIdx];
+          view.trigger("dispose");
           view.dispose();
         }
       }
@@ -63,15 +70,16 @@ $(function() {
           this.displayPart(diffIdx, view, pathParts.slice(diffIdx, pathParts.length));
         }
       }
-      console.log("Path parts", pathParts);
+      //console.log("Path parts", pathParts);
       this.currentPath = pathParts;
+      
     }
   });
 
   window.router = new Router();
 
   window.navigate = function(str, noTrigger) {
-    console.log("Navigating to", str);
+    //console.log("Navigating to", str, noTrigger);
     router.navigate(str, {
       trigger: !noTrigger
     });
@@ -83,10 +91,10 @@ $(function() {
   var waitingOn = collections.length;
   var start = function() {
     waitingOn = waitingOn - 1;
-    console.log("Waiting on", waitingOn);
+    //console.log("Waiting on", waitingOn);
     if (waitingOn == 0) {
       Backbone.history.start();
-      console.log("Started router", router);
+       //console.log("Started router", router);
     }
   }
 

@@ -1,0 +1,39 @@
+.powerpagecontent{
+	height: 100%;
+	width:100%;
+}
+
+.powerpagecontent .content,
+.powerpagecontent .content{
+	background-color: rgba(128, 128, 128, 0.40);
+	border-top: 5px solid;
+	height: 95%;
+}
+
+.top{
+	margin-top: -36px;
+	text-align: right;
+	float:left;
+	height: 33%;
+	width: 100%;
+}
+
+.bottom{
+	float:left;
+	margin-top: 3%;
+	height: 50%;
+	width: 49.5%;
+}
+
+.netwrapper{
+
+
+}
+
+.consumptionwrapper{
+	float:left;
+}
+
+.generationwrapper{
+	float:right;
+}

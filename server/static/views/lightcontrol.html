@@ -1,26 +1,8 @@
-<div id="lightcontroller">
-        <% console.log(this.model) %>
-
-        <h3><%= this.model.get('id') %></h3>
-        
-        <div id="maincontroller">
-            <% if( this.model.get('color')){ %>
-            
-                <!-- HERE I WILL PUT THE TEMPLATE FOR A COLOR PICKER -->
-            
-            <% } else { %>
-            
-                <div id="singlechannel">
-                    <div id="toggleon" class="lightbutton"><h4>ON</h4></div>
-                    <div id="lightdimmer"></div>
-                    <div id="toggleoff" class="lightbutton"><h4>OFF</h4></div>
-                </div>
-            
-            <% } %>
-        </div>
-    <!--
-        <div id="childrenlist">
-            <h3 id="childrenheader">Lights<h3>
-        </div>
-    -->
+<link href="/static/css/lightcontrol.css" rel="stylesheet" type="text/css">
+<div class='floorplanwrapper'>
+	<div id='floorplanholder'>
+	</div>
+	<div class='shadowwrapper'>
+		<img src='static/images/dropshadow.png'>
+	</div>
 </div>

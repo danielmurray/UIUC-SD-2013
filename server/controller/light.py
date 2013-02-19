@@ -5,7 +5,7 @@ import gevent
 from autobahn.websocket import WebSocketClientFactory, WebSocketClientProtocol, connectWS
 import requests, random, hmac, hashlib, base64, json
 
-LOX_ADDR = '130.126.29.12'
+LOX_ADDR = '192.168.1.102'
 PING_TIME = 10
 
 light_mapping = [  
@@ -13,11 +13,13 @@ light_mapping = [
       "UUID":"8208bb0c-9197-11e0-806c9f19214c414c",
       "name":"kitchen",
       "n":"-1",
+      "valPrefix":"",
     },
     {
       "UUID":"974dc1e9-76de-11e2-849982650d05814e",
       "name":"livingroom",
       "n":'-1',
+      "valPrefix":"AI/",
     }
 ]
 
@@ -79,7 +81,8 @@ class EchoIncoming(WebSocketClientProtocol):
       if uuid == "-1":
         print "Light not found", n, light_mapping
         return
-      msg = "jdev/sps/io/"+uuid+"/"+str(v)
+      msg = "jdev/sps/io/"+uuid+"/"+str(each['valPrefix'])+str(v)
+      print "sending: "+str(data['id'])+str(each['valPrefix'])+str(v)
       self.sendMessage(msg)
 
     def testDatShit(self):
