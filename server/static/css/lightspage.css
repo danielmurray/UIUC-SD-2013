@@ -1,0 +1,22 @@
+.floorplanwrapper{
+	height: 100%;
+	width: 100%;
+	margin-top: -5%}
+
+#floorplanholder{
+	opacity:1;
+}
+
+.shadowwrapper{
+	bottom: 15%;
+	height: 10%;
+	width: 100%;
+}
+
+.shadowwrapper img{
+	height: 8%;
+	width: 100%;
+}
+
+#overlaywrapper{
+}

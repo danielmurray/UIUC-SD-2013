@@ -63,8 +63,22 @@ var componentToHex = function(c) {
    return hex.length == 1 ? "0" + hex : hex;
 }
 
-var rgbToHex = function(r, g, b) {
-   return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+var rgbToHex = function(color) {
+  r = color.r;
+  g = color.g;
+  b = color.b;
+
+  if( r=="" ) r=0;
+  if( g=="" ) g=0;
+  if( b=="" ) b=0;
+  if( r<0 ) r=0;
+  if( g<0 ) g=0;
+  if( b<0 ) b=0;
+  if( r>255 ) r=255;
+  if( g>255 ) g=255;
+  if( b>255 ) b=255;
+
+   return componentToHex(r) + componentToHex(g) + componentToHex(b);
 }
 
 var hexToRgb = function(hex) {
@@ -81,41 +95,28 @@ var hexToRgb = function(hex) {
    } : null;
 }
 
-var loxoneToRgb = function(bigdisgustingnumber){
-  var logicalrepresentation = [];
+var randomArray = function(start, end, size, seed){
 
-  logicalrepresentation.r = (bigdisgustingnumber %100) * 255;
-  logicalrepresentation.g = (Math.floor(bigdisgustingnumber/1000) %100) * 255;
-  logicalrepresentation.b = (Math.floor(bigdisgustingnumber/1000000) %100) * 255;
+  var arr = [];
 
-  return logicalrepresentation;
+  var now = start;
+  var then = end;
 
-}
+  step = (now-then)/size;
+  arr[0] = [];
+  arr[0][0] = then;
+  arr[0][1] = Math.random() * seed;
 
-var rgbToLoxone = function(logicalrepresentation){
-
-
-  var bigdisgustingnumber = 0;
-
-  bigdisgustingnumber += Math.floor(logicalrepresentation.b/255*100)*1000000
-
-  bigdisgustingnumber += Math.floor(logicalrepresentation.g/255*100)*1000
-
-  bigdisgustingnumber += Math.floor(logicalrepresentation.r/255*100)
-
-  return bigdisgustingnumber;
-
-}
-
-var randomArray = function(size,multipler){
-
-  arr =[]
-
-  for(var i; i<size; i++){
-    arr[i] = Math.random()*multiplier
+  for(var i=1; i<size; i++){
+    arr[i] = [];
+    arr[i][0] = then + step *i;
+    
+    arr[i][1] = arr[i-1][1] + (Math.random()*2 - 1)
   }
 
-  return ar;
+  console.log(arr[0][0] , arr[1][0], arr[1][0] - arr[0][0])
+
+  return arr;
 }
 
 var rgbaToString = function(color,opacity){
@@ -124,69 +125,115 @@ var rgbaToString = function(color,opacity){
 
   return thing;
 }
-/*
-var generation =  [60, 60, 50, 40, 35, 45, 50, 65, 70, 75]
-var consumption = [50, 55, 50, 45, 45, 50, 50, 55, 55, 60]
-var graphData = function(goodarray, badarray){
-  var data = [];
-  var green = [];
-  var red = [];
-  var erase = [];
 
-  $.each(consumption, function(i, consumption){
-      if(consumption < generation[i]){
-          green[i] = generation[i] - consumption;
-          red[i] = 0;
-          erase[i] = consumption;
-      } else {
-          green[i] = 0;
-          red[i] = consumption - generation[i];
-          erase[i] = generation[i];
-      }
-      console.log(green[i], red[i], erase[i])
-  });
+var hslToRgb = function(color){
+  h = color.h
+  s = color.s;
+  l = color.l;
+
+  if( h=="" ) h=0;
+  if( s=="" ) s=0;
+  if( l=="" ) l=0;
+  if( h<0 ) h=0;
+  if( s<0 ) s=0;
+  if( l<0 ) l=0;
+  if( h>=360 ) h=359;
+  if( s>1 ) s=1;
+  if( l>1 ) l=1;
+
+  C = (1-Math.abs(2*l-1))*s;
+  hh = h/60;
+  X = C*(1-Math.abs(hh%2-1));
+  r = g = b = 0;
+  
+  if( hh>=0 && hh<1 ) {
+    r = C;
+    g = X;
+  } else if( hh>=1 && hh<2 ) {
+    r = X;
+    g = C;
+  }
+  else if( hh>=2 && hh<3 ) {
+    g = C;
+    b = X;
+  } else if( hh>=3 && hh<4 ) {
+    g = X;
+    b = C;
+  } else if( hh>=4 && hh<5 ) {
+    r = X;
+    b = C;
+  } else {
+    r = C;
+    b = X;
+  }
+
+  m = l-C/2;
+  r += m;
+  g += m;
+  b += m;
+  r *= 255;
+  g *= 255;
+  b *= 255;
+
+  r = Math.floor(r);
+  g = Math.floor(g);
+  b = Math.floor(b);
+
+  return {
+    'r': r,
+    'g': g,
+    'b': b
+  }              
 }
-    
-var chart = new Highcharts.Chart({
-    chart: {
-        renderTo: 'container',
-        type: 'area'
-    },
-    plotOptions: {
-        area: {
-            stacking: true,
-            lineWidth: 0,
-            shadow: false,
-            marker: {
-                enabled: false
-            },
-            enableMouseTracking: false,
-            showInLegend: false        
-        },
-        line: {
-            zIndex: 5
-        }
-    },
-    series: [{
-        type: 'line',
-        color: '#555',
-        data: generation
-    },{
-        type: 'line',
-        color: '#55e',
-        data: consumption
-    },{
-        color: '#5e5',
-        data: green
-    },{
-        color: '#e55',
-        data: red
-    },{
-        id: 'transparent',
-        color: 'rgba(255,255,255,0)',
-        data: erase
-    }]
-}, function(chart){
-    chart.get('transparent').area.hide();
-});
-*/
+
+var rgbToHsl = function(color){
+
+  r = color.r;
+  g = color.g;
+  b = color.b;
+
+  if( r=="" ) r=0;
+  if( g=="" ) g=0;
+  if( b=="" ) b=0;
+  if( r<0 ) r=0;
+  if( g<0 ) g=0;
+  if( b<0 ) b=0;
+  if( r>255 ) r=255;
+  if( g>255 ) g=255;
+  if( b>255 ) b=255;
+
+  r/=255;
+  g/=255;
+  b/=255;
+  M = Math.max(r,g,b);
+  m = Math.min(r,g,b);
+  d = M-m;
+  
+  if( d==0 ) 
+    h=0;
+  else if( M==r ) 
+    h=((g-b)/d)%6;
+  else if( M==g ) 
+    h=(b-r)/d+2;
+  else 
+    h=(r-g)/d+4;
+  
+  h*=60;
+  
+  if( h<0 ) 
+    h+=360;
+  
+  l = (M+m)/2;
+  
+  if( d==0 )
+    s = 0;
+  else
+    s = d/(1-Math.abs(2*l-1));
+
+  return {
+    'h': h,
+    's': s,
+    'l': l
+  } 
+}
+

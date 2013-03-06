@@ -13,13 +13,17 @@ $(function() {
       remainingPath = remainingPath.slice();
       //console.log("Displaying", level, currentView, remainingPath);
       var part = remainingPath.shift();
+      //console.log(remainingPath)
       var subviews = currentView.route(part, remainingPath); // returns a dict
+      //consoles.log("View", currentView, "creating subviews", subviews);
+      //console.log(currentView)
       currentView.render(); // re-render parent view before attaching children
       currentView.trigger("assign");
-      var allCreatedViews = this.currentViews;
-      
-      console.log(level, this.currentViews[level])
-
+      var allCreatedViews = this.currentViews[level];
+      if (allCreatedViews == undefined) {
+        allCreatedViews = [];
+        this.currentViews[level] = allCreatedViews;
+      }
       for (var name in subviews) {
         var subview = subviews[name];
 
@@ -38,6 +42,10 @@ $(function() {
       // ["control", "lights"] diffIdx = 0
       // ["control", "heat"] diffIdx = 1
       // ["history", "lights"] diffIdx = 0
+      //console.log(this.currentViews);
+      //console.log(this.currentPath);
+      //console.log(pathParts);
+
       var diffIdx;
       for (diffIdx = 0; diffIdx < Math.min(this.currentPath.length, pathParts.length); diffIdx++) {
         if (this.currentPath[diffIdx] != pathParts[diffIdx]) {
@@ -45,10 +53,11 @@ $(function() {
         }
       }
 
-      // tear down old views
-      for (var teardownIdx = this.currentPath.length-1; teardownIdx >= diffIdx; teardownIdx--) {
-        //console.log("Destroying view level", teardownIdx, this.currentPath[teardownIdx]);
+      // tear down old views, there may be more views than the path length
+      for (var teardownIdx = this.currentViews.length-1; teardownIdx >= diffIdx; teardownIdx--) {
+        //console.log("Destroying view level", teardownIdx, "pathpart", this.currentPath[teardownIdx]);
         for (var viewIdx in this.currentViews[teardownIdx]) {
+          //console.log("View", this.currentViews[teardownIdx]);
           var view = this.currentViews[teardownIdx][viewIdx];
           view.trigger("dispose");
           view.dispose();
@@ -65,6 +74,7 @@ $(function() {
         // no parts are the same
         this.displayPart(0, this.rootView, pathParts);
       } else {
+        //console.log(this.currentViews)
         for (var viewIdx in this.currentViews[diffIdx-1]) {
           var view = this.currentViews[diffIdx-1][viewIdx];
           this.displayPart(diffIdx, view, pathParts.slice(diffIdx, pathParts.length));
@@ -72,7 +82,7 @@ $(function() {
       }
       //console.log("Path parts", pathParts);
       this.currentPath = pathParts;
-      
+     //console.log("Views after displayUrl", this.currentViews);
     }
   });
 

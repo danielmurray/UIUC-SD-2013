@@ -1,20 +1,56 @@
 <link href="/static/css/power.css" rel="stylesheet" type="text/css">
 <div class='powerpagecontent'>
 	<div class='top netwrapper'>
-		<h2 class='power subheader'>Net Metering</h2>
 		<div class='net content'>
-		</div>
-	</div>
-	<div class='bottom consumptionwrapper'>
-		<h2 class='power subheader'>Consumption</h2>
-		<div class='consumption content'>
-
+			<div id='graphwrapper'>
+			</div>
 		</div>
 	</div>
 	<div class='bottom generationwrapper'>
-		<h2 class='power subheader'>Generation</h2>
-		<div class='generation content'>
+		<div class='header'>
+			<h2 class='power subheader'>Generation</h2>
+			<div class='dataviewselection'>
+				<span>
+				<input id="table" name="generation-view-selection" type="radio" value="table" checked="checked" ></input>
+				<label for="table">Table</label>
+				</span>
+				
+				<span>
+				<input id="graphic" name="generation-view-selection" type="radio" value="graphic" ></input>
+				<label for="graphic">Graphic</label>
+				</span>
+				
+				<span>
+				<input id="history" name="generation-view-selection" type="radio" value="history" ></input>
+				<label for="history">History</label>
+				</span>
+			</div>
+		</div>
+		<div id='generationwrapper' class='generation content'>
 
+		</div>
+	</div>
+	<div class='bottom consumptionwrapper'>
+		<div class='header'>
+			<h2 class='subheader'>Consumption</h2>
+			<div class='dataviewselection'>
+				<span>
+				<input id="table" name="consumption-view-selection" type="radio" value="table" checked="checked" ></input>
+				<label for="table">Table</label>
+				</span>
+				
+				<span>
+				<input id="graphic" name="consumption-view-selection" type="radio" value="graphic" ></input>
+				<label for="graphic">Graphic</label>
+				</span>
+				
+				<span>
+				<input id="history" name="consumption-view-selection" type="radio" value="history" ></input>
+				<label for="history">History</label>
+				</span>
+			</div>
+		</div>
+		<div id='consumptionwrapper' class='consumption content'>
 		</div>
 	</div>
 </div>

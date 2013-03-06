@@ -57,7 +57,7 @@
       "path": "M 185 230 L 290 230 L 290 250 L 185 250 L 185 230 M 185 265 L 290 265 L 290 285 L 185 285 L 185 265"
     }
   },
-  "rooms": {
+  "zones": {
     "kitchen": {
       "id": "kitchen", 
       "path": "M 50 0 L 172.5 0 L 172.5 70 L 155 70 L 155 115 L 50 115 L 50 0"
@@ -86,8 +86,8 @@
       "id": "mechanical",
       "path": "M 155 70 L 195 70 L 195 115 L 155 115 L 155 70"
     },
-    "washer": {
-      "id": "washer",
+    "laundry": {
+      "id": "laundry",
       "path": "M 195 70 L 250 70 L 250 115 L 195 115 L 195 70"
     },
     "closet": {

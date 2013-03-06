@@ -4,110 +4,73 @@ from ws import BackboneCollection
 import gevent
 from autobahn.websocket import WebSocketClientFactory, WebSocketClientProtocol, connectWS
 import requests, random, hmac, hashlib, base64, json
+from light_ctrl.light_ctrl import *
+import random
 
 LOX_ADDR = '192.168.1.102'
 PING_TIME = 10
 
-light_mapping = [  
-    {
-      "UUID":"8208bb0c-9197-11e0-806c9f19214c414c",
-      "name":"kitchen",
-      "n":"-1",
-      "valPrefix":"",
-    },
-    {
-      "UUID":"974dc1e9-76de-11e2-849982650d05814e",
-      "name":"livingroom",
-      "n":'-1',
-      "valPrefix":"AI/",
-    }
-]
-
 class EchoIncoming(WebSocketClientProtocol):
     def __init__(self, parent, *args, **kwargs):
-      self.parent = parent
-      self.isClosed = False
-      #WebSocketClientProtocol.__init__(*args, **kwargs)
+        self.parent = parent
+        self.isClosed = False
+        self.light_ctrl = light_controller(self)
+        #WebSocketClientProtocol.__init__(*args, **kwargs)
 
     def onMessage(self,msg, binary):
-      if '{"s":' in msg:
-        self.parseStateMsg(msg)
-      elif '{"LL":' in msg:
-        self.parseVerMsg(msg)
-      elif '{"LoxLIVE"' in msg:
-        self.parseConfigMsg(msg)
+        msg = self.parseMessage(msg)
+        self.light_ctrl.on_message(msg)
+
+    def parseMessage(self, msg):
+        ''' parses the incoming message from the main loxone controller'''
+        if '{"s":' in msg:
+            return self.parseStateMsg(msg)
+        elif '{"LL":' in msg:
+            return self.parseVerMsg(msg)
+        elif '{"LoxLIVE"' in msg:
+            return self.parseConfigMsg(msg)
+        else:
+            return {
+                "type":"ERR",
+                "msg":None
+            }
 
     def parseConfigMsg(self,msg):
-      print 'Config Msg'
-      msg_dict = json.loads(msg)
-      n_list = msg_dict['UUIDs']['UUID']
-      for each in light_mapping:
-        uuid = each['UUID'] #the uuid's n we are looking for
-        for n in n_list:
-          if n['UUID'] == uuid:
-            each['n'] = n['n']
-
-      print msg_dict
+        msg_dict = json.loads(msg)
+        uuid_list = msg_dict['UUIDs']['UUID']
+        return {
+            "type":"config",
+            "msg": uuid_list
+        }
 
     def parseVerMsg(self,msg):
-      print 'Ver msg'
-      msg_dict = json.loads(msg)
-      print msg_dict
+        msg_dict = json.loads(msg)
+        return {
+            "type":"ver",
+            "msg":msg_dict
+        }
 
     def parseStateMsg(self,msg):
-      #parse the damn string
-      states = msg.split('\r\n')
-      states = states[:-1] #remove the last empty object
-      for each in states:
-        tmp_dict = json.loads(each)['s']
-        for light in light_mapping:
-          if light['n'] == tmp_dict['n']: #we found the damn light
-            light['v'] = tmp_dict['v']
-            #convert keys properly
-            light['current'] = float(light['v'])
-            light['id'] = light['name']
-            # {id: None, name: "", current: 0}
-            self.parent.update(light)
-
-
-    def updateLight(self, data):
-      n = str(data['id'])
-      v = str(data['current'])
-      uuid = "-1"
-      for each in light_mapping:
-        if str(n) == each['id']: #found the light
-          uuid = each["UUID"]
-          break
-      if uuid == "-1":
-        print "Light not found", n, light_mapping
-        return
-      msg = "jdev/sps/io/"+uuid+"/"+str(each['valPrefix'])+str(v)
-      print "sending: "+str(data['id'])+str(each['valPrefix'])+str(v)
-      self.sendMessage(msg)
-
-    def testDatShit(self):
-      n = light_mapping[0]['n']
-      if 'v' in light_mapping[0].keys():
-        v = float(light_mapping[0]['v']) + 1
-        if v > 10:
-          v = 0
-        self.updateLight(n,v)
-      gevent.Greenlet(self.testDatShit).start_later(2)
-      #reactor.callLater(2,self.testDatShit)
-
+        #parse the damn string
+        states = msg.split('\r\n')
+        states = states[:-1] #remove the last empty object
+        state_list = []
+        for each in states:
+            tmp_dict = json.loads(each)['s']
+            state_list.append(tmp_dict)
+        return{
+            "type":"state",
+            "msg":state_list
+        }
+            
+    def serverToClient(self, model):
+        self.parent.update(model)
+    def clientToServer(self, model):
+        self.light_ctrl.c2s_update(model)
+        print model
     def onOpen(self):
-        self.parent.isClosed = False
-        # do someting
-        #message = "dev/sps/io/BreadButton2/pulse"
         self.a = 0
         self.initConnection()
-        # self.testDatShit()
-        # self.custPing()
-
-    def custPing(self):
-        self.sendMessage("jdev/sps/LoxAPPversion")
-        gevent.Greenlet(self.custPing).start_later(PING_TIME)
-        #reactor.callLater(PING_TIME, self.custPing)
 
     def initConnection(self):
         message = ["jdev/sps/LoxAPPversion","jdev/sps/getloxapp","jdev/sps/enablestatusupdate"]
@@ -118,7 +81,6 @@ class EchoIncoming(WebSocketClientProtocol):
         gevent.Greenlet(self.initConnection).start_later(1)
 
     def onClose(self, wasClean, code, reason):
-        self.parent.isClosed = True
         print "Socket Closed--- Was Clean:"+str(wasClean)+" Code:"+str(code) + " Reason:" +reason
 
 class LightControllerProxy:
@@ -153,11 +115,11 @@ class LightController(BackboneCollection):
       else:
           print "FAIL!"+r.status_code
       while not self.proxy.isClosed:
-        print(".")
+        print random.choice(["(>'.')>", "<('.'<)", ":)", ":(", "XD","oo","||","v"])
         gevent.sleep(1) # don't block event loop
 
   def do_save(self, data):
     if self.proxy:
-      self.proxy.child.updateLight(data)
+      self.proxy.child.clientToServer(data)
     else:
       print("ERROR: No proxy connected?!")
