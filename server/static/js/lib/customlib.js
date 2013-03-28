@@ -114,7 +114,6 @@ var randomArray = function(start, end, size, seed){
     arr[i][1] = arr[i-1][1] + (Math.random()*2 - 1)
   }
 
-  console.log(arr[0][0] , arr[1][0], arr[1][0] - arr[0][0])
 
   return arr;
 }
@@ -187,7 +186,6 @@ var hslToRgb = function(color){
 }
 
 var rgbToHsl = function(color){
-
   r = color.r;
   g = color.g;
   b = color.b;

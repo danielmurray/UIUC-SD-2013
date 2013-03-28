@@ -69,7 +69,9 @@ var HomeView = BaseView.extend({
     var viewMap = {
       'home' : StatusView,
       'lights': LightingView,
-      'power': PowerView
+      'windoor': WindoorView,
+      'power': PowerView,
+      'water': WaterView
     }
 
     //establish pane data to be passed to view
@@ -182,40 +184,38 @@ var LightingView = PageView.extend({
   initialize: function(data) {
     PageView.prototype.initialize.apply(this, [data]);
     this.lighttemplate = loadTemplate("/static/views/lightspage.html");
-    data = loadData("/static/paths.json");
-    this.floorplanpaths = JSON.parse(data);
-    //this.collection = window.Lights;
-    this.collection = window.bullshit;
-    //console.log('hey look here')
+
+    this.collection = window.Lights;
+    //this.collection = window.bullshit;
+
   },
   animateIn: function(){
     PageView.prototype.animateIn.apply(this);
   },
-  selectzone: function(zone){
-    //console.log('hello')
-    navigate('lights/' + zone, false);
-  },
   route: function(part) {
-    //console.log(part)
-    if (!part) {
-      navigate("lights/home" , true); // don't trigger nav inside route
-    }
 
-    data = {}
-    data['id'] = part;
-    data.lights = this.collection.getLightsByZone(part);
+    floorplanview = new FloorPlanView(this.collection);
+    floorplanview.on('zoneselect', function(zone){
+      navigate("lights/"+ zone , false)
+    });
 
-    //console.log(data);
+    var viewsToBeReturned = {
+      "#floorplanwrapper" : floorplanview
+    };
 
-    if(!part || part == 'home'){
-      //console.log('wut')
-      return{};
-    }else{
+    if(part){
+      data = {}
+      data['id'] = part;
+      data.lights = this.collection.getLightsByZone(part);
+
       lightcontrolview = new LightControlView(data);
-      return{
-        "#overlaywrapper" : lightcontrolview
-      };
+      
+      viewsToBeReturned['#overlaywrapper'] = lightcontrolview;
     }
+
+    return viewsToBeReturned;
+
+
   },
   render: function() {
     PageView.prototype.render.apply(this);
@@ -223,72 +223,64 @@ var LightingView = PageView.extend({
     
     this.$('#pagecontent').html(renderedTemplate);
 
-    var that = this;
+    }
+});
 
-    this.$('#floorplanholder').height('90%');
-    this.$('#floorplanholder').width('100%');
+var WindoorView = PageView.extend({
+  el: 'div',
+  initialize: function(data) {
+    PageView.prototype.initialize.apply(this, [data]);
+    this.windoortemplate = loadTemplate("/static/views/windoor.html");
 
-    h = this.$('#floorplanholder').height();
-    w = this.$('#floorplanholder').width();
+    //TO DO add bullshit collection
+    //this.collection = window.Blinds;
+    this.collection = window.BsBlinds;
+    console.log(window.BsBlinds)
 
-    var floorplancanvas = new ScaleRaphael( "floorplanholder", 350, 300);
+  },
+  animateIn: function(){
+    PageView.prototype.animateIn.apply(this);
+  },
+  route: function(part) {
 
-    var zones = [];
-
-    var raphzones = floorplancanvas.set();
-
-    _.each(this.floorplanpaths.zones, function(zone){
-        var thing = zones[zone.id] = floorplancanvas.path(zone.path).attr({
-          "id": zone.id, 
-          "fill": "#3E3E3E", 
-          "stroke": "#000000", 
-          "stroke-width": 0, 
-          "opacity": .75, 
-          'stroke-opacity':'0'
-        }); //creates the raphael objects then stores them to an array zones
-        zones[zone.id].id = zone.id;    //setting the ids of the raphael objects
-        raphzones.push(thing)           //pushing the zones to a raphael group object for easier manipulation
-    })
-
-
-    var outerWalls = floorplancanvas.path(this.floorplanpaths.outerwalls).attr({
-      'fill':'#000',
-      'fill-opacity':'0', 
-      'stroke':'#000',
-      'stroke-width':'3',
-      'stroke-opacity':'1'
+    floorplanview = new FloorPlanView(this.collection);
+    floorplanview.on('zoneselect', function(zone){
+      navigate("windoor/"+ zone , false)
     });
+
+    return{
+      "#floorplanwrapper" : floorplanview
+    };
+
+    /*
+    if(!part || part == 'home'){
+      floorplanview = new FloorPlanView(this.collection);
+      return{
+        "#floorplanwrapper" : floorplanview
+      };
+    }else{
+      floorplanview = new FloorPlanView(this.collection);
+
+      data = {}
+      data['id'] = part;
+      data.lights = this.collection.getLightsByZone(part);
+
+      //TO DO add detail view
+      //lightcontrolview = new LightControlView(data);
+      return{
+        "#floorplanwrapper" : floorplanview
+        //,"#overlaywrapper" : lightcontrolview
+      };
+    }
+    */
+  },
+  render: function() {
+    PageView.prototype.render.apply(this);
+    var renderedTemplate = this.windoortemplate();
     
-    var innerWalls = floorplancanvas.path(this.floorplanpaths.innerwalls).attr({
-      'fill':'#000',
-      'fill-opacity':'0', 
-      'stroke':'#000',
-      'stroke-width':'2',
-      'stroke-opacity':'1'
-    });
+    this.$('#pagecontent').html(renderedTemplate);
 
-
-    //BINDINGS
-    raphzones.mouseover(function (event) {
-        if(this.id != that.selectedlight)
-            this.attr({"opacity": 1});
-    });
-    raphzones.mouseout(function (event) {
-        if(this.id != that.selectedlight){
-            this.attr({"opacity": .75});
-        }
-    });
-    raphzones.click(function (event) {
-        that.selectzone(this.id)
-    });  
-
-    this.floorplancanvas = floorplancanvas;
-    this.zones = zones;
-    this.raphzones = raphzones;
-    
-      
-    floorplancanvas.changeSize(w, h)
-  }
+    }
 });
 
 var LightControlView = BaseView.extend({
@@ -310,7 +302,7 @@ var LightControlView = BaseView.extend({
     });
   },
   exit: function(){
-    navigate('lights/home', false);
+    navigate('lights', false);
   },
   updateValue: function(value){
     _.each(this.lights, function(light){
@@ -408,7 +400,7 @@ var LightControlView = BaseView.extend({
   }
 });
 
-var  LightView = BaseView.extend({
+var LightView = BaseView.extend({
   el: 'div',
   initialize: function(data) {
     this.model = data;
@@ -507,7 +499,7 @@ var  LightView = BaseView.extend({
   }
 });
 
-var  PowerView = PageView.extend({
+var PowerView = PageView.extend({
   el: 'div',
   initialize: function(data) {
     PageView.prototype.initialize.apply(this, [data]);
@@ -530,14 +522,95 @@ var  PowerView = PageView.extend({
   },
   route: function(part) {
 
-    graph = new GraphView(this.collection);
-    consumptiontable = new TableView(this.collection[1]);   
-    generationtable = new TableView(this.collection[0]);
+    graph = new GraphView({
+      type:'area',
+      series:[
+        {
+          name:'Production',
+          color: 'rgba(85,160,85,1)',
+          collection: this.collection[0]
+        },
+        {
+          name:'Consumption',
+          color: 'rgba(173,50,50,1)',
+          collection: this.collection[1]
+        }
+      ],
+      range: 'day'
+    });
+
+    consumptiondatabox = new DataBox({
+      id: 'Consumption',
+      collection: this.collection[1],
+      databoxcontent: 'table',
+      subviews: {
+        table: {
+          id: 'table',
+          view: TableView,
+          args: this.collection[1]
+        },
+        graphic: {
+          id: 'graphic',
+          view: FloorPlanView,
+          args: this.collection[1]
+        },
+        history: {
+          id: 'history',
+          view: GraphView,
+          args: {
+            type:'line',
+            series:[
+              {
+                name:'Consumption',
+                color: 'rgba(173,50,50,1)',
+                collection: this.collection[1]
+              }
+            ],
+            range: 'day'
+          }
+        }
+      }
+    });   
+    
+    generationtdatabox = new DataBox({
+      id: 'Generation',
+      collection: this.collection[0],
+      databoxcontent: 'table',
+      subviews: {
+        table: {
+          id: 'table',
+          view: TableView,
+          args: this.collection[0]
+        },
+        graphic: {
+          id: 'graphic',
+          view: PVGraphicView,
+          args: {
+
+          }
+        },
+        history: {
+          id: 'history',
+          view: GraphView,
+          args: {
+            type:'line',
+            series:[
+              {
+                name:'Generation',
+                color: 'rgba(85,160,85,1)',
+                collection: this.collection[0]
+              }
+            ],
+            range: 'day'
+          }
+        }
+      }
+    });  
 
     return{
       '#graphwrapper': graph
-      ,'#consumptionwrapper': consumptiontable
-      ,'#generationwrapper': generationtable
+      ,'#consumptionwrapper': consumptiondatabox
+      ,'#generationwrapper': generationtdatabox
     }
   },
   render: function(pane, subpane) {
@@ -547,29 +620,187 @@ var  PowerView = PageView.extend({
   }
 });
 
-var  GraphView = BaseView.extend({
+var WaterView = PageView.extend({
   el: 'div',
-  initialize: function(collections) {
-    that = this;
-    this.collections = collections;
+  initialize: function(data) {
+    PageView.prototype.initialize.apply(this, [data]);
+    this.watertemplate = loadTemplate("/static/views/water.html");
+    
+    this.collection = [];
 
-    this.template = loadTemplate("/static/views/graph.html");
+    //this.collection['pv'] = window.Water;
+    this.collection[0] = window.BsWater;
+    this.collection[0]._sortBy('value',true);
+   
 
-    this.series = []
-
-    $.each(this.collections, function(i, collection){
-      that.series[i] = that.getHistoricalData(collection, 'day');
+  },
+  animateIn: function(){
+    PageView.prototype.animateIn.apply(this);
+  },
+  route: function(part) {
+    
+    graph = new GraphView({
+      type:'line',
+      series:[
+        {
+          name:'Consumption',
+          color: 'rgba(84,175,226,1)',
+          collection: this.collection[0]
+        }
+      ],
+      range: 'day'
     });
+
+    consumptiontable = new TableView(this.collection[0]);   
+    //greywatertable = new TableView(this.collection[0]);
+
+    return{
+      '#graphwrapper': graph,
+      '#consumptionwrapper': consumptiontable,
+      //,'#greywaterwrapper': greywatertable
+    }
+
+    return {}; 
+  },
+  render: function(pane, subpane) {
+    PageView.prototype.render.apply(this);
+    var renderedTemplate = this.watertemplate();
+    this.$('#pagecontent').html(renderedTemplate);
+  }
+});
+
+var DataBox = BaseView.extend({
+  el: 'div',
+  events: {
+    "click .contentselection":  "changecontent"
+  },
+  initialize: function(data) {
+    //WHY??
+    this.model = null;
+
+    this.template = loadTemplate("/static/views/databox.html");
+    this.databox = data;
+
+    this.contentdivselector = '#databoxcontentwrapper';
+    this.currcontentview = this.databox.databoxcontent
+    this.views = this.databox.subviews;
+    
+  },
+  changecontent: function(click){
+    //acquiring selected view id
+    var newcontentview = click.target.id.split("/")[0];
+    
+    this.currcontentview = newcontentview;
+    
+    this.rendercontentview();
+  },
+  route: function(part) {
+    return {};
+  },
+  render: function() {
+    var renderedTemplate = this.template();
+    this.$el.html(renderedTemplate);
+    this.rendercontentview()
+  },
+  rendercontentview: function() {
+    //prepare content view
+    var obj = this.views[this.currcontentview]
+    var currview = new obj.view(obj.args);
+    currview.setElement(this.$(this.contentdivselector));
+
+    //render and animate
+    router.displayPart(0,currview,[])
+
+  }
+});
+
+var GraphView = BaseView.extend({
+  el: 'div',
+  initialize: function(graphdata) {
+
+    this.type = graphdata.type;
+    this.timeperiod = graphdata.range;
+    this.inputdata = graphdata.series;
 
     this.organizeHistoricalData();
 
+    this.template = loadTemplate("/static/views/graph.html");
+
   },
-  getHistoricalData:function(collection, timeperiod){
+  organizeHistoricalData: function(){    
+    that = this;
+    
+    this.series = [];
+
+    $.each(this.inputdata, function(i, inputdata){
+      that.series[i] = {
+        name: inputdata.name,
+        type: 'line',
+        color: inputdata.color,
+        data: that.getHistoricalData(inputdata.collection)
+      }
+    });
+
+    if(this.type == 'area' && this.series.length >= 2){
+
+      this.line1 = this.series[0].data;
+      this.line2 = this.series[1].data;
+      
+      this.area1 = {
+        color: this.series[0].color,
+        data:[]
+      };
+
+      this.area2 = {
+        color: this.series[1].color,
+        data:[]
+      };
+
+      this.erase = {
+          id: 'transparent',
+          color: 'rgba(255,255,255,0)',
+          data: []
+      };
+
+      $.each(this.series[0].data, function(i){
+
+        that.area1.data[i] = [];
+        that.area2.data[i] = [];
+        that.erase.data[i] = [];
+
+        //assign x-value
+        that.area1.data[i][0] = that.area2.data[i][0] = that.erase.data[i][0] = that.line1[i][0];
+
+
+        //determine y-value
+        if(that.line2[i][1] <0){
+          that.line2[i][1] = 0;
+        }
+        
+        if(that.line1[i][1] <0){
+          that.line1[i][1] = 0;
+        }
+
+        if(that.line2[i][1] < that.line1[i][1]){
+            that.area1.data[i][1] = that.line1[i][1] - that.line2[i][1];
+            that.area2.data[i][1] = 0;
+            that.erase.data[i][1] = that.line2[i][1];
+        } else {
+            that.area1.data[i][1] = 0;
+            that.area2.data[i][1] = that.line2[i][1] - that.line1[i][1];
+            that.erase.data[i][1] = that.line1[i][1];
+        }
+      });
+
+      this.series.push(this.area1,this.area2,this.erase);
+    }
+  },
+  getHistoricalData:function(collection){
 
     var now = new Date();
     var now = Math.round((new Date()).getTime()) - now.getTimezoneOffset()*60*1000;
     
-    switch(timeperiod){
+    switch(this.timeperiod){
       case 'day':
         var then = now - 24*60*60*1000;
         break;
@@ -583,76 +814,28 @@ var  GraphView = BaseView.extend({
         var then = now - 365*24*60*60*1000;
     }
 
+    //console.log(collection.getHistoricalData(now,then,100))
     return collection.getHistoricalData(now,then,100);
 
-  },
-  organizeHistoricalData: function(){
-    
-    //Allows us to show green areas if we are producing
-    //And red areas if we are consuming
-    //This implementation will definitely change but 
-    //for now it is just aesthetic
-    //Aka a proof of concept
-
-    this.good = this.series[0];
-    this.bad = this.series[1];
-    
-    this.green = [];
-    this.red = [];
-    this.erase = [];
-
-    $.each(this.bad, function(i, bad){
-
-      that.green[i] = [];
-      that.red[i] = [];
-      that.erase[i] = [];
-
-      that.green[i][0] = that.red[i][0] = that.erase[i][0] = bad[0];
-
-      if(that.bad[i][1] <0){
-        that.bad[i][1] = 0;
-      }
-      
-      if(that.good[i][1] <0){
-        that.good[i][1] = 0;
-      }
-
-      if(that.bad[i][1] < that.good[i][1]){
-          that.green[i][1] = that.good[i][1] - that.bad[i][1];
-          that.red[i][1] = 0;
-          that.erase[i][1] = that.bad[i][1];
-      } else {
-          that.green[i][1] = 0;
-          that.red[i][1] = that.bad[i][1] - that.good[i][1];
-          that.erase[i][1] = that.good[i][1];
-      }
-    });
   },
   route: function(part) {
     return{};
   },
   render: function(pane, subpane) {
+    var that = this;
+
     var renderedTemplate = this.template();
     this.$el.html(renderedTemplate);
 
-    var that = this;
-
     setTimeout(function(){
-      var h = that.$('#graphholder').height()
       that.renderChart()
     }, 400);
 
     $('.histdata').click(function(){
-      var timeperiod = this.id;
-
+      that.timeperiod = this.id;
 
       $('.histdata').removeClass('selected');
       $(this).addClass('selected')
-
-      $.each(that.collections, function(i, collection){
-        that.series[i] = that.getHistoricalData(collection, timeperiod);
-      });
-
 
       that.organizeHistoricalData();
 
@@ -661,17 +844,18 @@ var  GraphView = BaseView.extend({
     });
   },
   renderChart: function(){
-    console.log(this.collections[0].models[0].get('unit'))
     var that = this;
     //sometimes the template doesn't render in time 
     //for this chart to render correctly
+    var container = this.$('#graphholder');
+
     this.$el.chart = new Highcharts.Chart({
       chart: {
-          renderTo: 'graphholder',
-          type: 'area',
+          renderTo: container[0],
+          type: that.type,
           color: 'rgba(245, 245, 245, 0.2)',
           backgroundColor:'rgba(255, 255, 255, 0)',
-          marginRight: 30,
+          marginRight: 0,
           marginLeft: 0,
           marginTop: 0,
           marginBottom: 0
@@ -728,6 +912,7 @@ var  GraphView = BaseView.extend({
         */
       },
       xAxis: {
+        oppposite: true,
         showFirstLabel: true,
         lineWidth:0,
         type: 'datetime',
@@ -753,29 +938,30 @@ var  GraphView = BaseView.extend({
         }
       },
       yAxis: {
+        opposite: true,
         showFirstLabel: false,
+        allowDecimals: false,
         title: {
-                text: '',
-                style: {
-                    color: '#FFF',
-                    font: '8px neou'
-                }
+            text: '',
+            style: {
+                color: '#FFF',
+                font: '8px neou'
+            }
         },
         labels: {
           formatter: function(){
-            console.log(that)
-            return this.value + that.collections[0].models[0].get('unit')
+            return this.value + that.inputdata[0].collection.models[0].get('unit')
           },
-            style: {
+          style: {
               fontFamily: "Lato-thin",
               fontSize: "20px",
               color: 'rgba(245, 245, 245, 0.4)',
               fontWeight: 'bold'
             },
-            x: 60
+          x:-65
         },
         gridLineWidth: 1,
-        gridLineColor: 'rgba(245, 245, 245, 0.2)',
+        gridLineColor: 'rgba(245, 245, 245, 0.4)',
         gridLineDashStyle: 'dash',
         plotLines: [{
                 value: 0,
@@ -791,28 +977,9 @@ var  GraphView = BaseView.extend({
       credits: {
         enabled: false
       },
-      series: [{
-          name: 'Production',
-          type: 'line',
-          color: 'rgba(85,160,85,1)',
-          data: this.good
-      },{
-          name: 'Consumption',
-          type: 'line',
-          color: 'rgba(173,50,50,1)',
-          data: this.bad
-      },{
-          color: 'rgba(85,160,85,1)',
-          data: this.green
-      },{
-          color: 'rgba(173,50,50,1)',
-          data: this.red
-      },{
-          id: 'transparent',
-          color: 'rgba(255,255,255,0)',
-          data: this.erase
-      }]
+      series: that.series,
     }, function(chart){
+      if(chart.get('transparent'))
         chart.get('transparent').area.hide();
     });
     
@@ -850,7 +1017,6 @@ var TableView = BaseView.extend({
 
     });
 
-    console.log(tableEntriesToRendered);
     return tableEntriesToRendered;
   },
   render: function() {
@@ -871,5 +1037,160 @@ var TableViewEntry = BaseView.extend({
   render: function() {
     var renderedTemplate = this.template();
     this.$el.html(renderedTemplate);
+  }
+});
+
+var FloorPlanView = BaseView.extend({
+  el: 'div',
+  initialize: function(data) {
+    //WHY IS MODEL DEFINED FOR THIS THING
+    this.model = null;
+
+    this.template = loadTemplate("/static/views/floorplan.html");
+    this.data = data;
+    console.log(data)
+
+    var paths = loadData("/static/paths.json");
+    this.floorplanpaths = JSON.parse(paths);
+  },
+  selectzone: function(zone){
+    this.trigger('zoneselect', zone);
+  },
+  route: function(part) {
+
+    var floorplandataoverlayview = new FloorPlanDataOverlay({
+      collection: this.data,
+      paths: this.floorplanpaths
+    });
+
+    return {
+      '#floorplandataoverlay' : floorplandataoverlayview
+    };
+  },
+  render: function() {
+    var that = this;
+
+    var renderedTemplate = this.template();
+    this.$el.html(renderedTemplate);
+  
+    setTimeout(function(){
+      that.renderFloorplan()
+    }, 200);
+  },
+  renderFloorplan : function(){
+    var that  = this;
+
+    this.$('#floorplanholder').height('90%');
+
+    console.log(this.$el.height())
+    h = this.$('#floorplanholder').height();
+    w = this.$('#floorplanholder').width();
+
+    console.log(h,w)
+    var floorplancanvas = new ScaleRaphael( "floorplanholder", 350, 300);
+
+    var zones = [];
+
+    var raphzones = floorplancanvas.set();
+
+    _.each(this.floorplanpaths.zones, function(zone){
+        var thing = zones[zone.id] = floorplancanvas.path(zone.path).attr({
+          "id": zone.id, 
+          "fill": "#3E3E3E", 
+          "stroke": "#000000", 
+          "stroke-width": 0, 
+          "opacity": .75, 
+          'stroke-opacity':'0',
+          'text': 'hello world!'
+        }); //creates the raphael objects then stores them to an array zones
+        zones[zone.id].id = zone.id;    //setting the ids of the raphael objects
+        raphzones.push(thing)           //pushing the zones to a raphael group object for easier manipulation
+    })
+
+
+    var outerWalls = floorplancanvas.path(this.floorplanpaths.outerwalls).attr({
+      'fill':'#000',
+      'fill-opacity':'0', 
+      'stroke':'#000',
+      'stroke-width':'3',
+      'stroke-opacity':'1'
+    });
+    
+    var innerWalls = floorplancanvas.path(this.floorplanpaths.innerwalls).attr({
+      'fill':'#000',
+      'fill-opacity':'0', 
+      'stroke':'#000',
+      'stroke-width':'2',
+      'stroke-opacity':'1'
+    });
+
+
+    //BINDINGS
+    raphzones.mouseover(function (event) {
+        if(this.id != that.selectedlight)
+            this.attr({"opacity": 1});
+    });
+    raphzones.mouseout(function (event) {
+        if(this.id != that.selectedlight){
+            this.attr({"opacity": .75});
+        }
+    });
+    raphzones.click(function (event) {
+        that.selectzone(this.id)
+    });  
+
+    this.floorplancanvas = floorplancanvas;
+    this.zones = zones;
+    this.raphzones = raphzones;
+    
+      
+    floorplancanvas.changeSize(w, h, false, true);
+  }
+});
+
+var FloorPlanDataOverlay = BaseView.extend({
+  el: 'div',
+  initialize: function(data) {
+    //WHY IS MODEL DEFINED FOR THIS THING
+    this.model = null;
+
+
+
+
+    this.template = loadTemplate("/static/views/floorplandataoverlay.html");
+    this.collection = data.collection;
+    this.floorplanpaths = data.paths;
+
+  },
+  route: function(part) {
+    return {};
+  },
+  render: function() {
+    var that = this;
+    console.log('heelo')
+
+    setTimeout(function(){
+      that.$el.height($('#floorplanholder').height())
+      that.$el.width($('#floorplanholder').width())
+
+      var renderedTemplate = that.template();
+      that.$el.html(renderedTemplate);
+    }, 300);
+
+  }
+});
+
+var PVGraphicView = BaseView.extend({
+  el: 'div',
+  initialize: function(data) {
+    //this.template = loadTemplate("/static/views/databox.html");
+    this.model = null;
+  },
+  route: function(part) {
+    return {};
+  },
+  render: function() {
+    //var renderedTemplate = this.template();
+    //this.$el.html(renderedTemplate);
   }
 });

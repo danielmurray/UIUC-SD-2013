@@ -2,92 +2,92 @@ window.BsDevices = new DevicesCollection();
 BsDevices.add([
 	{
 		id: "Computer",
-		room: "bedroom",
+		zone: "bedroom",
 		value: Math.random() * 100
     },
 	{
 		id: "Laptop",
-		room: "livingroom",
+		zone: "livingroom",
 		value: Math.random() * 100
     },
 	{
 		id: "refrigerator",
-		room: "kitchen",
+		zone: "kitchen",
 		value: Math.random() * 100
     },
 	{
 		id: "microwave",
-		room: "kitchen",
+		zone: "kitchen",
 		value: Math.random() * 100
     },
 	{
 		id: "stove",
-		room: "kitchen",
+		zone: "kitchen",
 		value: Math.random() * 100
     },
 	{
 		id: "ricecooker",
-		room: "kitchen",
+		zone: "kitchen",
 		value: Math.random() * 100
     },
 	{
 		id: "toaster",
-		room: "kitchen",
+		zone: "kitchen",
 		value: Math.random() * 100
     },
 	{
 		id: "dishwasher",
-		room: "kitchen",
+		zone: "kitchen",
 		value: Math.random() * 100
     },
 	{
 		id: "coffeemaker",
-		room: "kitchen",
+		zone: "kitchen",
 		value: Math.random() * 100
     },
 	{
 		id: "blender",
-		room: "kitchen",
+		zone: "kitchen",
 		value: Math.random() * 100
     },
 	{
 		id: "waterboiler",
-		room: "kitchen",
+		zone: "kitchen",
 		value: Math.random() * 100
     },
 	{
 		id: "lamp",
-		room: "livingroom",
+		zone: "livingroom",
 		value: Math.random() * 100
     },
 	{
 		id: "tv",
-		room: "livingroom",
+		zone: "livingroom",
 		value: Math.random() * 100
     },
 	{
 		id: "ps3",
-		room: "livingroom",
+		zone: "livingroom",
 		value: Math.random() * 100
     },
 	{
 		id: "xbox",
-		room: "livingroom",
+		zone: "livingroom",
 		value: Math.random() * 100
     },
 	{
 		id: "wii",
-		room: "livingroom",
+		zone: "livingroom",
 		value: Math.random() * 100
     },
 	{
 		id: "sterio",
-		room: "livingroom",
+		zone: "livingroom",
 		value: Math.random() * 100
     },
 	{
 		id: "tv1",
-		room: "master",
+		zone: "master",
 		value: Math.random() * 100
     },
 ]);

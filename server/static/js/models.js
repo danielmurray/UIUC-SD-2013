@@ -14,7 +14,6 @@ var LightModel = ModelWS.extend({
   	var rgb = hexToRgb(hex);
   	var hsl = rgbToHsl(rgb)
   	
-    console.log(hsl)
   	return hsl;
 
   },
@@ -58,19 +57,13 @@ var LightModel = ModelWS.extend({
 
 	color = this.getcolor()
 	
-	console.log(color.h, color.s, color.l)
-
 	color.h = value;
 	color.s = 1;
 	color.l = 0.5;
 
-	console.log(color.h, color.s, color.l)
-
 	rgb = hslToRgb(color);
 	hex = rgbToHex(rgb);
 		
-	console.log(hex)
-	
 	this.save({
 		value: hex
 	});
@@ -78,7 +71,16 @@ var LightModel = ModelWS.extend({
 	return hex;
   }
 });
- 
+
+var BlindModel = ModelWS.extend({
+  defaults: function() {
+    return {
+      id: null,
+      room: null, //id = room
+      value: null
+    }
+  }
+}); 
 
 var HVACModel = ModelWS.extend({
   defaults: function() {
@@ -105,7 +107,7 @@ var DevicesModel = ModelWS.extend({ //2 or 3 devices for each room.
   defaults: function() {
     return {
       id: null,
-      room: null,
+      zone: null,
       value: null,
       unit: 'W'
     }
@@ -118,6 +120,7 @@ var WaterModel = ModelWS.extend({
       id: null,
       room: null,
       value: null,
+      unit: 'L'
     }
   }
 });

@@ -11,7 +11,7 @@
     },
     "windoor": {
     	"id": "windoor",
-		"name": "Windows + Doors",
+		"name": "Windows <br />+ Doors",
 		"color": [223, 144, 1]
     },
     "power": {
