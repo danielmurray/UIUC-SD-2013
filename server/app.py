@@ -33,10 +33,12 @@ app.config.update(
 )
 
 eventLogger = logger.EventLogger()
+loxoneController = controller.LoxoneController()
+# loxone controller works fine, just have to test registering the listeners and also making sure that sending message through the proxy method works
 
 # singleton controllers
 debugController = controller.DebugController()
-lightController = controller.LightController()
+lightController = controller.LightController(loxoneController)
 
 # add the logger to every controller
 map(lambda x: x.add_client(eventLogger), [
