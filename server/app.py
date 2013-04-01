@@ -39,6 +39,7 @@ loxoneController = controller.LoxoneController()
 # singleton controllers
 debugController = controller.DebugController()
 lightController = controller.LightController(loxoneController)
+sensorController = controller.SensorController()
 
 # add the logger to every controller
 map(lambda x: x.add_client(eventLogger), [
