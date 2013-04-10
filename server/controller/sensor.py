@@ -1,4 +1,5 @@
 from ws import BackboneCollection
+import gevent
 from sensor_dict import * #sensor dictionay is in here
 
 # the sensor protocol works in the following way:
@@ -42,21 +43,23 @@ class ParentController(object):
         hash_key = str(self.typ) + str(mac_add)
 
         #make sure the sensor exists in the dict
-        global sensor_dict
-        if not sensor_dict.has_key(hash_key):
+        global sensor_list
+        if not sensor_list.has_key(hash_key):
             print "type and mac_add combo not found in the dict"
             return -1
         #make async call to update the front end to close the req asap
         gevent.Greenlet(self._update, hash_key, val).start_later(1)
         #return the freq
-        return sensor_dict[hash_key]['freq']
+        return sensor_list[hash_key]['freq']
         
 
     def _update(self, hash_key, val):
         '''over ride this function if needed'''
         #update the value in the global dict
-        sensor_dict[hash_key]['val'] = val
-        self.update(sensor_dict[hash_key])
+        sensor_list[hash_key]['val'] = val
+        self.update(sensor_list[hash_key])
+        #just for debug
+        print sensor_list[hash_key] 
 
 
 

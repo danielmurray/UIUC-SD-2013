@@ -101,7 +101,7 @@ def sensor_data():
   mac_add = request.args.get('mac_address')
   typ = request.args.get('type')
   val = request.args.get('value')
-  return relayController(mac_add, typ, val)
+  return str(relayController.on_message(mac_add, typ, val))
 
 if __name__ == '__main__':
   import signal
