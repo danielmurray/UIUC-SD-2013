@@ -39,7 +39,24 @@ loxoneController = controller.LoxoneController()
 # singleton controllers
 debugController = controller.DebugController()
 lightController = controller.LightController(loxoneController)
-sensorController = controller.SensorController()
+#sensor controllers
+tempController = controller.TempController()
+pyraController = controller.PyraController()
+humidController = controller.HumidController()
+flowController = controller.FlowController()
+windoorController = controller.WindoorController()
+co2Controller = controller.Co2Controller()
+#dictionary to be passed to the relay controller
+controller_dict = {
+  'temp'    :tempController,
+  'prya'    :pyraController,
+  'humid'   :humidController,
+  'flow'    :flowController,
+  'windoor' :windoorController,
+  'co2'     :co2Controller,
+}
+relayController = controller.RelayController(controller_dict)
+
 
 # add the logger to every controller
 map(lambda x: x.add_client(eventLogger), [
@@ -66,9 +83,25 @@ def socket_path(remaining=None):
   print "New websocket connection"
   socketio.socketio_manage(request.environ, {
     "/debug": debugController,
-    "/light": lightController
+    "/light": lightController,
+    #sensors
+    "/temp":tempController,
+    "/pyra": pyraController,
+    "/humid": humidController,
+    "/CO2":co2Controller,
+    "/flow":flowController,
+    "/windoor":windoorController,
+
   }, request)
   return "end"
+
+@app.route("/sensor/data")
+def sensor_data():
+  """this should return the frequency"""
+  mac_add = request.args.get('mac_address')
+  typ = request.args.get('type')
+  val = request.args.get('value')
+  return relayController(mac_add, typ, val)
 
 if __name__ == '__main__':
   import signal
