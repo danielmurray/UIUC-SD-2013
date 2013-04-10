@@ -35,7 +35,7 @@ class BackboneCollectionInstance(BaseNamespace):
     self.collection.save(args["data"])
     self.emit(args["tid"], "saved")
 
-  def do_update(self, data):
+  def do_update(self, name, data):
     """
     Send a websocket update event to the client.
     """
@@ -46,6 +46,7 @@ class BackboneCollection:
   cache of the current state of the sensors
   dict of model id: {model attributes}
   """
+  name = "__undefined__" # override this for each subclass
   models = None
   clients = None
 
@@ -80,6 +81,9 @@ class BackboneCollection:
     return self.models.values()
 
   def update(self, data):
+    return self._update(self.name, data)
+
+  def _update(self, name, data):
     """
     Update(id, data) is called with a dictionary of model attributes whenever a
     sensor value is updated (from a remote API call, over websockets, etc).
@@ -90,7 +94,7 @@ class BackboneCollection:
     self.models[data["id"]] = data
 
     for client in self.clients:
-      client.do_update(data)
+      client.do_update(name, data)
 
   def save(self, data):
     self.models[data["id"]] = data
