@@ -1,10 +1,10 @@
 <link href="/static/css/floorplandataoverlay.css" rel="stylesheet" type="text/css">
 <div class='dataoverlaywrapper'>
 <%
-var that = this;
-_.each(this.floorplanpaths.zones, function(zone){
+console.log(collection)
+_.each(floorplanpaths.zones, function(zone){
 	if(zone.databox){
-		var data = that.collection.zoneData(zone.id);
+		var data = collection.zoneData(zone.id);
 %>
 	<div id="<%=zone.id%>" class='zonecontainer' 
 		style='left: <%=(zone.databox[0]+5)/3.5%>%;

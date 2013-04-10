@@ -101,7 +101,7 @@ var HomeView = BaseView.extend({
 
   },
   render: function() {
-    var renderedTemplate = this.template();
+    var renderedTemplate = this.template({panes: this.panes});
     this.$el.html(renderedTemplate);
   },
   animateIn: function(click){
@@ -154,7 +154,7 @@ var PageView = BaseView.extend({
     return{};
   },
   render: function() {
-    var renderedTemplate = this.template();
+    var renderedTemplate = this.template({currentpane: this.currentpane});
     this.$el.html(renderedTemplate);
   }
 });
@@ -185,8 +185,8 @@ var LightingView = PageView.extend({
     PageView.prototype.initialize.apply(this, [data]);
     this.lighttemplate = loadTemplate("/static/views/lightspage.html");
 
-    this.collection = window.Lights;
-    //this.collection = window.bullshit;
+    //this.collection = window.Lights;
+    this.collection = window.bullshit;
 
   },
   animateIn: function(){
@@ -194,7 +194,7 @@ var LightingView = PageView.extend({
   },
   route: function(part) {
 
-    floorplanview = new FloorPlanView(this.collection);
+    floorplanview = new FloorPlanView({collection: this.collection});
     floorplanview.on('zoneselect', function(zone){
       navigate("lights/"+ zone , false)
     });
@@ -243,7 +243,7 @@ var WindoorView = PageView.extend({
   },
   route: function(part) {
 
-    floorplanview = new FloorPlanView(this.collection);
+    floorplanview = new FloorPlanView({collection: this.collection});
     floorplanview.on('zoneselect', function(zone){
       navigate("windoor/"+ zone , false)
     });
@@ -298,7 +298,7 @@ var LightControlView = BaseView.extend({
       height: '67%'
     },{
       queue: true,
-      duration: 1000
+      duration: 200
     });
   },
   exit: function(){
@@ -357,7 +357,7 @@ var LightControlView = BaseView.extend({
   render: function() {
     var that = this;
 
-    var renderedTemplate = this.template();
+    var renderedTemplate = this.template({ id: this.id, lights: this.lights, height: this.height });
     this.$el.html(renderedTemplate);
     this.renderZoneDimmer();
 
@@ -541,18 +541,17 @@ var PowerView = PageView.extend({
 
     consumptiondatabox = new DataBox({
       id: 'Consumption',
-      collection: this.collection[1],
       databoxcontent: 'table',
       subviews: {
         table: {
           id: 'table',
           view: TableView,
-          args: this.collection[1]
+          args: {collection: this.collection[1]}
         },
         graphic: {
           id: 'graphic',
           view: FloorPlanView,
-          args: this.collection[1]
+          args: {collection: this.collection[1]}
         },
         history: {
           id: 'history',
@@ -574,13 +573,12 @@ var PowerView = PageView.extend({
     
     generationtdatabox = new DataBox({
       id: 'Generation',
-      collection: this.collection[0],
       databoxcontent: 'table',
       subviews: {
         table: {
           id: 'table',
           view: TableView,
-          args: this.collection[0]
+          args: {collection: this.collection[0]}
         },
         graphic: {
           id: 'graphic',
@@ -651,7 +649,7 @@ var WaterView = PageView.extend({
       range: 'day'
     });
 
-    consumptiontable = new TableView(this.collection[0]);   
+    consumptiontable = new TableView({collection: this.collection[0]});   
     //greywatertable = new TableView(this.collection[0]);
 
     return{
@@ -675,14 +673,12 @@ var DataBox = BaseView.extend({
     "click .contentselection":  "changecontent"
   },
   initialize: function(data) {
-    //WHY??
-    this.model = null;
-
+    
     this.template = loadTemplate("/static/views/databox.html");
     this.databox = data;
 
     this.contentdivselector = '#databoxcontentwrapper';
-    this.currcontentview = this.databox.databoxcontent
+    this.currcontentview = this.databox.databoxcontent; //View to be rendered to the databox
     this.views = this.databox.subviews;
     
   },
@@ -706,6 +702,7 @@ var DataBox = BaseView.extend({
     //prepare content view
     var obj = this.views[this.currcontentview]
     var currview = new obj.view(obj.args);
+    console.log(currview);
     currview.setElement(this.$(this.contentdivselector));
 
     //render and animate
@@ -991,11 +988,7 @@ var TableView = BaseView.extend({
   initialize: function(data) {
     this.template = loadTemplate("/static/views/table.html");
     
-    //WHY IS MODEL DEFINED FOR THIS THING
-    this.model = null;
-    
-
-    this.collection = data;
+    this.collection = data.collection;
   },
   route: function(part) {
     var that = this;
@@ -1020,7 +1013,7 @@ var TableView = BaseView.extend({
     return tableEntriesToRendered;
   },
   render: function() {
-    var renderedTemplate = this.template();
+    var renderedTemplate = this.template({collection: this.collection});
     this.$el.html(renderedTemplate);
   }
 });
@@ -1035,7 +1028,7 @@ var TableViewEntry = BaseView.extend({
     return {};
   },
   render: function() {
-    var renderedTemplate = this.template();
+    var renderedTemplate = this.template({model:this.model});
     this.$el.html(renderedTemplate);
   }
 });
@@ -1043,12 +1036,9 @@ var TableViewEntry = BaseView.extend({
 var FloorPlanView = BaseView.extend({
   el: 'div',
   initialize: function(data) {
-    //WHY IS MODEL DEFINED FOR THIS THING
-    this.model = null;
 
     this.template = loadTemplate("/static/views/floorplan.html");
-    this.data = data;
-    console.log(data)
+    this.collection = data.collection;
 
     var paths = loadData("/static/paths.json");
     this.floorplanpaths = JSON.parse(paths);
@@ -1059,7 +1049,7 @@ var FloorPlanView = BaseView.extend({
   route: function(part) {
 
     var floorplandataoverlayview = new FloorPlanDataOverlay({
-      collection: this.data,
+      collection: this.collection,
       paths: this.floorplanpaths
     });
 
@@ -1151,12 +1141,7 @@ var FloorPlanView = BaseView.extend({
 var FloorPlanDataOverlay = BaseView.extend({
   el: 'div',
   initialize: function(data) {
-    //WHY IS MODEL DEFINED FOR THIS THING
-    this.model = null;
-
-
-
-
+    console.log(data)
     this.template = loadTemplate("/static/views/floorplandataoverlay.html");
     this.collection = data.collection;
     this.floorplanpaths = data.paths;
@@ -1173,7 +1158,7 @@ var FloorPlanDataOverlay = BaseView.extend({
       that.$el.height($('#floorplanholder').height())
       that.$el.width($('#floorplanholder').width())
 
-      var renderedTemplate = that.template();
+      var renderedTemplate = that.template({floorplanpaths: that.floorplanpaths, collection: that.collection});
       that.$el.html(renderedTemplate);
     }, 300);
 
