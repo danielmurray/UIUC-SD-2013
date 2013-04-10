@@ -440,7 +440,7 @@ var LightView = BaseView.extend({
       this.status = 'off'
     }
 
-    var renderedTemplate = this.lighttemplate();
+    var renderedTemplate = this.lighttemplate({model: this.model, colorhex: this.colorhex});
     this.$el.html(renderedTemplate);
     this.renderLightDimmer();
 
@@ -694,7 +694,7 @@ var DataBox = BaseView.extend({
     return {};
   },
   render: function() {
-    var renderedTemplate = this.template();
+    var renderedTemplate = this.template({subviews: this.views, currentcontent: this.currcontentview} );
     this.$el.html(renderedTemplate);
     this.rendercontentview()
   },

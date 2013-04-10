@@ -1,7 +1,6 @@
 <link href="/static/css/floorplandataoverlay.css" rel="stylesheet" type="text/css">
 <div class='dataoverlaywrapper'>
 <%
-console.log(collection)
 _.each(floorplanpaths.zones, function(zone){
 	if(zone.databox){
 		var data = collection.zoneData(zone.id);
