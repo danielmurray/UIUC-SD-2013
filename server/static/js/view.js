@@ -557,7 +557,7 @@ var PowerView = PageView.extend({
             series:[
               {
                 name:'Consumption',
-                color: 'rgba(173,50,50,1)',
+                color: [173,50,50],
                 collection: this.collection[1]
               }
             ],
@@ -591,7 +591,7 @@ var PowerView = PageView.extend({
             series:[
               {
                 name:'Generation',
-                color: 'rgba(85,160,85,1)',
+                color:[85,160,85],
                 collection: this.collection[0]
               }
             ],
