@@ -55,6 +55,7 @@ var HomeView = BaseView.extend({
     var viewMap = {
       'home' : StatusView,
       'lights': LightingView,
+      'hvac': HvacView,
       'windoor': WindoorView,
       'power': PowerView,
       'water': WaterView
@@ -522,12 +523,12 @@ var PowerView = PageView.extend({
       series:[
         {
           name:'Production',
-          color: 'rgba(85,160,85,1)',
+          color: [85,160,85],
           collection: this.collection[0]
         },
         {
           name:'Consumption',
-          color: 'rgba(173,50,50,1)',
+          color: [173,50,50],
           collection: this.collection[1]
         }
       ],
@@ -636,7 +637,7 @@ var WaterView = PageView.extend({
       series:[
         {
           name:'Consumption',
-          color: 'rgba(84,175,226,1)',
+          color: [84,175,226],
           collection: this.collection[0]
         }
       ],
@@ -656,21 +657,6 @@ var WaterView = PageView.extend({
           id: 'graphic',
           view: FloorPlanView,
           args: {collection: this.collection[0]}
-        },
-        history: {
-          id: 'history',
-          view: GraphView,
-          args: {
-            type:'line',
-            series:[
-              {
-                name:'Consumption',
-                color: 'rgba(84,175,226,1)',
-                collection: this.collection[0]
-              }
-            ],
-            range: 'day'
-          }
         }
       }
     });   
@@ -686,6 +672,54 @@ var WaterView = PageView.extend({
     PageView.prototype.render.apply(this);
     var renderedTemplate = this.watertemplate();
     this.$('#pagecontent').html(renderedTemplate);
+  }
+});
+
+var HvacView = PageView.extend({
+  el: 'div',
+  initialize: function(data) {
+    PageView.prototype.initialize.apply(this, [data]);
+    this.watertemplate = loadTemplate("/static/views/hvac.html");
+    
+    this.collection = [];
+
+    //this.collection['pv'] = window.Water;
+    this.collection[0] = window.BsWater;
+    this.collection[0]._sortBy('value',true);
+   
+
+  },
+  animateIn: function(){
+    PageView.prototype.animateIn.apply(this);
+  },
+  route: function(part) {
+    graph = new GraphView({
+      type:'line',
+      series:[
+        {
+          name:'Consumption',
+          color: [173,50,50],
+          collection: this.collection[0]
+        }
+      ],
+      range: 'day'
+    });
+
+    thermostat = new Thermostat();
+
+    return{
+      '#graphwrapper': graph
+      ,'#thermostatwrapper': thermostat
+      //,'#weekviewwrapper': generationtdatabox
+    }
+
+  },
+  render: function(pane, subpane) {
+    PageView.prototype.render.apply(this);
+    var renderedTemplate = this.watertemplate();
+    this.$('#pagecontent').html(renderedTemplate);
+    
+    $('.thermostatknob').knob();
   }
 });
 
@@ -753,24 +787,28 @@ var GraphView = BaseView.extend({
     $.each(this.inputdata, function(i, inputdata){
       that.series[i] = {
         name: inputdata.name,
-        type: 'line',
-        color: inputdata.color,
+        type: 'area',
+        color: rgbaToString(that.inputdata[i].color,1),
         data: that.getHistoricalData(inputdata.collection)
       }
     });
 
     if(this.type == 'area' && this.series.length >= 2){
 
+      this.series[0].type = this.series[1].type = 'line'
+
       this.line1 = this.series[0].data;
       this.line2 = this.series[1].data;
       
       this.area1 = {
-        color: this.series[0].color,
+        type: 'area',
+        color: rgbaToString(this.inputdata[0].color,0.1),
         data:[]
       };
 
       this.area2 = {
-        color: this.series[1].color,
+        type: 'area',
+        color: rgbaToString(this.inputdata[0].color,0.1),
         data:[]
       };
 
@@ -880,14 +918,15 @@ var GraphView = BaseView.extend({
       },
       plotOptions: {
           area: {
+            fillOpacity: 0.4,
             marker: {
               symbol: 'circle',
               radius: 0,
               enabled:false,
-              fillOpacity:.75
+              fillOpacity: 0
             },
             stacking: true,
-            lineWidth: '0px',
+            lineWidth: '3px',
             shadow: false,
             showInLegend: true        
           },
@@ -1183,6 +1222,34 @@ var FloorPlanDataOverlay = BaseView.extend({
       var renderedTemplate = that.template({floorplanpaths: that.floorplanpaths, collection: that.collection});
       that.$el.html(renderedTemplate);
     }, 300);
+
+  }
+});
+
+var Thermostat = BaseView.extend({
+  el: 'div',
+  initialize: function(data) {
+    this.template = loadTemplate("/static/views/thermostat.html");
+    this.model = null;
+  },
+  route: function(part) {
+    return {};
+  },
+  render: function() {
+    var renderedTemplate = this.template();
+    this.$el.html(renderedTemplate);  
+
+    $('.thermostatknob').knob({
+        'min':60
+        ,'max':80
+        ,'angleOffset': 225
+        ,'angleArc': 270
+        , 'width': 280
+        , 'height': 380
+        , 'fgColor': 'rgba(173,50,50,0.8)'
+        , 'bgColor': 'rgba(84,175,226,0.8)'
+        , 'inputColor' : 'rgba(245,245,245,0.8)'
+      });
 
   }
 });

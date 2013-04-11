@@ -39,6 +39,7 @@ html{
     background: rgb(216, 216, 216);
     -webkit-user-select: none; 
     overflow: hidden;
+    margin: 0 auto;
 }
 
 body{
