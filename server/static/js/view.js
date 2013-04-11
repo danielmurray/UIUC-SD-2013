@@ -42,30 +42,16 @@ var HomeView = BaseView.extend({
     this.template = loadTemplate("/static/views/nav.html");
     var data = loadData("/static/panes.json");
     this.panes = JSON.parse(data);
-    this.render(); // never changes
+    this.currpane = 'home'
     
-    this.resizeViewport();
-
-    $(window).resize(function(){
-      that.resizeViewport();
-    })
-    
-  },
-  resizeViewport: function(){
-    h = $(window).height();
-    w = $(window).width();
-
-    this.$el.height(h);
-    this.$el.width(w);
   },
   route: function(part, remaining) {
     
     if (!part) {
       navigate("home", true); // don't trigger nav inside route
     }
- 
+  
     //id to view map
-
     var viewMap = {
       'home' : StatusView,
       'lights': LightingView,
@@ -81,7 +67,13 @@ var HomeView = BaseView.extend({
     } else {
       //404 routes home
       this.currentpane = {
-        "id": 'home'
+        "id": 'home',
+        "name": "etHome", 
+        "color": [
+          41,
+          41,
+          41
+        ]
       };      
     }
 
@@ -101,14 +93,14 @@ var HomeView = BaseView.extend({
 
   },
   render: function() {
-    var renderedTemplate = this.template({panes: this.panes});
+    var renderedTemplate = this.template({panes: this.panes, currpane: this.currentpane});
     this.$el.html(renderedTemplate);
   },
   animateIn: function(click){
     
     if(!this.currentpane)
       return;
-
+    /*
     var slider = $('.' + this.currentpane.id + '.icon-nav .slider');
     slider.animate({
       width: '100%'
@@ -116,7 +108,7 @@ var HomeView = BaseView.extend({
       duration: 500, 
       queue: true
     });
-
+  */
   },
   navigateTo: function(click){
     
@@ -146,7 +138,7 @@ var PageView = BaseView.extend({
       opacity: 1
     },{
       queue: false,
-      duration: 1000
+      duration: 200
     });
   },
   route: function(part) {
@@ -636,7 +628,6 @@ var WaterView = PageView.extend({
     PageView.prototype.animateIn.apply(this);
   },
   route: function(part) {
-    
     graph = new GraphView({
       type:'line',
       series:[
@@ -649,16 +640,44 @@ var WaterView = PageView.extend({
       range: 'day'
     });
 
-    consumptiontable = new TableView({collection: this.collection[0]});   
-    //greywatertable = new TableView(this.collection[0]);
+    consumptiondatabox = new DataBox({
+      id: 'Consumption',
+      databoxcontent: 'table',
+      subviews: {
+        table: {
+          id: 'table',
+          view: TableView,
+          args: {collection: this.collection[0]}
+        },
+        graphic: {
+          id: 'graphic',
+          view: FloorPlanView,
+          args: {collection: this.collection[0]}
+        },
+        history: {
+          id: 'history',
+          view: GraphView,
+          args: {
+            type:'line',
+            series:[
+              {
+                name:'Consumption',
+                color: 'rgba(84,175,226,1)',
+                collection: this.collection[0]
+              }
+            ],
+            range: 'day'
+          }
+        }
+      }
+    });   
 
     return{
-      '#graphwrapper': graph,
-      '#consumptionwrapper': consumptiontable,
-      //,'#greywaterwrapper': greywatertable
+      '#graphwrapper': graph
+      ,'#consumptionwrapper': consumptiondatabox
+      //,'#greywaterwrapper': generationtdatabox
     }
 
-    return {}; 
   },
   render: function(pane, subpane) {
     PageView.prototype.render.apply(this);
@@ -702,7 +721,6 @@ var DataBox = BaseView.extend({
     //prepare content view
     var obj = this.views[this.currcontentview]
     var currview = new obj.view(obj.args);
-    console.log(currview);
     currview.setElement(this.$(this.contentdivselector));
 
     //render and animate
@@ -1070,7 +1088,7 @@ var FloorPlanView = BaseView.extend({
   renderFloorplan : function(){
     var that  = this;
 
-    this.$('#floorplanholder').height('90%');
+    this.$('#floorplanholder').height('95%');
 
     console.log(this.$el.height())
     h = this.$('#floorplanholder').height();
@@ -1141,7 +1159,6 @@ var FloorPlanView = BaseView.extend({
 var FloorPlanDataOverlay = BaseView.extend({
   el: 'div',
   initialize: function(data) {
-    console.log(data)
     this.template = loadTemplate("/static/views/floorplandataoverlay.html");
     this.collection = data.collection;
     this.floorplanpaths = data.paths;
@@ -1152,11 +1169,13 @@ var FloorPlanDataOverlay = BaseView.extend({
   },
   render: function() {
     var that = this;
-    console.log('heelo')
 
     setTimeout(function(){
-      that.$el.height($('#floorplanholder').height())
-      that.$el.width($('#floorplanholder').width())
+      that.$el.height($('#floorplanholder').height());
+      that.$el.width($('#floorplanholder').width());
+      that.$el.width($('#floorplanholder').width());
+      var marginLeft = $('#floorplanholder').css('margin-left');
+      that.$el.css("margin-left", marginLeft);
 
       var renderedTemplate = that.template({floorplanpaths: that.floorplanpaths, collection: that.collection});
       that.$el.html(renderedTemplate);

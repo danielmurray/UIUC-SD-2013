@@ -1,15 +1,18 @@
 .dataoverlaywrapper{
 	position: relative;
-	margin: auto;
+	height: inherit;
+	width: inherit;
 }
 
 .zonecontainer{
-	z-index: 1;
+	z-index: 4;
 	position: absolute;
 }
 
 .zonewrapper{
 	position: relative;
+	height: 100%;
+	width:100%;
 }
 
 .zoneholder{

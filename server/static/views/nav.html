@@ -1,7 +1,13 @@
 <link href="/static/css/nav.css" rel="stylesheet" type="text/css">
-<div id="sidebar-wrapper">
+<style>
+	.pagetitle{
+		color: <%=rgbaToString(currpane.color,1)%>;
+	}
+</style>
+<div id="topbar-wrapper">
 	<img class="nav-button home-nav home" src="/static/images/logo.png">
-	<div class="sidebar">
+	<h1 class='pagetitle'><%= currpane.name %> </h1>
+	<div class="topbar">
 		<ul class="main-nav">
 
 <%
@@ -14,16 +20,12 @@ _.each(panes, function(pane){
 	    border-color: <%=rgbaToString(pane.color,1)%>;
 	}
 
-	<%='.' + pane.id%> .slider {
+	<%='.' + pane.id%>.icon-nav{
 	    background-color: <%=rgbaToString(pane.color,1)%>;
 	}
 </style>
 			<li class="nav-button icon-nav <%=pane.id%>">
-				<div class="slider">
-				</div>
-				<div class='icon-wrapper'>
 					<img src=<%='/static/images/icons/' + pane.id + '.png'%> >
-				</div>
 			</li>
 <%
 });

@@ -4,7 +4,7 @@
 }
 
 .top{
-	margin-top: 0%;
+	margin-top: 5px;
 	text-align: right;
 	float:left;
 	height: 25%;
@@ -13,7 +13,7 @@
 
 .bottom{
 	float:left;
-	height: 55%;
+	height: 70%;
 	width: 49.5%;
 }
 
@@ -29,7 +29,8 @@
 }
 
 #graphwrapper{
-	background-color: rgba(128, 128, 128, 0.40);
+	height:100%;
+	width:100%;
 }
 
 #generationwrapper{

@@ -1,52 +1,45 @@
 /* Control Page CSS */
-#sidebar-wrapper{
+#topbar-wrapper{
 	position:relative;
 	float: left;
-	height: 100%;
-	width: 8%;
-	background: rgb(26, 26, 26);
+	height: 75px;
+	width: 100%;
 	z-index: 1;
 }
 
-#sub-nav-wrapper{
-	position:relative;
+.pagetitle{
 	float: left;
-	height: 100%;
-	width: 0;
-	z-index: -1;
-}
-
-#dashboard-wrapper{
-	float: right;
-	background-color: rgba(245, 245, 245, 0);
-	width: 92%;
-	height: 100%;
-	opacity: 0;
-}
-
-.sidebar{
-	height: 100%;
-	width: 100%;
-}
-
-.main-nav{
-	height: 90%;
-	width: 100%;
+	margin-left: 15px;
 }
 
 .home-nav{
-    margin: 0 19% 9.5% 22.5%;
-    width: 59%;
+    height: 75px;
+    width: 75px;
+    float: left;
+    background: rgb(26, 26, 26);
+}
+
+.topbar{
+	float:right;
+	width: 550px;
+}
+
+.main-nav{
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+	height: inherit;
 }
 
 .icon-nav{
+	margin-right: 15px;
 	position: relative;
-	width: 95%;
-	height: 11%;
-	margin: 0 0 9% 4.5%;
-	list-style-type: none;
-	border-right-style: solid;
-	border-right-width: 5px;
+	display:inline;
+	float:left;
+	height: 75px;
+	width: 75px;
+	opacity: 0.8;
+	-webkit-box-shadow: 0 0 45px #383838;
 }
 
 .slider{
@@ -56,15 +49,17 @@
     width:0;
 }
 
-.icon-wrapper{
-	position:absolute;
-	float: left;
-	padding: 9.5% 0 0 21%;
-	width: 72.5%;
-	height: 83%;
+.icon-nav img{
+	margin: 5px 0px 0px 8px;
+	width: 60px;
+	height: 60px;
 }
 
-.icon-nav img{
-	width: inherit;
-	height: inherit;
+#dashboard-wrapper{
+	float: right;
+	margin-top: 35px;
+	background-color: rgba(245, 245, 245, 0);
+	width: 100%;
+	height: 85%;
+	opacity: 0;
 }

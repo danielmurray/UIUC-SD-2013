@@ -2,7 +2,7 @@
 	"lights": {
 		"id": "lights",
 		"name": "Lights",
-		"color": [206, 218, 77]
+		"color": [170, 184, 26]
     },
     "hvac": {
     	"id": "hvac",
@@ -11,7 +11,7 @@
     },
     "windoor": {
     	"id": "windoor",
-		"name": "Windows <br />+ Doors",
+		"name": "WinDoors",
 		"color": [223, 144, 1]
     },
     "power": {
@@ -29,10 +29,5 @@
     	"id": "opt",
 		"name": "Optimizer",
 		"color": [150, 111, 150]
-    },
-    "sched": {
-    	"id": "sched",
-		"name": "Scheduling",
-		"color": [58, 90, 58]
     }
 }
