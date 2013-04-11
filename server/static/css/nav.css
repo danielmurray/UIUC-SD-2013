@@ -63,3 +63,13 @@
 	height: 85%;
 	opacity: 0;
 }
+
+#shadow{
+	position: absolute;
+	top: 0;
+	left: 0;
+	height:100%;
+	width:100%;
+    background-color: rgba(0,0,0,0.3);
+    display: none;
+}

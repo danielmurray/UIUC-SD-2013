@@ -1,10 +1,9 @@
-.shadow{
+.overlay{
     position: absolute;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    background-color: rgba(0,0,0,0.3)
 }
 
 .shadow div{
@@ -38,21 +37,21 @@
 
 .lightswrapper{
     float:left;
-    height:100%;
+    height:350px;
     width:70%;
-    margin-top:5%;
+    margin-top:50px;
 }
 
 .singlechannel{
 	width: 92%;
-    height: 93%;
+    height: 350px;
 	margin-right: 0;
 	text-align: center;
 }
 .lightbutton{
 	position: relative;
 	width: 100%;
-	height: 12%;
+    height: 50px;
 	text-align: center;
 }
 
@@ -75,7 +74,7 @@
 
 #zonedimmer{
 	background: rgb(134, 134, 134);
-	height: 63%;
+	height: 250px;
 	width: 100%%;
 }
 
@@ -93,7 +92,7 @@
 }
 
 .lightlistwrapper{
-	height: 80%;
+	height: 342px;
 	width: 100%;
 	margin: auto;
 	margin-top: 1%;
@@ -137,6 +136,8 @@
 
 .lightviewwrapper{
     float: left;
+    height: 100%;
+    width: 100%;
 }
 
 

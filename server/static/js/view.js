@@ -294,6 +294,7 @@ var LightControlView = BaseView.extend({
     });
   },
   exit: function(){
+    $('#shadow').css('display', 'none');
     navigate('lights', false);
   },
   updateValue: function(value){
@@ -352,12 +353,13 @@ var LightControlView = BaseView.extend({
     var renderedTemplate = this.template({ id: this.id, lights: this.lights, height: this.height });
     this.$el.html(renderedTemplate);
     this.renderZoneDimmer();
+    $('#shadow').css('display', 'block')
 
-    $('.shadow').click(function(e){
+    $('#shadow').click(function(e){  
       if( e.target !== this ) 
-       return;
-     else
-      that.exit();
+        return;
+      else
+        that.exit();
     });
 
   },
@@ -401,6 +403,7 @@ var LightView = BaseView.extend({
     this.type = this.model.get('type');
 
     this.lighttemplate = loadTemplate("/static/views/light.html");
+    console.log('did we get here')
   },
   animateIn: function(){
 

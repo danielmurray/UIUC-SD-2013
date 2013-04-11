@@ -5,7 +5,7 @@
 }
 
 .zonecontainer{
-	z-index: 4;
+	z-index: 1;
 	position: absolute;
 }
 
@@ -34,5 +34,5 @@
 .zonedataunit{
 	float:right;
 	font-size: 20px;
-	color:whitesmoke;
+	color:white;
 }
