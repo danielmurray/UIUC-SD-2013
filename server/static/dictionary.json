@@ -1,22 +1,30 @@
 {
-  "in":{
-    "en": "in",
+  "home":{
+    "en": "etHome",
     "zh": "内"
   },
-  "out":{
-    "en": "out",
-    "zh": "外"
+  "lights":{
+    "en": "Lights",
+    "zh": "内"
   },
   "hvac":{
-    "en": "hvac",
+    "en": "HVAC",
     "zh": "hvac"
   },
+  "windoor":{
+    "en": "WinDoors",
+    "zh": "功率"
+  },
   "power":{
-    "en": "power",
+    "en": "Power",
     "zh": "功率"
   },
   "water":{
-    "en": "water",
+    "en": "Water",
+    "zh": "内"
+  },
+  "opt":{
+    "en": "Optimizer",
     "zh": "内"
   },
   "media":{
@@ -26,6 +34,10 @@
   "on":{
     "en": "on",
     "zh": "内"
+  },
+  "out":{
+    "en": "out",
+    "zh": "外"
   },
   "off":{
     "en": "off",

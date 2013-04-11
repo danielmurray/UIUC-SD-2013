@@ -1,6 +1,7 @@
 .dataoverlaywrapper{
 	position: relative;
-	margin: auto;
+	height: inherit;
+	width: inherit;
 }
 
 .zonecontainer{
@@ -10,6 +11,8 @@
 
 .zonewrapper{
 	position: relative;
+	height: 100%;
+	width:100%;
 }
 
 .zoneholder{
@@ -31,5 +34,5 @@
 .zonedataunit{
 	float:right;
 	font-size: 20px;
-	color:whitesmoke;
+	color:white;
 }

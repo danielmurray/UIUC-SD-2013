@@ -31,14 +31,15 @@
 }
 
 html{ 
-    height: 800px;
-    width: 1380px;
+    height: 768px;
+    width: 1024px;
     position:relative;
     font-family: "Lato-thin";
     color: whitesmoke;
-    background: rgb(95, 94, 90);
+    background: rgb(216, 216, 216);
     -webkit-user-select: none; 
     overflow: hidden;
+    margin: 0 auto;
 }
 
 body{
@@ -48,10 +49,6 @@ body{
     z-index: -10;
 }
 
-div{
-    height: 100%;
-    width: 100%;
-}
 h1{
     font-size: 75px;
 }
@@ -61,11 +58,12 @@ h2{
 }
 
 #viewport{
-    position:relative;
-    height: 100%;
-    width: 100%;
-    z-index: -10;
-    background-image: url('/static/images/render2.png');
-    background-size: 100% 100%;
-    background-repeat:no-repeat;
+  margin: 0 auto;
+  width: inherit;
+  height: inherit;
+  z-index: -10;
+  background-image: url('/static/images/renderlight.png');
+  background-size: 100% 80%;
+  background-position:bottom;
+  background-repeat:no-repeat;
 }

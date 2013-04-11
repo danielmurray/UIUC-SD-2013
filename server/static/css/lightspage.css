@@ -1,8 +1,12 @@
 #floorplanwrapper{
-	position: absolute;
-	top: 5%;
-	left: 25%;
+	width: inherit;
+	height: inherit;
 }
 
 #overlaywrapper{
+	position: absolute;
+	top:0;
+	left:0;
+	width: inherit;
+	height: inherit;
 }

@@ -5,6 +5,10 @@
 #floorplanholder{
 	opacity:1;
 	z-index: 1;
+	height: 100%;
+	width: 100%;
+	margin: 0 auto;
+	padding-top: 10px;
 }
 
 .shadowwrapper{

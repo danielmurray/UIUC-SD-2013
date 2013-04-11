@@ -1,5 +1,6 @@
 .tablewrapper{
 	overflow-y:scroll;
+	height: 100%;
 }
 
 .tablelist{
@@ -9,8 +10,8 @@
 }
 
 .tablelist li{
-	height:15%;
-	background-color: rgba(128, 128, 128, 0.40);
+	height: 60px;
+	background-color: rgba(0, 15, 30, 0.8);
 	margin-bottom: 1%
 }
 

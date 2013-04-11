@@ -124,3 +124,16 @@ var WaterModel = ModelWS.extend({
     }
   }
 });
+
+var TemperatureModel = ModelWS.extend({
+  defaults: function(){
+    return{
+      name:null,
+      id:null,
+      value:null,
+      units: 'C',
+      timestamp: null
+    }
+  }
+});
+

@@ -14,3 +14,7 @@ LightModel {id: id, state: on/off, location: (x,y)}
 /door
 /air - temp, humidity, co2
 /thermostat
+
+Devices fanout to 1 or more Sensor Controllers
+- Loxone Device
+- Arduino Device

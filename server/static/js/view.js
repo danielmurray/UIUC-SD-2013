@@ -42,33 +42,20 @@ var HomeView = BaseView.extend({
     this.template = loadTemplate("/static/views/nav.html");
     var data = loadData("/static/panes.json");
     this.panes = JSON.parse(data);
-    this.render(); // never changes
+    this.currpane = 'home'
     
-    this.resizeViewport();
-
-    $(window).resize(function(){
-      that.resizeViewport();
-    })
-    
-  },
-  resizeViewport: function(){
-    h = $(window).height();
-    w = $(window).width();
-
-    this.$el.height(h);
-    this.$el.width(w);
   },
   route: function(part, remaining) {
     
     if (!part) {
       navigate("home", true); // don't trigger nav inside route
     }
- 
+  
     //id to view map
-
     var viewMap = {
       'home' : StatusView,
       'lights': LightingView,
+      'hvac': HvacView,
       'windoor': WindoorView,
       'power': PowerView,
       'water': WaterView
@@ -81,7 +68,13 @@ var HomeView = BaseView.extend({
     } else {
       //404 routes home
       this.currentpane = {
-        "id": 'home'
+        "id": 'home',
+        "name": "etHome", 
+        "color": [
+          41,
+          41,
+          41
+        ]
       };      
     }
 
@@ -101,14 +94,14 @@ var HomeView = BaseView.extend({
 
   },
   render: function() {
-    var renderedTemplate = this.template();
+    var renderedTemplate = this.template({panes: this.panes, currpane: this.currentpane});
     this.$el.html(renderedTemplate);
   },
   animateIn: function(click){
     
     if(!this.currentpane)
       return;
-
+    /*
     var slider = $('.' + this.currentpane.id + '.icon-nav .slider');
     slider.animate({
       width: '100%'
@@ -116,7 +109,7 @@ var HomeView = BaseView.extend({
       duration: 500, 
       queue: true
     });
-
+  */
   },
   navigateTo: function(click){
     
@@ -146,7 +139,7 @@ var PageView = BaseView.extend({
       opacity: 1
     },{
       queue: false,
-      duration: 1000
+      duration: 200
     });
   },
   route: function(part) {
@@ -154,7 +147,7 @@ var PageView = BaseView.extend({
     return{};
   },
   render: function() {
-    var renderedTemplate = this.template();
+    var renderedTemplate = this.template({currentpane: this.currentpane});
     this.$el.html(renderedTemplate);
   }
 });
@@ -185,8 +178,8 @@ var LightingView = PageView.extend({
     PageView.prototype.initialize.apply(this, [data]);
     this.lighttemplate = loadTemplate("/static/views/lightspage.html");
 
-    this.collection = window.Lights;
-    //this.collection = window.bullshit;
+    //this.collection = window.Lights;
+    this.collection = window.bullshit;
 
   },
   animateIn: function(){
@@ -194,7 +187,7 @@ var LightingView = PageView.extend({
   },
   route: function(part) {
 
-    floorplanview = new FloorPlanView(this.collection);
+    floorplanview = new FloorPlanView({collection: this.collection});
     floorplanview.on('zoneselect', function(zone){
       navigate("lights/"+ zone , false)
     });
@@ -243,7 +236,7 @@ var WindoorView = PageView.extend({
   },
   route: function(part) {
 
-    floorplanview = new FloorPlanView(this.collection);
+    floorplanview = new FloorPlanView({collection: this.collection});
     floorplanview.on('zoneselect', function(zone){
       navigate("windoor/"+ zone , false)
     });
@@ -298,10 +291,11 @@ var LightControlView = BaseView.extend({
       height: '67%'
     },{
       queue: true,
-      duration: 1000
+      duration: 200
     });
   },
   exit: function(){
+    $('#shadow').css('display', 'none');
     navigate('lights', false);
   },
   updateValue: function(value){
@@ -357,15 +351,16 @@ var LightControlView = BaseView.extend({
   render: function() {
     var that = this;
 
-    var renderedTemplate = this.template();
+    var renderedTemplate = this.template({ id: this.id, lights: this.lights, height: this.height });
     this.$el.html(renderedTemplate);
     this.renderZoneDimmer();
+    $('#shadow').css('display', 'block')
 
-    $('.shadow').click(function(e){
+    $('#shadow').click(function(e){  
       if( e.target !== this ) 
-       return;
-     else
-      that.exit();
+        return;
+      else
+        that.exit();
     });
 
   },
@@ -409,6 +404,7 @@ var LightView = BaseView.extend({
     this.type = this.model.get('type');
 
     this.lighttemplate = loadTemplate("/static/views/light.html");
+    console.log('did we get here')
   },
   animateIn: function(){
 
@@ -440,7 +436,7 @@ var LightView = BaseView.extend({
       this.status = 'off'
     }
 
-    var renderedTemplate = this.lighttemplate();
+    var renderedTemplate = this.lighttemplate({model: this.model, colorhex: this.colorhex});
     this.$el.html(renderedTemplate);
     this.renderLightDimmer();
 
@@ -527,12 +523,12 @@ var PowerView = PageView.extend({
       series:[
         {
           name:'Production',
-          color: 'rgba(85,160,85,1)',
+          color: [85,160,85],
           collection: this.collection[0]
         },
         {
           name:'Consumption',
-          color: 'rgba(173,50,50,1)',
+          color: [173,50,50],
           collection: this.collection[1]
         }
       ],
@@ -541,18 +537,17 @@ var PowerView = PageView.extend({
 
     consumptiondatabox = new DataBox({
       id: 'Consumption',
-      collection: this.collection[1],
       databoxcontent: 'table',
       subviews: {
         table: {
           id: 'table',
           view: TableView,
-          args: this.collection[1]
+          args: {collection: this.collection[1]}
         },
         graphic: {
           id: 'graphic',
           view: FloorPlanView,
-          args: this.collection[1]
+          args: {collection: this.collection[1]}
         },
         history: {
           id: 'history',
@@ -574,13 +569,12 @@ var PowerView = PageView.extend({
     
     generationtdatabox = new DataBox({
       id: 'Generation',
-      collection: this.collection[0],
       databoxcontent: 'table',
       subviews: {
         table: {
           id: 'table',
           view: TableView,
-          args: this.collection[0]
+          args: {collection: this.collection[0]}
         },
         graphic: {
           id: 'graphic',
@@ -638,34 +632,94 @@ var WaterView = PageView.extend({
     PageView.prototype.animateIn.apply(this);
   },
   route: function(part) {
-    
     graph = new GraphView({
       type:'line',
       series:[
         {
           name:'Consumption',
-          color: 'rgba(84,175,226,1)',
+          color: [84,175,226],
           collection: this.collection[0]
         }
       ],
       range: 'day'
     });
 
-    consumptiontable = new TableView(this.collection[0]);   
-    //greywatertable = new TableView(this.collection[0]);
+    consumptiondatabox = new DataBox({
+      id: 'Consumption',
+      databoxcontent: 'table',
+      subviews: {
+        table: {
+          id: 'table',
+          view: TableView,
+          args: {collection: this.collection[0]}
+        },
+        graphic: {
+          id: 'graphic',
+          view: FloorPlanView,
+          args: {collection: this.collection[0]}
+        }
+      }
+    });   
 
     return{
-      '#graphwrapper': graph,
-      '#consumptionwrapper': consumptiontable,
-      //,'#greywaterwrapper': greywatertable
+      '#graphwrapper': graph
+      ,'#consumptionwrapper': consumptiondatabox
+      //,'#greywaterwrapper': generationtdatabox
     }
 
-    return {}; 
   },
   render: function(pane, subpane) {
     PageView.prototype.render.apply(this);
     var renderedTemplate = this.watertemplate();
     this.$('#pagecontent').html(renderedTemplate);
+  }
+});
+
+var HvacView = PageView.extend({
+  el: 'div',
+  initialize: function(data) {
+    PageView.prototype.initialize.apply(this, [data]);
+    this.watertemplate = loadTemplate("/static/views/hvac.html");
+    
+    this.collection = [];
+
+    //this.collection['pv'] = window.Water;
+    this.collection[0] = window.BsWater;
+    this.collection[0]._sortBy('value',true);
+   
+
+  },
+  animateIn: function(){
+    PageView.prototype.animateIn.apply(this);
+  },
+  route: function(part) {
+    graph = new GraphView({
+      type:'line',
+      series:[
+        {
+          name:'Consumption',
+          color: [173,50,50],
+          collection: this.collection[0]
+        }
+      ],
+      range: 'day'
+    });
+
+    thermostat = new Thermostat();
+
+    return{
+      '#graphwrapper': graph
+      ,'#thermostatwrapper': thermostat
+      //,'#weekviewwrapper': generationtdatabox
+    }
+
+  },
+  render: function(pane, subpane) {
+    PageView.prototype.render.apply(this);
+    var renderedTemplate = this.watertemplate();
+    this.$('#pagecontent').html(renderedTemplate);
+    
+    $('.thermostatknob').knob();
   }
 });
 
@@ -675,14 +729,12 @@ var DataBox = BaseView.extend({
     "click .contentselection":  "changecontent"
   },
   initialize: function(data) {
-    //WHY??
-    this.model = null;
-
+    
     this.template = loadTemplate("/static/views/databox.html");
     this.databox = data;
 
     this.contentdivselector = '#databoxcontentwrapper';
-    this.currcontentview = this.databox.databoxcontent
+    this.currcontentview = this.databox.databoxcontent; //View to be rendered to the databox
     this.views = this.databox.subviews;
     
   },
@@ -698,7 +750,7 @@ var DataBox = BaseView.extend({
     return {};
   },
   render: function() {
-    var renderedTemplate = this.template();
+    var renderedTemplate = this.template({subviews: this.views, currentcontent: this.currcontentview} );
     this.$el.html(renderedTemplate);
     this.rendercontentview()
   },
@@ -735,24 +787,28 @@ var GraphView = BaseView.extend({
     $.each(this.inputdata, function(i, inputdata){
       that.series[i] = {
         name: inputdata.name,
-        type: 'line',
-        color: inputdata.color,
+        type: 'area',
+        color: rgbaToString(that.inputdata[i].color,1),
         data: that.getHistoricalData(inputdata.collection)
       }
     });
 
     if(this.type == 'area' && this.series.length >= 2){
 
+      this.series[0].type = this.series[1].type = 'line'
+
       this.line1 = this.series[0].data;
       this.line2 = this.series[1].data;
       
       this.area1 = {
-        color: this.series[0].color,
+        type: 'area',
+        color: rgbaToString(this.inputdata[0].color,0.1),
         data:[]
       };
 
       this.area2 = {
-        color: this.series[1].color,
+        type: 'area',
+        color: rgbaToString(this.inputdata[0].color,0.1),
         data:[]
       };
 
@@ -862,14 +918,15 @@ var GraphView = BaseView.extend({
       },
       plotOptions: {
           area: {
+            fillOpacity: 0.4,
             marker: {
               symbol: 'circle',
               radius: 0,
               enabled:false,
-              fillOpacity:.75
+              fillOpacity: 0
             },
             stacking: true,
-            lineWidth: '0px',
+            lineWidth: '3px',
             shadow: false,
             showInLegend: true        
           },
@@ -991,11 +1048,7 @@ var TableView = BaseView.extend({
   initialize: function(data) {
     this.template = loadTemplate("/static/views/table.html");
     
-    //WHY IS MODEL DEFINED FOR THIS THING
-    this.model = null;
-    
-
-    this.collection = data;
+    this.collection = data.collection;
   },
   route: function(part) {
     var that = this;
@@ -1020,7 +1073,7 @@ var TableView = BaseView.extend({
     return tableEntriesToRendered;
   },
   render: function() {
-    var renderedTemplate = this.template();
+    var renderedTemplate = this.template({collection: this.collection});
     this.$el.html(renderedTemplate);
   }
 });
@@ -1035,7 +1088,7 @@ var TableViewEntry = BaseView.extend({
     return {};
   },
   render: function() {
-    var renderedTemplate = this.template();
+    var renderedTemplate = this.template({model:this.model});
     this.$el.html(renderedTemplate);
   }
 });
@@ -1043,12 +1096,9 @@ var TableViewEntry = BaseView.extend({
 var FloorPlanView = BaseView.extend({
   el: 'div',
   initialize: function(data) {
-    //WHY IS MODEL DEFINED FOR THIS THING
-    this.model = null;
 
     this.template = loadTemplate("/static/views/floorplan.html");
-    this.data = data;
-    console.log(data)
+    this.collection = data.collection;
 
     var paths = loadData("/static/paths.json");
     this.floorplanpaths = JSON.parse(paths);
@@ -1059,7 +1109,7 @@ var FloorPlanView = BaseView.extend({
   route: function(part) {
 
     var floorplandataoverlayview = new FloorPlanDataOverlay({
-      collection: this.data,
+      collection: this.collection,
       paths: this.floorplanpaths
     });
 
@@ -1080,7 +1130,7 @@ var FloorPlanView = BaseView.extend({
   renderFloorplan : function(){
     var that  = this;
 
-    this.$('#floorplanholder').height('90%');
+    this.$('#floorplanholder').height('95%');
 
     console.log(this.$el.height())
     h = this.$('#floorplanholder').height();
@@ -1151,12 +1201,6 @@ var FloorPlanView = BaseView.extend({
 var FloorPlanDataOverlay = BaseView.extend({
   el: 'div',
   initialize: function(data) {
-    //WHY IS MODEL DEFINED FOR THIS THING
-    this.model = null;
-
-
-
-
     this.template = loadTemplate("/static/views/floorplandataoverlay.html");
     this.collection = data.collection;
     this.floorplanpaths = data.paths;
@@ -1167,15 +1211,45 @@ var FloorPlanDataOverlay = BaseView.extend({
   },
   render: function() {
     var that = this;
-    console.log('heelo')
 
     setTimeout(function(){
-      that.$el.height($('#floorplanholder').height())
-      that.$el.width($('#floorplanholder').width())
+      that.$el.height($('#floorplanholder').height());
+      that.$el.width($('#floorplanholder').width());
+      that.$el.width($('#floorplanholder').width());
+      var marginLeft = $('#floorplanholder').css('margin-left');
+      that.$el.css("margin-left", marginLeft);
 
-      var renderedTemplate = that.template();
+      var renderedTemplate = that.template({floorplanpaths: that.floorplanpaths, collection: that.collection});
       that.$el.html(renderedTemplate);
     }, 300);
+
+  }
+});
+
+var Thermostat = BaseView.extend({
+  el: 'div',
+  initialize: function(data) {
+    this.template = loadTemplate("/static/views/thermostat.html");
+    this.model = null;
+  },
+  route: function(part) {
+    return {};
+  },
+  render: function() {
+    var renderedTemplate = this.template();
+    this.$el.html(renderedTemplate);  
+
+    $('.thermostatknob').knob({
+        'min':60
+        ,'max':80
+        ,'angleOffset': 225
+        ,'angleArc': 270
+        , 'width': 280
+        , 'height': 380
+        , 'fgColor': 'rgba(173,50,50,0.8)'
+        , 'bgColor': 'rgba(84,175,226,0.8)'
+        , 'inputColor' : 'rgba(245,245,245,0.8)'
+      });
 
   }
 });

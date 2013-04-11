@@ -1,17 +1,22 @@
 .bottom .header{
-	height:10%;
+	height: 50px;
+	position: relative;
 	border-bottom: 5px solid;
 }
 
 .subheader{
+	position: absolute;
+	bottom:0;
 	font-family: 'Lato-light';
 	width:40%;
 	float:left;
 }
 
 .dataviewselection{
-	float:right;
+	position: absolute;
 	width: 60%;
+	bottom: 5px;
+	right: 0;
 }
 
 .dataviewselection input[type='radio']{
@@ -24,7 +29,7 @@
     cursor: pointer;
     /* the following are the styles */
     background: rgba(0,0,0,0);
-    color: #aaa;
+    color: rgba(41,41,41,1);
     border-radius: 10px;
     text-shadow: 1px 1px 0 rgba(0,0,0,0);
 }
@@ -35,7 +40,7 @@
 
     text-align: center;
     display: block;
-    width: 30%;
+    width: 33%;
     float: right;
 }
 
@@ -47,12 +52,13 @@ input[type="radio"]:checked + label{
     border: 1px solid #444;
     text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
     color: white;
+    -webkit-box-shadow: 0 0 20px #383838;
 }
 
 .summarywrapper{
-	background-color: rgba(128, 128, 128, 0.40);
+	background-color: rgba(0, 15, 30, 0.8);
 	color: rgba(245,245,245,0.6);
-	height: 15%;
+	height: 70px;
 	border-bottom: 5px solid;
 }
 
@@ -79,5 +85,6 @@ input[type="radio"]:checked + label{
 }
 
 .content{
-	height: 80%;
+	height: 325px;
+	-webkit-box-shadow: 0 0 45px #383838;
 }
