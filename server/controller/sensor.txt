@@ -1,0 +1,9 @@
+4 x temp: C
+1 x pyranometer: W/m2
+4 x humidity: rh(%) [0 100]
+4 x CO2: ppm
+1 x flowmeter:
+x x door/window:
+{
+	
+}
