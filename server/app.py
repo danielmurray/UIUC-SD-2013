@@ -46,6 +46,8 @@ humidController = controller.HumidController()
 flowController = controller.FlowController()
 windoorController = controller.WindoorController()
 co2Controller = controller.Co2Controller()
+#Pass in the tempController and loxone controller to the Hvac controller for its operation
+hvacController = controller.HvacController(loxoneController, tempController)
 #dictionary to be passed to the relay controller
 controller_dict = {
   'temp'    :tempController,
@@ -54,15 +56,14 @@ controller_dict = {
   'flow'    :flowController,
   'windoor' :windoorController,
   'co2'     :co2Controller,
+  'hvac'    :hvacController,
 }
 relayController = controller.RelayController(controller_dict)
-#Pass in the tempController and loxone controller to the Hvac controller for its operation
-hvacController = controller.HvacController(loxoneController, tempController)
 
-
+#WHAT SHOULD THIS BE DOING?
 # add the logger to every controller
 map(lambda x: x.add_client(eventLogger), [
-  debugController, lightController
+  debugController, lightController, hvacController
 ])
 
 @app.route("/")

@@ -34,6 +34,7 @@ class HvacController(BackboneCollection):
         for each in msg:
             if hvac_uuids["hvac_state"]["n_cool"] == each["n"]:
                 if str(each['v']) == "1":
+                    hvac_uuids["hvac_state"]["cooling"] = True
                     hvac_uuids["hvac_state"]["val"] = "Cooling"
                     change = True
                 else:
@@ -42,6 +43,7 @@ class HvacController(BackboneCollection):
             elif hvac_uuids["hvac_state"]["n_heat"] == each["n"]:
                 if str(each['v']) == "1":
                     hvac_uuids["hvac_state"]["val"] = "Heating"
+                    hvac_uuids["hvac_state"]["heating"] = True
                     change = True
                 else:
                     hvac_uuids["hvac_state"]["heating"] = False
@@ -53,6 +55,7 @@ class HvacController(BackboneCollection):
                 if not hvac_uuids["hvac_state"]["heating"] and not hvac_uuids["hvac_state"]["cooling"]:
                     hvac_uuids["hvac_state"]["val"] = "Off"
             self.update(hvac_uuids)
+            print hvac_uuids['hvac_state']['val'],'--------------------------'
 
 
     def on_temp_change(self, avg_temp):
