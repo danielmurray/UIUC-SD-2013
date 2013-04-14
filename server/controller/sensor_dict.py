@@ -11,7 +11,7 @@ _sensor_list = [
 		'name':'room-1',
 		'freq':4,
 		'meta_data':{
-			'location':'room-1'
+			'location':'room-1',
 		}
 	},
 	{

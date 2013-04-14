@@ -48,18 +48,27 @@ class ParentController(object):
             print "type and mac_add combo not found in the dict"
             return -1
         #make async call to update the front end to close the req asap
-        gevent.Greenlet(self._update, hash_key, val).start_later(1)
+        gevent.Greenlet(self.relay_update, hash_key, val).start_later(1)
         #return the freq
         return sensor_list[hash_key]['freq']
         
 
-    def _update(self, hash_key, val):
+    def relay_update(self, hash_key, val):
         '''over ride this function if needed'''
         #update the value in the global dict
+
+        if  sensor_list[hash_key].has_key("val") and sensor_list[hash_key]['val'] == val:
+            #check if the value has actually changed before updating the client unnecessarily
+            #this also prevents relaying the same avg temp to the loxone server
+            return
         sensor_list[hash_key]['val'] = val
         self.update(sensor_list[hash_key])
         #just for debug
         print sensor_list[hash_key] 
+
+    def do_save(self, data):
+        print "Invalid call from client to update the state of sensor-------"
+        print data
 
 
 
@@ -69,6 +78,31 @@ class TempController(BackboneCollection, ParentController):
         self.ws = None # make the websocket connection + send auth
         BackboneCollection.__init__(self)
         self.typ = 'temp'
+        self.listners = []
+
+    def register_listner(self, listner):
+        if callable(listner):
+            self.listners.append(listner)
+
+    def relay_update(self, hash_key, val):
+        #call the parent controller update first        
+        super(TempController, self).relay_update(hash_key, val)
+        avg_temp = self.avg_temp()
+        for each in self.listners:
+            #call the remote function with the JSON object of the update temperature.
+            each(avg_temp)
+
+    def avg_temp(self):
+        total_temp = 0
+        n = 0
+        outdoor_locations = ["Outdoor", "Outdoors", "outdoor", "outdoors"]
+        for key, value in sensor_list.items():
+            if value['type'] == 'temp':
+                if value['meta_data']['location'] not in outdoor_locations:
+                    if value.has_key("val"):
+                        total_temp += float(value['val'])
+                        n += 1
+        return total_temp/n
 
 class PyraController(BackboneCollection, ParentController):
 

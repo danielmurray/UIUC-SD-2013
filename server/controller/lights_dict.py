@@ -9,7 +9,7 @@ light_mapping = [
     "type":"analog",
     "bounds":{
       "state_low":0,
-      "state_high":10,
+      "state_high":100,
       "action_low":0,
       "action_high":100,
     },

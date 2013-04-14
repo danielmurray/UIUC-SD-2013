@@ -56,6 +56,8 @@ controller_dict = {
   'co2'     :co2Controller,
 }
 relayController = controller.RelayController(controller_dict)
+#Pass in the tempController and loxone controller to the Hvac controller for its operation
+hvacController = controller.HvacController(loxoneController, tempController)
 
 
 # add the logger to every controller
@@ -91,6 +93,8 @@ def socket_path(remaining=None):
     "/CO2":co2Controller,
     "/flow":flowController,
     "/windoor":windoorController,
+    #hvac
+    "/hvac":hvacController,
 
   }, request)
   return "end"
