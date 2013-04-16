@@ -69,7 +69,7 @@ var HVACCollection = CollectionWS.extend({
   url: '/hvac'
 });
 
-var PVCollection = CollectionWS.extend({
+/*var PVCollection = CollectionWS.extend({
   model: PVModel,
   url: '/pv',
   _order_by: 'id',
@@ -163,7 +163,7 @@ var WaterCollection = CollectionWS.extend({
 
   }
 });
-
+*/
 
 
 

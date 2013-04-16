@@ -70,6 +70,10 @@ map(lambda x: x.add_client(eventLogger), [
 def index():
   return render_template("index.html", debug=request.args.get("debug", False))
 
+@app.route("/debug")
+def index():
+  return render_template("debug.html", debug=request.args.get("debug", False))
+
 @app.route("/ws")
 def debugger():
   return render_template("websockets.html")

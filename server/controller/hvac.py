@@ -60,10 +60,16 @@ class HvacController(BackboneCollection):
 
     def on_temp_change(self, avg_temp):
         """relay the avg temp value to the loxone server"""
+        if hvac_uuids["avg_temp"].has_key("val"):
+            if hvac_uuids["avg_temp"]["val"] == avg_temp:
+                #incase the avg temp hasn't changed, don't worry about telling everyplace about this
+                return False
         hvac_uuids["avg_temp"]["val"] = avg_temp
         sock_str = "jdev/sps/io/"+hvac_uuids["avg_temp"]["uuid"]+"/"+str(int(avg_temp))
         print "avg_temp called", sock_str
+        #on change of average temp make sure to relay the change to both the loxone and the client
         self.sock.send_message(sock_str)
+        self.update(hvac_uuids)        
 
     def do_save(self, data):
         """assuming the same model as the hvac_dict is sent back to the server"""

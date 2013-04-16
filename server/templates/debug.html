@@ -1,0 +1,31 @@
+<html>
+<head>
+	<title> Debug page for the backend</title>
+	<link href="/static/css/debug.css" rel="stylesheet" type="text/css">
+	
+</head>
+<body>
+	<div class="tabs-holder">
+		<div class="tab selected" id="lights">Lights</div>
+		<div class="tab" id="sensors">Sensors</div>
+		<div class="tab" id="hvac">HVAC</div>
+		<div class="tab" id="others">Others</div>
+	</div>
+	<div class="main-view">
+		<div class="main-sub-view selected" id="lights">Loading...</div>
+		<div class="main-sub-view" id="sensors">Loading...</div>
+		<div class="main-sub-view" id="hvac">Loading...</div>
+		<div class="main-sub-view" id="others">Loading...</div>
+	</div>
+	<script src="/static/js/lib/jquery.min.js"></script>
+    <script src="/static/js/lib/underscore.js"></script>
+    <script src="/static/js/lib/backbone.js"></script>
+    <script src="/static/js/lib/socket.io.js"></script>  
+    <script src="/static/js/backbone-ws.js"></script>
+    <script src="/static/js/models.js"></script>
+    <script src="/static/js/collections.js"></script>
+    <script src="/static/js/collections-prod.js"></script>
+    <script src="/static/js/debug.js"></script>
+
+</body>
+</html>

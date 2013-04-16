@@ -1,0 +1,22 @@
+.tab{
+	cursor:pointer;
+	float:left;
+	margin:5px;
+	padding:5px;
+	background-color: #606060;
+
+}
+.tabs-holder{
+	width:100%;
+	margin:5px;
+	clear:both;
+}
+.main-view{
+	clear:both;
+}
+.main-sub-view{
+	display:none;
+}
+.main-sub-view.selected{
+	display: block;
+}
