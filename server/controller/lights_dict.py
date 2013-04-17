@@ -3,9 +3,9 @@ light_mapping = [
     "UUIDs":{
       "action_up":"8208bb0c-9197-11e0-806c9f19214c414c",
       "action_down":"8208bb0c-9197-11e0-806c9f19214c414c",
-      "state":"8208bb0c-9197-11e0-807a9f19214c414c",
+      "state":"632ba1d8-76df-11e2-8b0a82650d05814e",
     },
-    "id":"kitchentrack",
+    "id":"Light 2-1",
     "type":"analog",
     "bounds":{
       "state_low":0,
@@ -17,11 +17,11 @@ light_mapping = [
   }, 
   {
     "UUIDs":{
-      "action_up":"bf84f96e-87c6-11e2-9251fe0f4c46aeec",
-      "action_down":"bf84f96e-87c6-11e2-9251fe0f4c46aeec",
+      "action_up":"08ac2791-a2f6-11e2-a2fe87adfd6dc69a",
+      "action_down":"08ac2791-a2f6-11e2-a2fe87adfd6dc69a",
       "state":"7e11758e-87c6-11e2-9000fe0f4c46aeec",
     },
-    "id":"ExternalVLM",
+    "id":"Light 3-1",
     "type":"analog",
     "bounds":{
       "state_low":0,
