@@ -71,7 +71,7 @@ def index():
   return render_template("index.html", debug=request.args.get("debug", False))
 
 @app.route("/debug")
-def index():
+def debug():
   return render_template("debug.html", debug=request.args.get("debug", False))
 
 @app.route("/ws")
