@@ -58,7 +58,8 @@ var HomeView = BaseView.extend({
       'hvac': HvacView,
       'windoor': WindoorView,
       'power': PowerView,
-      'water': WaterView
+      'water': WaterView,
+      'opt': OptView
     }
 
     //establish pane data to be passed to view
@@ -147,6 +148,7 @@ var PageView = BaseView.extend({
     return{};
   },
   render: function() {
+    console.log(this)
     var renderedTemplate = this.template({currentpane: this.currentpane});
     this.$el.html(renderedTemplate);
   }
@@ -723,6 +725,39 @@ var HvacView = PageView.extend({
   }
 });
 
+var OptView = PageView.extend({
+  el: 'div',
+  initialize: function(data) {
+    PageView.prototype.initialize.apply(this, [data]);    
+    this.opttemplate = loadTemplate("/static/views/optimizer.html");
+
+    //BRYANT BUT YOU OPTIMIZER COLLECTION RIGHT IN HERE
+    this.collection = window.BsDevices;
+    this.collection._sortBy('value',true);
+  },
+  animateIn: function(){
+    PageView.prototype.animateIn.apply(this);
+  },
+  route: function(part) {
+    
+    console.log(this.collection)
+
+    table = new TableView({collection:this.collection});
+
+    return{
+      '#optimizertabledebug': table
+      //,'#weekviewwrapper': generationtdatabox
+    }
+
+  },
+  render: function(pane, subpane) {
+    PageView.prototype.render.apply(this);
+    var renderedTemplate = this.opttemplate();
+    this.$('#pagecontent').html(renderedTemplate);
+    
+  }
+});
+
 var DataBox = BaseView.extend({
   el: 'div',
   events: {
@@ -1059,6 +1094,8 @@ var TableView = BaseView.extend({
     //views to be returned
     tableEntriesToRendered = {};
 
+    console.log(this.collection)
+
     _.each(this.collection.models, function(model) {
 
       tableentry = new TableViewEntry(model);
@@ -1146,7 +1183,7 @@ var FloorPlanView = BaseView.extend({
     _.each(this.floorplanpaths.zones, function(zone){
         var thing = zones[zone.id] = floorplancanvas.path(zone.path).attr({
           "id": zone.id, 
-          "fill": "#3E3E3E", 
+          "fill": "rgb(0,15,30)", 
           "stroke": "#000000", 
           "stroke-width": 0, 
           "opacity": .75, 
