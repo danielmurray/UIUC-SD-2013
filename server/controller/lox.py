@@ -9,7 +9,6 @@ PING_TIME = 10
 class EchoIncoming(WebSocketClientProtocol):
     def __init__(self, parent, *args, **kwargs):
         self.parent = parent
-        self.isClosed = False
         self.initialized = False
         self.msg_list = []
         self.listners = []
@@ -108,6 +107,7 @@ class EchoIncoming(WebSocketClientProtocol):
 
     def onClose(self, wasClean, code, reason):
         print "Socket Closed--- Was Clean:"+str(wasClean)+" Code:"+str(code) + " Reason:" +reason
+        self.parent.isClosed = True
 
 class LoxoneContollerProxy:
     '''proxy class, this is because we can access EchoIncoming's methods in LoxoneController'''
@@ -130,27 +130,30 @@ class LoxoneController(object):
         self.initialized = False
         self.listner_list = [] #stack for listner while sock is initalized
         # start a new thread to talk with the lighting controller over websockets
-        gevent.spawn(self._run_websocket_loop)
+        gevent.spawn(self._run_websocket)
 
-    def _run_websocket_loop(self):
+    def _run_websocket(self):
         self.proxy = LoxoneContollerProxy(self)
         while True:
-            num = random.random()
-            r = requests.get('http://'+LOX_ADDR+'/jdev/sys/getkey?'+str(num))
+            print "(re?)starting socket------"
+            self.create_socket()
+    
+    def create_socket(self):
+        num = random.random()
+        r = requests.get('http://'+LOX_ADDR+'/jdev/sys/getkey?'+str(num))
 
-            if(r.status_code == 200):
-                print "Doing something"
-                protocol = hmac.new(r.json()['LL']['value'].decode("hex"), "admin:admin", digestmod=hashlib.sha1).digest().encode("hex")
-                factory = WebSocketClientFactory("ws://"+LOX_ADDR+"/ws/",protocols = [protocol], debug=True)
-                factory.protocol = self.proxy
-                connectWS(factory)
-            else:
-                print "FAIL!"+r.status_code
-                return
-            self.initialized = True
-            while not self.proxy.isClosed:
-                print random.choice(["(>'.')>", "<('.'<)", ":)", ":(", "XD","oo","||","u"])
-                gevent.sleep(1) # don't block event loop
+        if(r.status_code == 200):
+            protocol = hmac.new(r.json()['LL']['value'].decode("hex"), "admin:admin", digestmod=hashlib.sha1).digest().encode("hex")
+            factory = WebSocketClientFactory("ws://"+LOX_ADDR+"/ws/",protocols = [protocol], debug=True)
+            factory.protocol = self.proxy
+            connectWS(factory)
+        else:
+            print "FAIL!"+r.status_code
+            return
+        self.initialized = True
+        while not self.proxy.isClosed:
+            print random.choice(["(>'.')>", "<('.'<)", ":)", ":(", "XD","oo","||","u"])
+            gevent.sleep(1) # don't block event loop
 
     def register_listner(self, listner):
         '''register a function that will be called whenever a message is received on the socket'''

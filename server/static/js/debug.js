@@ -51,10 +51,20 @@ var lightsView = {
 var sensorsView = {
 	init: function(){
 		//bind all the events
+		sensorsView.bindEvents();
 		console.log("Sensors View Initialized");
 	},
-	render: function(){
+	bindEvents: function(){
+		Temp.on("all", sensorsView.render,"temp");
+		Pyra.on("all", sensorsView.render,"pyra");
+		Humid.on("all", sensorsView.render,"humid");
+		CO2.on("all", sensorsView.render, "co2");
+		Flow.on("all", sensorsView.render, "flow");
+		Windoor.on("all", sensorsView.render, "windoor");
+	},
+	render: function(a,b,c){
 		if(tabs.selectedId !== 'sensors') return false;
+		console.log("Sensor",a,b,c);
 		console.log("Sensors Rendered");
 	}
 }
@@ -67,7 +77,7 @@ var hvacView = {
 	bindEvents: function(){
 		HVAC.on("all", hvacView.render);
 	},
-	render: function(a,b,c){
+	render: function(){
 		if(tabs.selectedId !== 'hvac') return false;
 		$('.main-sub-view#hvac').html("");
 		_.each(HVAC.toJSON(),function(value){
@@ -76,7 +86,7 @@ var hvacView = {
 			$('.main-sub-view#hvac').append(el);
 			console.log(log_key,value);
 		});
-		console.log("HVAC Rendered",a,b,c);
+		console.log("HVAC Rendered");
 	},
 	objToString: function(obj){
 		var ret_str = "Avg Temp:"+obj.avg_temp.val+" State:"+obj.hvac_state.val+" Tar Temp:"+obj.tar_temp.val;
@@ -110,7 +120,7 @@ var views = {
 views.init(); //initialize all the views
 // Only fetch non-debug collections
 var initWS = function(){
-	var collections = [window.Lights, HVAC];
+	var collections = [window.Lights, HVAC, Temp, Pyra, Humid, CO2, Flow, Windoor];
 	var waitingOn = collections.length;
 	var start = function() {
 	  waitingOn = waitingOn - 1;
