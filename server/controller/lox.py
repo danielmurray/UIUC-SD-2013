@@ -113,7 +113,6 @@ class LoxoneContollerProxy:
     '''proxy class, this is because we can access EchoIncoming's methods in LoxoneController'''
     def __init__(self, parent):
         self.parent = parent
-        self.isClosed = False
 
     def __call__(self, *args, **kwargs):
         self.child = EchoIncoming(self.parent, *args, **kwargs)
@@ -141,7 +140,7 @@ class LoxoneController(object):
     def create_socket(self):
         num = random.random()
         r = requests.get('http://'+LOX_ADDR+'/jdev/sys/getkey?'+str(num))
-
+        self.isClosed = False
         if(r.status_code == 200):
             protocol = hmac.new(r.json()['LL']['value'].decode("hex"), "admin:admin", digestmod=hashlib.sha1).digest().encode("hex")
             factory = WebSocketClientFactory("ws://"+LOX_ADDR+"/ws/",protocols = [protocol], debug=True)
@@ -151,7 +150,7 @@ class LoxoneController(object):
             print "FAIL!"+r.status_code
             return
         self.initialized = True
-        while not self.proxy.isClosed:
+        while not self.isClosed:
             print random.choice(["(>'.')>", "<('.'<)", ":)", ":(", "XD","oo","||","u"])
             gevent.sleep(1) # don't block event loop
 

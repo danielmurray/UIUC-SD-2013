@@ -9,6 +9,42 @@ _sensor_list = [
 		'mac_address':'mac-1',
 		'type':'temp',
 		'name':'room-1',
+		'freq':0,
+		'meta_data':{
+			'location':'room-1',
+		}
+	},
+	{
+		'mac_address':'mac-1',
+		'type':'pyra',
+		'name':'room-1',
+		'freq':1,
+		'meta_data':{
+			'location':'room-1'
+		}
+	},	
+	{
+		'mac_address':'mac-1',
+		'type':'humid',
+		'name':'room-1',
+		'freq':2,
+		'meta_data':{
+			'location':'room-1',
+		}
+	},
+	{
+		'mac_address':'mac-1',
+		'type':'co2',
+		'name':'room-1',
+		'freq':3,
+		'meta_data':{
+			'location':'room-1',
+		}
+	},	
+	{
+		'mac_address':'mac-1',
+		'type':'flow',
+		'name':'room-1',
 		'freq':4,
 		'meta_data':{
 			'location':'room-1',
@@ -16,11 +52,11 @@ _sensor_list = [
 	},
 	{
 		'mac_address':'mac-1',
-		'type':'humid',
+		'type':'windoor',
 		'name':'room-1',
 		'freq':5,
 		'meta_data':{
-			'location':'room-1'
+			'location':'room-1',
 		}
 	},
 	{

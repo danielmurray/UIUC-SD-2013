@@ -51,7 +51,7 @@ hvacController = controller.HvacController(loxoneController, tempController)
 #dictionary to be passed to the relay controller
 controller_dict = {
   'temp'    :tempController,
-  'prya'    :pyraController,
+  'pyra'    :pyraController,
   'humid'   :humidController,
   'flow'    :flowController,
   'windoor' :windoorController,

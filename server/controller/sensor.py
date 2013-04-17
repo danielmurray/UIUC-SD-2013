@@ -62,6 +62,7 @@ class ParentController(object):
             #this also prevents relaying the same avg temp to the loxone server
             return
         sensor_list[hash_key]['val'] = val
+        print "UPDATED", str(sensor_list[hash_key])
         self.update(sensor_list[hash_key])
         #just for debug
         print sensor_list[hash_key] 
@@ -87,6 +88,7 @@ class TempController(BackboneCollection, ParentController):
     def relay_update(self, hash_key, val):
         #call the parent controller update first        
         super(TempController, self).relay_update(hash_key, val)
+        #now calculate the avg temp and relay it to the listners
         avg_temp = self.avg_temp()
         for each in self.listners:
             #call the remote function with the JSON object of the update temperature.

@@ -55,17 +55,27 @@ var sensorsView = {
 		console.log("Sensors View Initialized");
 	},
 	bindEvents: function(){
-		Temp.on("all", sensorsView.render,"temp");
-		Pyra.on("all", sensorsView.render,"pyra");
-		Humid.on("all", sensorsView.render,"humid");
-		CO2.on("all", sensorsView.render, "co2");
-		Flow.on("all", sensorsView.render, "flow");
-		Windoor.on("all", sensorsView.render, "windoor");
+		Temp.on("all", sensorsView.render);
+		Pyra.on("all", sensorsView.render);
+		Humid.on("all", sensorsView.Rendered);
+		CO2.on("all", sensorsView.render);
+		Flow.on("all", sensorsView.render);
+		Windoor.on("all", sensorsView.render);
 	},
-	render: function(a,b,c){
+	render: function(a,b,c,d,e){
 		if(tabs.selectedId !== 'sensors') return false;
-		console.log("Sensor",a,b,c);
+		$('.main-sub-view#sensors').html(""); //clear the tab view
+		var sensor_list = [Temp, Pyra, Humid, CO2, Flow, Windoor];
+		_.each(sensor_list, sensorsView.renderSubSensor);
 		console.log("Sensors Rendered");
+	},
+	renderSubSensor: function(subSensorColl){
+		$('.main-sub-view#sensors').append("<div>--------------------</div><br/>");
+		_.each(subSensorColl.toJSON(), function(model){
+			var log_key = model.mac_address+" "+model.type+" "+model.val;
+			var el= $('<div>'+log_key+'</div><br/>');
+			$('.main-sub-view#sensors').append(el);
+		});
 	}
 }
 var hvacView = {
