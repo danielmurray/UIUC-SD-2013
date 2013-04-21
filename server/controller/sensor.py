@@ -13,7 +13,11 @@ from sensor_dict import * #sensor dictionay is in here
 class RelayController(object):
     def __init__(self, controller_dict):
         self.controller_dict = controller_dict
+        self.load_all_sensors()
 
+    def load_all_sensors(self):
+        for key, value in sensor_list.items():
+            self.on_message(value['mac_address'],value['type'], -1)
     def on_message(self, mac_address,typ, value):
         mac_address = self.remove_quotes(mac_address)
         typ = self.remove_quotes(typ)

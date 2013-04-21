@@ -81,7 +81,7 @@ _sensor_list = [
 ]
 
 sensor_list = dict();
-id_tracker = 0
+id_tracker = 1
 for each in _sensor_list:
 	hash_key = str(each['type'])+str(each['mac_address'])
 	if not sensor_list.has_key(hash_key):

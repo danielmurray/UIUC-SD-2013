@@ -57,7 +57,7 @@ var sensorsView = {
 	bindEvents: function(){
 		Temp.on("all", sensorsView.render);
 		Pyra.on("all", sensorsView.render);
-		Humid.on("all", sensorsView.Rendered);
+		Humid.on("all", sensorsView.render);
 		CO2.on("all", sensorsView.render);
 		Flow.on("all", sensorsView.render);
 		Windoor.on("all", sensorsView.render);
