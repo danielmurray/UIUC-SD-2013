@@ -33,16 +33,16 @@ var HumidCollection = CollectionWS.extend({
 });
 var FlowCollection = CollectionWS.extend({
   model: SensorModel,
-  url: '/CO2'
+  url: '/flow'
 });
 
 var WindoorCollection = CollectionWS.extend({
   model: SensorModel,
-  url: '/flow'
+  url: '/windoor'
 });
 
 var Co2Collection = CollectionWS.extend({
   model: SensorModel,
-  url: '/windoor'
+  url: '/CO2'
 });
 

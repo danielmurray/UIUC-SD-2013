@@ -105,7 +105,6 @@ var hvacView = {
 }
 var othersView = {
 	init: function(){
-		//bind all the events
 		console.log("Others View Initialized");
 	},
 	render: function(){
