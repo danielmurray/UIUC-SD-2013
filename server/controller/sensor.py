@@ -1,5 +1,6 @@
 from ws import BackboneCollection
 import gevent
+from flowmeter import FlowmeterDS
 from sensor_dict import * #sensor dictionay is in here
 
 # the sensor protocol works in the following way:
@@ -60,7 +61,6 @@ class ParentController(object):
     def relay_update(self, hash_key, val):
         '''over ride this function if needed'''
         #update the value in the global dict
-
         if  sensor_list[hash_key].has_key("val") and sensor_list[hash_key]['val'] == val:
             #check if the value has actually changed before updating the client unnecessarily
             #this also prevents relaying the same avg temp to the loxone server
@@ -136,7 +136,50 @@ class FlowController(BackboneCollection, ParentController):
     def __init__(self):
         self.ws = None # make the websocket connection + send auth
         BackboneCollection.__init__(self)
+        self.flowDS = {}
+        self.freq = 10 #in seconds
         self.typ = 'flow'
+        self.init_datastores()
+        #this function calculates the flowrate every so often to update
+        gevent.spawn(self._recaculate_loop)
+
+    def init_datastores(self):
+        '''initalizes datastore for each of the flowmeters'''
+        for key in sensor_list:
+            if 'flow' in key.lower():
+                self.flowDS.update({key: FlowmeterDS(self.freq)})
+
+    def relay_update(self, hash_key, val):
+        '''modified relay update function for the flowmeter
+        because the values received here is not flowrate'''
+
+        val = float(val)
+        if  self.flowDS.has_key(hash_key):
+            self.flowDS[hash_key].append(float(val))
+            sensor_list[hash_key]["val"] = self.flowDS[hash_key].calc_flow()
+            print "UPDATED", str(sensor_list[hash_key])
+            self.update(sensor_list[hash_key])
+        else:
+            print "Flowmeter with no Datastore being updated! WHY?!"
+            return -1
+
+    def _recaculate_loop(self):
+        delay = int(self.freq * 1.5)
+        while(1):
+            time.sleep(delay)
+            recaculate_loop()
+
+
+    def recaculate_loop(self):
+        '''return false to kill the loop on self in this function'''
+        #loop through all the flow meter and update them
+        print "FLOW RECALCULATION"
+        for key,val in self.flowDS.items():
+            tmp_rate = val.calc_flow()
+            if sensor_list[key]['val'] != tmp_rate:
+                #if the value has actually changed
+                sensor_list[key]['val'] = tmp_rate
+                self.update(sensor_list[key])
 
 
 

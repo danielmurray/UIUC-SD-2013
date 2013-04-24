@@ -2,8 +2,8 @@ from datetime import datetime,timedelta
 
 
 
-class FlowMeterDS(object):
-'''This class is meant to be used as storage and calculation of flow for each flowmeter sensor'''
+class FlowmeterDS(object):
+	'''This class is meant to be used as storage and calculation of flow for each flowmeter sensor'''
 	def __init__(self, time_period):
 		'''initialize the flowmeter datastore with the timeperiod'''
 		self.history_store = [] # basic list that we store the value in
@@ -11,12 +11,11 @@ class FlowMeterDS(object):
 		self.time_period_min = float(self.time_period.total_seconds())/60
 
 	def append(self, value):
-		if not type(value) == type(1):
-			return False
+		value = float(value)
 		temp_dict = {'val':value,'time_stamp':datetime.now()}
 		self.history_store.append(temp_dict)
 
-	def calculate_flow(self):
+	def calc_flow(self):
 		'''looks in the history store to calculate the flow flow_rate
 		it uses the last time_period data to calculate the flow_rate'''
 		filtered_vals = []
