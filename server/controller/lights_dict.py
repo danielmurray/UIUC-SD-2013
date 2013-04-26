@@ -6,8 +6,8 @@ light_mapping = [
       "state":"632ba1d8-76df-11e2-8b0a82650d05814e",
     },
     "id":"Light_2-1",
-    "name":"Board Track",
-    "type":"Board Mount",
+    "name":"Board Mount",
+    "type":"analog",
     "bounds":{
       "state_low":0,
       "state_high":100,
