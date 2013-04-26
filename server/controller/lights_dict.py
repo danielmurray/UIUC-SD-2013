@@ -5,7 +5,7 @@ light_mapping = [
       "action_down":"8208bb0c-9197-11e0-806c9f19214c414c",
       "state":"632ba1d8-76df-11e2-8b0a82650d05814e",
     },
-    "id":"Light 2-1",
+    "id":"Light_2-1",
     "type":"analog",
     "bounds":{
       "state_low":0,
@@ -21,7 +21,7 @@ light_mapping = [
       "action_down":"08ac2791-a2f6-11e2-a2fe87adfd6dc69a",
       "state":"7e11758e-87c6-11e2-9000fe0f4c46aeec",
     },
-    "id":"Light 3-1",
+    "id":"Light\ 3_1",
     "type":"analog",
     "bounds":{
       "state_low":0,

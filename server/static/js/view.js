@@ -180,8 +180,8 @@ var LightingView = PageView.extend({
     PageView.prototype.initialize.apply(this, [data]);
     this.lighttemplate = loadTemplate("/static/views/lightspage.html");
 
-    //this.collection = window.Lights;
-    this.collection = window.bullshit;
+    this.collection = window.Lights;
+    //this.collection = window.bullshit;
 
   },
   animateIn: function(){
