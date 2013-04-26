@@ -60,6 +60,9 @@ controller_dict = {
 }
 relayController = controller.RelayController(controller_dict)
 
+#power and energy controllers
+powerController = controller.PowerController()
+
 #WHAT SHOULD THIS BE DOING?
 # add the logger to every controller
 map(lambda x: x.add_client(eventLogger), [
@@ -100,17 +103,19 @@ def socket_path(remaining=None):
     "/windoor":windoorController,
     #hvac
     "/hvac":hvacController,
+    #power and energy
+    "/power":powerController
 
   }, request)
   return "end"
 
-@app.route("/sensor/data")
+@app.route("/sensor",methods=['GET', 'POST'])
 def sensor_data():
   """this should return the frequency"""
   mac_add = request.args.get('mac_address')
   typ = request.args.get('type')
   val = request.args.get('value')
-  return str(relayController.on_message(mac_add, typ, val))
+  return '#'+str(relayController.on_message(mac_add, typ, val))+'#'
 
 if __name__ == '__main__':
   import signal

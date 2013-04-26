@@ -62,12 +62,12 @@ var sensorsView = {
 		Flow.on("all", sensorsView.render);
 		Windoor.on("all", sensorsView.render);
 	},
-	render: function(a,b,c,d,e){
+	render: function(){
 		if(tabs.selectedId !== 'sensors') return false;
 		$('.main-sub-view#sensors').html(""); //clear the tab view
 		var sensor_list = [Temp, Pyra, Humid, CO2, Flow, Windoor];
 		_.each(sensor_list, sensorsView.renderSubSensor);
-		console.log("Sensors Rendered",a,b,c,d);
+		console.log("Sensors Rendered");
 	},
 	renderSubSensor: function(subSensorColl){
 		$('.main-sub-view#sensors').append("<div>--------------------</div><br/>");
@@ -78,6 +78,34 @@ var sensorsView = {
 		});
 	}
 }
+
+var powerView = {
+	init: function(){
+		//bind all the events
+		powerView.bindEvents();
+		console.log("Power View Initialized");
+	},
+	bindEvents: function(){
+		Power.on("all", sensorsView.render);
+	},
+	render: function(){
+		if(tabs.selectedId !== 'power') return false;
+		$('.main-sub-view#power').html(""); //clear the tab view
+		var power_list = [Power];
+		_.each(power_list, sensorsView.renderSubSensor);
+		console.log("Power Rendered");
+	},
+	renderSubSensor: function(subPowerColl){
+		$('.main-sub-view#power').append("<div>--------------------</div><br/>");
+		_.each(subPowerColl.toJSON(), function(model){
+			var log_key = model.id+" "+model.power;
+			var el= $('<div>'+log_key+'</div><br/>');
+			$('.main-sub-view#sensors').append(el);
+		});
+	}
+}
+
+
 var hvacView = {
 	init: function(){
 		//bind all the events
@@ -118,11 +146,13 @@ var views = {
 	lights:lightsView,
 	sensors:sensorsView,
 	hvac:hvacView,
+	power: powerView,
 	others:othersView,
 	init: function(){
 		views.lights.init();
 		views.sensors.init();
 		views.hvac.init();
+		views.power.init();
 		views.others.init();
 	}
 }

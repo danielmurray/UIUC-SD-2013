@@ -23,7 +23,7 @@ def start_testing(server_add):
 
 def make_sensor_url(mac, typ, val):
 	global _server_add
-	url = _server_add+'/sensor/data?mac_address='+str(mac)+'&type='+str(typ)+'&value='+str(val)
+	url = _server_add+'/sensor?mac_address='+str(mac)+'&type='+str(typ)+'&value='+str(val)
 	return make_request(url, None)
 
 

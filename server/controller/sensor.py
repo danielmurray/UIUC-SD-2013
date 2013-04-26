@@ -1,5 +1,6 @@
 from ws import BackboneCollection
 import gevent
+import time
 from flowmeter import FlowmeterDS
 from sensor_dict import * #sensor dictionay is in here
 
@@ -141,7 +142,7 @@ class FlowController(BackboneCollection, ParentController):
         self.typ = 'flow'
         self.init_datastores()
         #this function calculates the flowrate every so often to update
-        gevent.spawn(self._recaculate_loop)
+        gevent.spawn(self._recalc_loop)
 
     def init_datastores(self):
         '''initalizes datastore for each of the flowmeters'''
@@ -163,14 +164,14 @@ class FlowController(BackboneCollection, ParentController):
             print "Flowmeter with no Datastore being updated! WHY?!"
             return -1
 
-    def _recaculate_loop(self):
+    def _recalc_loop(self):
         delay = int(self.freq * 1.5)
         while(1):
             time.sleep(delay)
-            recaculate_loop()
+            self.recalc_loop()
 
 
-    def recaculate_loop(self):
+    def recalc_loop(self):
         '''return false to kill the loop on self in this function'''
         #loop through all the flow meter and update them
         print "FLOW RECALCULATION"

@@ -46,3 +46,9 @@ var Co2Collection = CollectionWS.extend({
   url: '/CO2'
 });
 
+
+var PowerCollection = CollectionWS.extend({
+  model: SensorModel,
+  url: '/power'
+});
+
