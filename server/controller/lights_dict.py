@@ -6,6 +6,7 @@ light_mapping = [
       "state":"632ba1d8-76df-11e2-8b0a82650d05814e",
     },
     "id":"Light_2-1",
+    "name":"Board Track",
     "type":"Board Mount",
     "bounds":{
       "state_low":0,
@@ -22,7 +23,7 @@ light_mapping = [
       "state":"7e11758e-87c6-11e2-9000fe0f4c46aeec",
     },
     "id":"Light_3-1",
-    "name":"Big Track"
+    "name":"Big Track",
     "type":"analog",
     "bounds":{
       "state_low":0,
@@ -39,7 +40,7 @@ light_mapping = [
       "state":"974dc1e9-76de-11e2-849982650d05814e",
     },
     "id":"kitchenaccent",
-    "name":"RGB Strip"
+    "name":"RGB Strip",
     "type":"rgb",
     "bounds":{
       "state_low":0,
