@@ -1,32 +1,50 @@
 <html>
 <head>
 	<title> Debug page for the backend</title>
-	<link href="/static/css/debug.css" rel="stylesheet" type="text/css">
-	
+	<link href="/static/css/bootstrap.css" rel="stylesheet" type="text/css">
 </head>
 <body>
-	<div class="tabs-holder">
-		<div class="tab selected" id="lights">Lights</div>
-		<div class="tab" id="sensors">Sensors</div>
-		<div class="tab" id="hvac">HVAC</div>
-		<div class="tab" id="power">Power</div>
-		<div class="tab" id="others">Others</div>
-	</div>
-	<div class="main-view">
-		<div class="main-sub-view selected" id="lights">Loading...</div>
-		<div class="main-sub-view" id="sensors">Loading...</div>
-		<div class="main-sub-view" id="hvac">Loading...</div>
-		<div class="main-sub-view" id="power">Loading...</div>
-		<div class="main-sub-view" id="others">Loading...</div>
-	</div>
-	<script src="/static/js/lib/jquery.min.js"></script>
+	<div class="container-fluid">
+      <div class="row-fluid">
+        <div class="span12" id="debug">
+          <ul class="nav nav-tabs" id="tabs">
+          </ul>
+           
+          <div class="tab-content" id="content">
+          </div>
+        </div>
+      </div>
+  </div>
+
+  <script type="x-text/template" id="template-table">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <% _.each(fields, function(field) { %>
+            <th><%= field %></th>
+          <% }); %>
+        </tr>
+      </thead>
+      <tbody>
+        <% _.each(models, function(model) { %>
+          <tr>
+            <% _.each(fields, function(field) { %>
+              <td><%= JSON.stringify(model.get(field)) %></td>
+            <% }); %>
+          </tr>
+        <% }); %>
+      </tbody>
+    </table>
+  </script>
+  <script src="/static/js/lib/jquery.min.js"></script>
+  <script src="/static/js/bootstrap.js"></script>
     <script src="/static/js/lib/underscore.js"></script>
     <script src="/static/js/lib/backbone.js"></script>
     <script src="/static/js/lib/socket.io.js"></script>  
     <script src="/static/js/backbone-ws.js"></script>
-    <script src="/static/js/debug-models.js"></script>
-    <script src="/static/js/debug-collections.js"></script>
-    <script src="/static/js/debug-collections-prod.js"></script>
+    <script src="/static/js/models.js"></script>
+    <script src="/static/js/collections.js"></script>
+    <script src="/static/js/collections-prod.js"></script>
     <script src="/static/js/debug.js"></script>
 
 </body>

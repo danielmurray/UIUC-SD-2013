@@ -136,3 +136,10 @@ var TemperatureModel = ModelWS.extend({
   }
 });
 
+var SensorModel = ModelWS.extend({
+  defaults: function(){
+    return{
+      id:null,
+    }
+  }
+});

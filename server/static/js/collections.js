@@ -69,6 +69,42 @@ var HVACCollection = CollectionWS.extend({
   url: '/hvac'
 });
 
+var TempCollection = CollectionWS.extend({
+  model: SensorModel,
+  url: '/temp'
+});
+
+var PyraCollection = CollectionWS.extend({
+  model: SensorModel,
+  url: '/pyra'
+});
+
+var HumidCollection = CollectionWS.extend({
+  model: SensorModel,
+  url: '/humid'
+});
+var FlowCollection = CollectionWS.extend({
+  model: SensorModel,
+  url: '/flow'
+});
+
+var WindoorCollection = CollectionWS.extend({
+  model: SensorModel,
+  url: '/windoor'
+});
+
+var Co2Collection = CollectionWS.extend({
+  model: SensorModel,
+  url: '/co2'
+});
+
+
+var PowerCollection = CollectionWS.extend({
+  model: SensorModel,
+  url: '/power'
+});
+
+
 var PVCollection = CollectionWS.extend({
   model: PVModel,
   url: '/pv',
