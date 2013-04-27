@@ -12,7 +12,7 @@ from sensor_dict import * #sensor dictionay is in here
 # it simply relays it to relevant sensor controller
 
 
-class RelayController(object):
+class RelayDevice(object):
     def __init__(self, controller_dict):
         self.controller_dict = controller_dict
         self.load_all_sensors()
@@ -79,11 +79,10 @@ class ParentController(object):
 
 
 class TempController(BackboneCollection, ParentController):
-
+    typ = "temp"
     def __init__(self):
         self.ws = None # make the websocket connection + send auth
         BackboneCollection.__init__(self)
-        self.typ = 'temp'
         self.listners = []
 
     def register_listner(self, listner):
@@ -112,34 +111,30 @@ class TempController(BackboneCollection, ParentController):
         return total_temp/n
 
 class PyraController(BackboneCollection, ParentController):
-
+    typ = "pyra"
     def __init__(self):
         self.ws = None # make the websocket connection + send auth
         BackboneCollection.__init__(self)
-        self.typ = 'pyra'
 
 class HumidController(BackboneCollection, ParentController):
-
+    typ = "humid"
     def __init__(self):
         self.ws = None # make the websocket connection + send auth
         BackboneCollection.__init__(self)
-        self.typ = 'humid'
 
 class Co2Controller(BackboneCollection, ParentController):
-
+    typ = "co2"
     def __init__(self):
         self.ws = None # make the websocket connection + send auth
         BackboneCollection.__init__(self)
-        self.typ = 'co2'
 
 class FlowController(BackboneCollection, ParentController):
-
+    typ = "flow"
     def __init__(self):
         self.ws = None # make the websocket connection + send auth
         BackboneCollection.__init__(self)
         self.flowDS = {}
         self.freq = 10 #in seconds
-        self.typ = 'flow'
         self.init_datastores()
         #this function calculates the flowrate every so often to update
         gevent.spawn(self._recalc_loop)
@@ -185,8 +180,7 @@ class FlowController(BackboneCollection, ParentController):
 
 
 class WindoorController(BackboneCollection, ParentController):
-
+    typ = "windoor"
     def __init__(self):
         self.ws = None # make the websocket connection + send auth
         BackboneCollection.__init__(self)
-        self.typ = 'windoor'

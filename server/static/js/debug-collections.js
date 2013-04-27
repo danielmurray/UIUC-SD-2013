@@ -43,7 +43,7 @@ var WindoorCollection = CollectionWS.extend({
 
 var Co2Collection = CollectionWS.extend({
   model: SensorModel,
-  url: '/CO2'
+  url: '/co2'
 });
 
 

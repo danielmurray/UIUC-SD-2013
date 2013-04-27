@@ -109,7 +109,7 @@ class EchoIncoming(WebSocketClientProtocol):
         print "Socket Closed--- Was Clean:"+str(wasClean)+" Code:"+str(code) + " Reason:" +reason
         self.parent.isClosed = True
 
-class LoxoneContollerProxy:
+class LoxoneDeviceProxy:
     '''proxy class, this is because we can access EchoIncoming's methods in LoxoneController'''
     def __init__(self, parent):
         self.parent = parent
@@ -118,7 +118,7 @@ class LoxoneContollerProxy:
         self.child = EchoIncoming(self.parent, *args, **kwargs)
         return self.child
 
-class LoxoneController(object):
+class LoxoneDevice(object):
     '''this is the only thing that will be exposed to other controllers, 
     for no reason should the EchoIncoming's instance be used anywhere,
     basic two function will help any other controllers communicate through the socket
@@ -132,7 +132,7 @@ class LoxoneController(object):
         gevent.spawn(self._run_websocket)
 
     def _run_websocket(self):
-        self.proxy = LoxoneContollerProxy(self)
+        self.proxy = LoxoneDeviceProxy(self)
         while True:
             print "(re?)starting socket------"
             self.create_socket()

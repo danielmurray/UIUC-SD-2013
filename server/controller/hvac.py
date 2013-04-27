@@ -5,7 +5,7 @@ from hvac_dict import * #sensor dictionay is in here
 
 
 class HvacController(BackboneCollection):
-
+    typ = "hvac"
     def __init__(self, loxone, temp):
         self.ws = None # make the websocket connection + send auth
         BackboneCollection.__init__(self)

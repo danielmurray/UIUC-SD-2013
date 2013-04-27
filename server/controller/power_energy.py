@@ -4,7 +4,7 @@ import re, time, gevent, urllib2
 import xml.etree.ElementTree as ET
 
 class PowerController(BackboneCollection):
-
+  typ = "power"
   def __init__(self):
     self.ws = None # make the websocket connection + send auth
     self.freq = 60 #in seconds

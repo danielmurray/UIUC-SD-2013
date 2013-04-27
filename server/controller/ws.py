@@ -46,13 +46,15 @@ class BackboneCollection:
   cache of the current state of the sensors
   dict of model id: {model attributes}
   """
-  name = "__undefined__" # override this for each subclass
+  typ = "__undefined__" # override this for each subclass
   models = None
   clients = None
 
   def __init__(self):
     self.models = {}
     self.clients = []
+    if self.typ == "__undefined__":
+      raise Exception("Controller needs self.typ set")
 
   def __call__(self, *args, **kwargs):
     """
@@ -81,7 +83,7 @@ class BackboneCollection:
     return self.models.values()
 
   def update(self, data):
-    return self._update(self.name, data)
+    return self._update(self.typ, data)
 
   def _update(self, name, data):
     """

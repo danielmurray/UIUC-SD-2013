@@ -33,12 +33,12 @@ app.config.update(
 )
 
 eventLogger = logger.EventLogger()
-loxoneController = controller.LoxoneController()
+loxoneDevice = controller.LoxoneDevice()
 # loxone controller works fine, just have to test registering the listeners and also making sure that sending message through the proxy method works
 
 # singleton controllers
 debugController = controller.DebugController()
-lightController = controller.LightController(loxoneController)
+lightController = controller.LightController(loxoneDevice)
 #sensor controllers
 tempController = controller.TempController()
 pyraController = controller.PyraController()
@@ -47,7 +47,7 @@ flowController = controller.FlowController()
 windoorController = controller.WindoorController()
 co2Controller = controller.Co2Controller()
 #Pass in the tempController and loxone controller to the Hvac controller for its operation
-hvacController = controller.HvacController(loxoneController, tempController)
+hvacController = controller.HvacController(loxoneDevice, tempController)
 #dictionary to be passed to the relay controller
 controller_dict = {
   'temp'    :tempController,
@@ -58,16 +58,27 @@ controller_dict = {
   'co2'     :co2Controller,
   'hvac'    :hvacController,
 }
-relayController = controller.RelayController(controller_dict)
+relayDevice = controller.RelayDevice(controller_dict)
 
 #power and energy controllers
 powerController = controller.PowerController()
 
-#WHAT SHOULD THIS BE DOING?
+# every websocket controller must be in this list
+controllers = [
+  debugController,
+  lightController,
+  tempController,
+  pyraController,
+  humidController,
+  flowController,
+  windoorController,
+  co2Controller,
+  hvacController,
+  powerController
+]
+
 # add the logger to every controller
-map(lambda x: x.add_client(eventLogger), [
-  debugController, lightController, hvacController
-])
+map(lambda x: x.add_client(eventLogger), controllers)
 
 @app.route("/")
 def index():
@@ -88,25 +99,14 @@ def poke_debug():
     time.sleep(1)
   return "Poked debug sensor"
 
+websocketNamespaces = {}
+for c in controllers:
+  websocketNamespaces["/%s" % c.typ] = c
+
 @app.route("/socket.io/<path:remaining>")
 def socket_path(remaining=None):
   print "New websocket connection"
-  socketio.socketio_manage(request.environ, {
-    "/debug": debugController,
-    "/light": lightController,
-    #sensors
-    "/temp":tempController,
-    "/pyra": pyraController,
-    "/humid": humidController,
-    "/CO2":co2Controller,
-    "/flow":flowController,
-    "/windoor":windoorController,
-    #hvac
-    "/hvac":hvacController,
-    #power and energy
-    "/power":powerController
-
-  }, request)
+  socketio.socketio_manage(request.environ, websocketNamespaces, request)
   return "end"
 
 @app.route("/sensor",methods=['GET', 'POST'])
@@ -115,7 +115,7 @@ def sensor_data():
   mac_add = request.args.get('mac_address')
   typ = request.args.get('type')
   val = request.args.get('value')
-  return '#'+str(relayController.on_message(mac_add, typ, val))+'#'
+  return '#'+str(relayDevice.on_message(mac_add, typ, val))+'#'
 
 if __name__ == '__main__':
   import signal

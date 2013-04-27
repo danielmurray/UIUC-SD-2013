@@ -6,7 +6,7 @@ from light_model import *
 from lights_dict import *
 
 class LightController(BackboneCollection):
-    name = "light"
+    typ = "light"
 
     def __init__(self, lox_ctrl):
         '''initialize the lights as per the list in lights_dict'''
