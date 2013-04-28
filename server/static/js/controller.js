@@ -97,22 +97,26 @@ $(function() {
   };
 
   // Only fetch non-debug collections
-  var collections = [window.Lights];
-  var waitingOn = collections.length;
-  var start = function() {
-    waitingOn = waitingOn - 1;
-    //console.log("Waiting on", waitingOn);
-    if (waitingOn == 0) {
-      Backbone.history.start();
-       //console.log("Started router", router);
+  var collections = [Lights, HVAC, PV, Devices, Water, Temp, Pyra, Humid, CO2, Flow, Windoor, Power];
+  if (!DEBUG) {
+    var waitingOn = collections.length;
+    var start = function() {
+      waitingOn = waitingOn - 1;
+      console.log("Waiting on", waitingOn);
+      if (waitingOn == 0) {
+        Backbone.history.start();
+         console.log("Started router", router);
+      }
     }
-  }
 
-  for (var col in collections) {
-    if (collections[col].size() == 0) {
-      collections[col].fetch({
-        success: start
-      });
+    for (var col in collections) {
+      if (collections[col].size() == 0) {
+        collections[col].fetch({
+          success: start
+        });
+      }
     }
+  } else {
+    Backbone.history.start();
   }
 });

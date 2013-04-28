@@ -181,8 +181,6 @@ var LightingView = PageView.extend({
     this.lighttemplate = loadTemplate("/static/views/lightspage.html");
 
     this.collection = window.Lights;
-    //this.collection = window.bullshit;
-
   },
   animateIn: function(){
     PageView.prototype.animateIn.apply(this);
@@ -226,12 +224,7 @@ var WindoorView = PageView.extend({
   initialize: function(data) {
     PageView.prototype.initialize.apply(this, [data]);
     this.windoortemplate = loadTemplate("/static/views/windoor.html");
-
-    //TO DO add bullshit collection
-    //this.collection = window.Blinds;
-    this.collection = window.BsBlinds;
-    console.log(window.BsBlinds)
-
+    this.collection = window.Blinds;
   },
   animateIn: function(){
     PageView.prototype.animateIn.apply(this);
@@ -505,12 +498,10 @@ var PowerView = PageView.extend({
     
     this.collection = [];
 
-    //this.collection['pv'] = window.PV;
-    this.collection[0] = window.BsPV;
+    this.collection[0] = window.PV;
     this.collection[0]._sortBy('value',true);
 
-    //this.collection['device'] = window.Devices;
-    this.collection[1] = window.BsDevices;
+    this.collection[1] = window.Devices;
     this.collection[1]._sortBy('value',true);
     
 
@@ -624,11 +615,8 @@ var WaterView = PageView.extend({
     
     this.collection = [];
 
-    //this.collection['pv'] = window.Water;
-    this.collection[0] = window.BsWater;
+    this.collection[0] = window.Water;
     this.collection[0]._sortBy('value',true);
-   
-
   },
   animateIn: function(){
     PageView.prototype.animateIn.apply(this);
@@ -685,11 +673,8 @@ var HvacView = PageView.extend({
     
     this.collection = [];
 
-    //this.collection['pv'] = window.Water;
-    this.collection[0] = window.BsWater;
+    this.collection[0] = window.Water;
     this.collection[0]._sortBy('value',true);
-   
-
   },
   animateIn: function(){
     PageView.prototype.animateIn.apply(this);
@@ -732,7 +717,7 @@ var OptView = PageView.extend({
     this.opttemplate = loadTemplate("/static/views/optimizer.html");
 
     //BRYANT BUT YOU OPTIMIZER COLLECTION RIGHT IN HERE
-    this.collection = window.BsDevices;
+    this.collection = window.Devices;
     this.collection._sortBy('value',true);
   },
   animateIn: function(){

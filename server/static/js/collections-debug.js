@@ -1,6 +1,8 @@
+window.DEBUG = true;
+
 // Debug collection instantiation
-window.BsDevices = new DevicesCollection();
-BsDevices.add([
+window.Devices = new DevicesCollection();
+Devices.add([
   {
     id: "Computer",
     zone: "bedroom",
@@ -93,8 +95,8 @@ BsDevices.add([
     },
 ]);
 
-window.bullshit = new LightCollection();
-bullshit.add([
+window.Lights = new LightCollection();
+Lights.add([
   {
     id: "kitchencounter",
     type: "analog",
@@ -199,8 +201,8 @@ bullshit.add([
     }
 ]);
 
-window.BsPV = new PVCollection();
-BsPV.add([
+window.PV = new PVCollection();
+PV.add([
   {
     id: "PV1",
     value: Math.random() * 100
@@ -264,8 +266,8 @@ BsPV.add([
 ]);
 
 
-window.BsWater = new WaterCollection();
-BsWater.add([
+window.Water = new WaterCollection();
+Water.add([
   {
     id: "kitchensink",
     room: "kitchen",
@@ -308,8 +310,8 @@ BsWater.add([
     }
 ]);
 
-window.BsBlinds = new BlindCollection();
-BsBlinds.add([
+window.Blinds = new BlindCollection();
+Blinds.add([
   {
     id: "northwindowkitchen",
     zone: "kitchen",

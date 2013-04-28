@@ -1,4 +1,5 @@
 // Production collection instances
+window.DEBUG = false;
 
 window.Lights = new LightCollection();
 window.HVAC = new HVACCollection();

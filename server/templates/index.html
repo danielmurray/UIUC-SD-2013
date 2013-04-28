@@ -36,18 +36,11 @@
     
     <script src="/static/js/models.js"></script>
     <script src="/static/js/collections.js"></script>
-
-    <!-- Made a new view.js -->
     <script src="/static/js/view.js"></script>
-
     <script src="/static/js/controller.js"></script>
-
-
-    <script src="/static/js/lightdata.js"></script>
-    <script src="/static/js/pvdata.js"></script>
-    <script src="/static/js/devicesdata.js"></script>
-    <script src="/static/js/waterdata.js"></script>
-    <script src="/static/js/blindsdata.js"></script>
-
+    {% if debug %}
+    <script src="/static/js/collections-debug.js"></script>
+    {% else %}
     <script src="/static/js/collections-prod.js"></script>
+    {% endif %}
 </html>

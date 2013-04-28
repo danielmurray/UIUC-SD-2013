@@ -117,6 +117,14 @@ def sensor_data():
   val = request.args.get('value')
   return '#'+str(relayDevice.on_message(mac_add, typ, val))+'#'
 
+@app.route("/history", methods=["GET"])
+def history_data():
+  typ = request.args.get("type")
+  id = request.args.get("id", -1)
+  start = request.args.get("start")
+  end = request.args.get("end")
+  field = request.args.get("field")
+  
 if __name__ == '__main__':
   import signal
   print "Starting up"
