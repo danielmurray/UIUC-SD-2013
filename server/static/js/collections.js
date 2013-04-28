@@ -200,5 +200,3 @@ var WaterCollection = CollectionWS.extend({
   }
 });
 
-
-

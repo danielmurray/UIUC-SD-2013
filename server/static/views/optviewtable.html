@@ -1,0 +1,19 @@
+<link href="/static/css/tableentry.css" rel="stylesheet" type="text/css">
+<div class='tableentrywrapper'>
+		<div class='tableentryid'>
+			<%=model.attributes.name%>
+		</div>
+		<div class='tableentryvalue'>
+			<span class='value'>
+				<% if (model.get('val') != "-1") {
+			     print('on');
+			}
+			else {
+			    print('off');
+			} %>
+			</span>
+<!--  			<span class='unit'>
+				<%=model.get('unit')%>
+			</span> -->
+		</div>
+</div>

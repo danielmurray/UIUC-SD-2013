@@ -143,3 +143,13 @@ var SensorModel = ModelWS.extend({
     }
   }
 });
+
+var WindoorModel = ModelWS.extend({
+  defaults: function(){
+    return{
+      id:null,
+      zone: null,
+      value: null,
+    }
+  }
+});

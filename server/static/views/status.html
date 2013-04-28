@@ -16,12 +16,12 @@
          				<div class="status-box">
          					<h4>
          						<span class='notdata'>outside</span><br />
-         						<span class='data'>27</span>
+         						<span class='data'><%=Temp.models[1].attributes.val%></span>
          						<span class='unit'>°C</span>
          					</h4>
          					<h4>
          						<span class='notdata'>inside</span><br />
-         						<span class='data'>23</span>
+         						<span class='data'><%=HVAC.models[0].attributes.avg_temp.val%></span>
          						<span class='unit'>°C</span>
          					</h4>
          				</div>
@@ -30,8 +30,12 @@
          		<div class='middlepanes'>
          			<div class='nav-button status-pane windoor'>
          				<h2>Windows & Doors</h2>
-         				<div class="status-box">
-         				</div>
+                     <div class="status-box">
+                        <h4>
+                           <span class='data'>2</span><br />
+                           <span class='notdata'>windows/doors open</span>
+                        </h4>
+                     </div>
          			</div>
          			<div class='nav-button status-pane power'>
          				<h2>Power</h2>
@@ -68,16 +72,6 @@
          					<li class='tip-box'>
          						<div class='just-the-tip'>
          							your doors are unlocked
-         						</div>
-         					</li>
-         					<li class='tip-box'>
-         						<div class='just-the-tip'>
-         							its sunny but your lights are on
-         						</div>
-         					</li>
-         					<li class='tip-box'>
-         						<div class='just-the-tip'>
-         							your rice is done
          						</div>
          					</li>
          				</ul>
