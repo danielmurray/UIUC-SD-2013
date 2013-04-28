@@ -11,6 +11,7 @@ import logging
 import controller
 import time
 import random
+import data
 from gevent import monkey; monkey.patch_all()
 import gevent
 
@@ -79,6 +80,7 @@ controllers = [
 
 # add the logger to every controller
 map(lambda x: x.add_client(eventLogger), controllers)
+history = data.History(controllers, 15)
 
 @app.route("/")
 def index():
