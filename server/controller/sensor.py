@@ -96,10 +96,10 @@ class TempController(BackboneCollection, ParentController):
     def avg_temp(self):
         total_temp = 0
         n = 0
-        outdoor_locations = ["Outdoor", "Outdoors", "outdoor", "outdoors"]
+        outdoor_zones = ["Outdoor", "Outdoors", "outdoor", "outdoors"]
         for key, value in sensor_list.items():
             if value['type'] == 'temp':
-                if value['meta_data']['location'] not in outdoor_locations:
+                if value['zone'] not in outdoor_zones:
                     if value.has_key("val"):
                         total_temp += float(value['val'])
                         n += 1
