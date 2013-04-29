@@ -140,7 +140,8 @@ var WindoorCollection = CollectionWS.extend({
     var windooropen = [];
 
     _.each(this.models, function(model){
-      if(model.get('zone') == zone && model.get('value') != 0 ){
+      console.log(model.get('name'), model.get('val') )
+      if(model.get('zone') == zone && model.get('val') == 0 ){
         windooropen.push(model);
       }
     });
