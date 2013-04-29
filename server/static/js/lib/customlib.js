@@ -114,8 +114,29 @@ var randomArray = function(start, end, size, seed){
     arr[i][1] = arr[i-1][1] + (Math.random()*2 - 1)
   }
 
-
+  console.log(arr);
   return arr;
+}
+
+var historyData = function(type, field, start, end, period, group, callback) {
+  $.ajax("/history", {
+    data: {
+      type: type,
+      field: field,
+      start: start,
+      end: end,
+      period: period,
+      group: group
+    },
+    dataType: "json",
+    success: function(data) {
+      callback(data);
+    },
+    error: function(err) {
+      console.error(err);
+      callback(undefined);
+    }
+  });
 }
 
 var rgbaToString = function(color,opacity){

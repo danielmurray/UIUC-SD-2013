@@ -116,14 +116,14 @@ var WindoorCollection = CollectionWS.extend({
     var windooropen = [];
 
     _.each(this.models, function(model){
-      if(model.get('zone') == zone && model.get('val') != 0 ){
+      if(model.get('zone') == zone && model.get('value') != 0 ){
         windooropen.push(model);
       }
     });
 
     return [
       windooropen.length,
-      'Open<br />D+W'
+      'Open Doors <br />+ Window'
     ]
   }
 });
@@ -152,7 +152,7 @@ var PowerCollection = CollectionWS.extend({
   },
   getHistoricalData: function(start,end,density) {
     console.log(start, end, density);
-    return randomArray(start, end, density, 100);
+    historyData("power", "power", start, end, density, "sum", callback);
   }
 });
 
@@ -175,10 +175,9 @@ var PVCollection = CollectionWS.extend({
     this._order_by = orderOn;
     this.sort();
   },
-  getHistoricalData: function(start,end,density) {
-    
-    return randomArray(start, end, density, 100);
 
+  getHistoricalData: function(start,end,density) {
+    historyData("pv", "power", start, end, density, "sum", callback);
   }
 });
 

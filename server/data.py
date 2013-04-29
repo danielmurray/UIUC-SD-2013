@@ -50,13 +50,14 @@ class History:
     c.executemany(insert_history, data)
     conn.commit()
 
-  def get(self, typ, field, id, start, end, group_by):
+  def get(self, typ, field, id, start, end, group_by, period):
     """
     typ is the sensor type constant
     field is the selector into the JSON data (hvac_data.temp)
     id is optional
     start, end are unix timestamps
     group_by performs a grouping operation [sum, avg, none]
+    period is the number of seconds to group together
     """
     sql = "SELECT time, data FROM sensor_history WHERE type = ? AND time >= ? AND time <= ?"
     args = [typ, start, end]
@@ -96,11 +97,11 @@ class History:
     rows.append({"time": -1}) # needs an extra value for the cleanup
     for i in range(0, len(rows)):
       row = rows[i]
-      time = row["time"] - start
-      if time != cur_time:
+      time = row["time"]
+      if time > cur_time + period or time == -1:
         if cur_time > 0: # don't add for the first iteration
           for g in group_fn(group):
-            graph.append((cur_time, g))
+            graph.append((cur_time*1000, g))
         if i >= len(rows)-1:
           break
         group = []

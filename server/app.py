@@ -129,9 +129,10 @@ def history_data():
   start = int(request.args.get("start", 0))
   end = int(request.args.get("end", 9999999999))
   group = request.args.get("group", "none")
+  period = int(request.args.get("period", 0))
   if not field or not typ:
     abort(400)
-  h = history.get(typ, field, id, start, end, group)
+  h = history.get(typ, field, id, start, end, group, period)
   return json.dumps(h)
 
 if __name__ == '__main__':

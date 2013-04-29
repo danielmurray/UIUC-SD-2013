@@ -806,26 +806,48 @@ var GraphView = BaseView.extend({
     this.timeperiod = graphdata.range;
     this.inputdata = graphdata.series;
     this.unit = graphdata.unit;
-
-    this.organizeHistoricalData();
+    this.series = undefined;
+    var that = this;
+    this.fetchHistoricalData(function() {
+      console.log("Got all data", that.series);
+      that.organizeHistoricalData();
+      that.render();
+    });
 
     this.template = loadTemplate("/static/views/graph.html");
 
   },
-  organizeHistoricalData: function(){    
+  fetchHistoricalData: function(callback){    
     that = this;
     
     this.series = [];
+    var len = this.inputdata.length;
+    var allGraphs = function() {
+      len = len - 1;
+      if (!len) {
+        callback();
+      }
+    };
 
     $.each(this.inputdata, function(i, inputdata){
-      that.series[i] = {
-        name: inputdata.name,
-        type: 'area',
-        color: rgbaToString(that.inputdata[i].color,1),
-        data: that.getHistoricalData(inputdata.collection)
-      }
+      var clos = (function(j, d) {
+        return function (data) {
+          console.log(data, d, j);
+          that.series[j] = {
+            name: inputdata.name,
+            type: 'area',
+            color: rgbaToString(that.inputdata[j].color,1),
+            data: data
+          };
+          if (data) {
+            allGraphs();
+          }
+        }
+      })(i, inputdata);
+      that.getHistoricalData(inputdata.collection, clos);
     });
-
+  },
+  organizeHistoricalData: function() {
     if(this.type == 'area' && this.series.length >= 2){
 
       this.series[0].type = this.series[1].type = 'line'
@@ -884,42 +906,38 @@ var GraphView = BaseView.extend({
       this.series.push(this.area1,this.area2,this.erase);
     }
   },
-  getHistoricalData:function(collection){
-
-    var now = new Date();
-    var now = Math.round((new Date()).getTime()) - now.getTimezoneOffset()*60*1000;
+  getHistoricalData:function(collection, callback){
+    var now = Math.round((new Date()).getTime()/1000);
     
     switch(this.timeperiod){
       case 'day':
-        var then = now - 24*60*60*1000;
+        var then = now - 24*60*60;
         break;
       case 'week':
-        var then = now - 7*24*60*60*1000;
+        var then = now - 7*24*60*60;
         break;
       case 'month':
-        var then = now - 30*24*60*60*1000;
+        var then = now - 30*24*60*60;
         break;
       default:
-        var then = now - 365*24*60*60*1000;
+        var then = now - 365*24*60*60;
     }
-
-    //console.log(collection.getHistoricalData(now,then,100))
-    return collection.getHistoricalData(now,then,100);
-
+    collection.getHistoricalData(then,now,100, callback);
   },
   route: function(part) {
     return{};
   },
-  render: function(pane, subpane) {
+  render: function() {
     var that = this;
 
     var renderedTemplate = this.template();
     this.$el.html(renderedTemplate);
 
-    setTimeout(function(){
-      that.renderChart()
-    }, 400);
+    if (this.series) {
+      this.renderChart();
+    }
 
+    /*
     $('.histdata').click(function(){
       that.timeperiod = this.id;
 
@@ -931,6 +949,7 @@ var GraphView = BaseView.extend({
       that.renderChart();
 
     });
+*/
   },
   renderChart: function(){
     var that = this;
