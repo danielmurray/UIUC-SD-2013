@@ -87,6 +87,9 @@ var HVACCollection = CollectionWS.extend({
     
     historyData("hvac", "tar_temp", start, end, density, "sum", callback);
 
+  },
+  getTemp: function() {
+    return this.at(0).get("tar_temp")
   }
 });
 
@@ -97,6 +100,13 @@ var TempCollection = CollectionWS.extend({
     
     historyData("temp", "val", start, end, density, "avg", callback);
 
+  },
+  getAvgTemp: function() {
+    var sum = 0;
+    _.each(this, function(i, model) {
+      sum += int(model.get("val"));
+    });
+    return sum / this.size();
   }
 });
 

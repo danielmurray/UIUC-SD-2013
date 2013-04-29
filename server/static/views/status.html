@@ -16,12 +16,12 @@
          				<div class="status-box">
          					<h4>
          						<span class='notdata'>outside</span><br />
-         						<span class='data'><%=Temp.models[1].attributes.val%></span>
+         						<span class='data'><%=Temp.getAvgTemp()%></span>
          						<span class='unit'>°C</span>
          					</h4>
          					<h4>
          						<span class='notdata'>inside</span><br />
-         						<span class='data'><%=HVAC.models[0].attributes.avg_temp%></span>
+         						<span class='data'><%=HVAC.getTemp()%></span>
          						<span class='unit'>°C</span>
          					</h4>
          				</div>
