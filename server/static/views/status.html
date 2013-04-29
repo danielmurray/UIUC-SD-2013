@@ -41,10 +41,15 @@
          				<h2>Power</h2>
          				<div class="status-box">
          					<h4>
-                           <span class='notdata'>net metering</span><br />
-                           <span class='data'><%=Power.models[6].attributes.power%></span>
-                           <span class='unit'>W</span>
-                        </h4>
+                    <span class='notdata'>consumption</span><br />
+                    <span class='data'> <%=Power.getTotalConsumption()%></span>
+                    <span class='unit'>W</span>
+                  </h4>
+                  <h4>
+                    <span class='notdata'>production</span><br />
+                    <span class='data'> <%=PV.getTotalProduction()%></span>
+                    <span class='unit'>W</span>
+                  </h4>
          				</div>
          			</div>
          			<div class='nav-button status-pane water'>

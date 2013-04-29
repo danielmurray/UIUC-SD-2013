@@ -154,7 +154,15 @@ var PowerCollection = CollectionWS.extend({
   getHistoricalData: function(start,end,density,callback) {
     console.log(start, end, density);
     historyData("power", "power", start, end, density, "sum", callback);
-  }
+  },
+  getTotalConsumption: function() {
+    var total = 0.0;
+    $.each(this.models, function() {
+      var adder = parseFloat(this.attributes.power);
+      total += adder;
+    });
+    return Math.round(total);
+  },
 });
 
 
@@ -176,10 +184,17 @@ var PVCollection = CollectionWS.extend({
     this._order_by = orderOn;
     this.sort();
   },
-
   getHistoricalData: function(start,end,density,callback) {
     historyData("pv", "power", start, end, density, "sum", callback);
-  }
+  },
+  getTotalProduction: function() {
+    var total = 0.0;
+    $.each(this.models, function() {
+      var adder = parseFloat(this.attributes.power);
+      total += adder;
+    });
+    return Math.round(total)
+  },
 });
 
 var FlowCollection = CollectionWS.extend({

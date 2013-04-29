@@ -41,7 +41,7 @@ var SensorView = Backbone.View.extend({
 
 var tabView = new TabView();
 
-var collections = [Lights, HVAC, PV, Water, Temp, Pyra, Humid, CO2, Flow, Windoor, Power];
+var collections = [Lights, HVAC, PV, Temp, Pyra, Humid, CO2, Flow, Windoor, Power];
 for (var i in collections) {
 	var view = new SensorView(collections[i]);
 	tabView.add(collections[i].url, view);

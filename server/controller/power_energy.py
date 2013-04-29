@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 
 class PowerController(BackboneCollection):
   typ = "power"
+  ignored_power_meters = ["Total Usage", "Total Generation", "Solar+"]
   def __init__(self):
     self.ws = None # make the websocket connection + send auth
     self.freq = 3 #in seconds
@@ -27,7 +28,7 @@ class PowerController(BackboneCollection):
       self.update(v)
 
   def fetch_data(self):
-    server_url = "http://128.174.180.40/cgi-bin/egauge?tot"
+    server_url = "http://128.174.180.40/cgi-bin/egauge" # + "?tot"
     return self.make_request(server_url, None)
 
   def parse_xml(self,unparsed_xml):
@@ -35,6 +36,9 @@ class PowerController(BackboneCollection):
     energy_dict = {}
     for each in xml_tree.iter('meter'):
       key = each.attrib['title']
+      if key in self.ignored_power_meters:
+        continue
+      
       energy =  each.find('energy').text
       energyWs = each.find('energyWs').text
       power = each.find('power').text
@@ -81,7 +85,7 @@ class PVController(BackboneCollection):
     return a[0] if len(a) > 0 else 0
 
   def parse_aps_data(self):
-    html = BeautifulSoup(self.make_request('http://eric-johnson.net/APS-ECU/parameters.php',None))
+    html = BeautifulSoup(self.make_request('http://solardecathlon.web.cs.illinois.edu/APS-ECU/parameters.php',None))
     table = html.findAll('table')[0]
     panels = {}
     rows = table.tbody('tr')
