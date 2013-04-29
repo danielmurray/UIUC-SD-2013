@@ -1147,10 +1147,15 @@ var FloorPlanView = BaseView.extend({
     this.trigger('zoneselect', zone);
   },
   route: function(part) {
+    that = this
 
     var floorplandataoverlayview = new FloorPlanDataOverlay({
       collection: this.collection,
       paths: this.floorplanpaths
+    });
+
+    floorplandataoverlayview.on('zoneselect', function(zone){
+      that.selectzone(zone)
     });
 
     return {
@@ -1243,6 +1248,13 @@ var FloorPlanDataOverlay = BaseView.extend({
     this.collection = data.collection;
     this.floorplanpaths = data.paths;
     console.log(this.collection)
+  },
+  events: {
+    "click .zonecontainer":  "selectzone"
+  },
+  selectzone: function(click){
+    zone = click.currentTarget.id
+    this.trigger('zoneselect', zone);
   },
   route: function(part) {
     return {};
