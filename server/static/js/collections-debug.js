@@ -422,10 +422,9 @@ Flow.add([
 window.Windoor = new WindoorCollection();
 Windoor.add([
     {
-    id: "bedroom",
-    state: "on", //id = room
-    avg_temp: Math.random() * 100,
-    tar_temp: Math.random() * 100
+    id: "6",
+    zone: "room-1",
+    value: '1'
     }
 ]);
 
