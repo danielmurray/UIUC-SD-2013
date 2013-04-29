@@ -1250,7 +1250,7 @@ var FloorPlanDataOverlay = BaseView.extend({
     console.log(this.collection)
   },
   events: {
-    "click .zonecontainer":  "selectzone"
+    "click.zonecontainer":  "selectzone"
   },
   selectzone: function(click){
     zone = click.currentTarget.id
