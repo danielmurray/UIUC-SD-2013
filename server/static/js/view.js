@@ -159,6 +159,10 @@ var StatusView = PageView.extend({
     //console.log(data)
     this.on("assign", this.animateIn);
     this.statustemplate = loadTemplate("/static/views/status.html");
+    var that = this;
+    _.each(Collections, function(c, i) {
+      c.on("all", that.render, that);
+    });
   },
   animateIn: function(){
     PageView.prototype.animateIn.apply(this);

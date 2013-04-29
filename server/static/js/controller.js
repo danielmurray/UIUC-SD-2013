@@ -97,9 +97,9 @@ $(function() {
   };
 
   // Only fetch non-debug collections
-  var collections = [Lights, HVAC, PV, Temp, Pyra, Humid, CO2, Flow, Windoor, Power];
+  window.Collections = [Lights, HVAC, PV, Temp, Pyra, Humid, CO2, Flow, Windoor, Power];
   if (!DEBUG) {
-    var waitingOn = collections.length;
+    var waitingOn = Collections.length;
     var start = function() {
       waitingOn = waitingOn - 1;
       console.log("Waiting on", waitingOn);
@@ -109,9 +109,9 @@ $(function() {
       }
     }
 
-    for (var col in collections) {
-      if (collections[col].size() == 0) {
-        collections[col].fetch({
+    for (var col in Collections) {
+      if (Collections[col].size() == 0) {
+        Collections[col].fetch({
           success: start
         });
       }

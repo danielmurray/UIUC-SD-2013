@@ -103,7 +103,7 @@ var TempCollection = CollectionWS.extend({
   },
   getAvgTemp: function() {
     var sum = 0;
-    _.each(this, function(i, model) {
+    _.each(this, function(model) {
       sum += int(model.get("val"));
     });
     return sum / this.size();
