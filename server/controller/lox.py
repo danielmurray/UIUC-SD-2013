@@ -12,11 +12,14 @@ class EchoIncoming(WebSocketClientProtocol):
         self.initialized = False
         self.msg_list = []
         self.listners = []
+        self.config_received = False
         gevent.Greenlet(self.parent.clear_listner_list).start_later(1)
 
     def registerListner(self, listner):
         if callable(listner):
             self.listners.append(listner)
+        if config_received:
+            listner(self.config_msg)
 
 
     def onMessage(self,msg, binary):
@@ -45,10 +48,13 @@ class EchoIncoming(WebSocketClientProtocol):
     def parseConfigMsg(self,msg):
         msg_dict = json.loads(msg)
         uuid_list = msg_dict['UUIDs']['UUID']
-        return {
+        self.config_received = True
+        msg =  {
             "type":"config",
             "msg": uuid_list
         }
+        self.config_msg = msg
+        return msg
 
     def parseVerMsg(self,msg):
         msg_dict = json.loads(msg)

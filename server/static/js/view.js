@@ -523,7 +523,8 @@ var PowerView = PageView.extend({
           collection: this.collection[1]
         }
       ],
-      range: 'day'
+      range: 'day',
+      unit: "w"
     });
 
     consumptiondatabox = new DataBox({
@@ -552,7 +553,8 @@ var PowerView = PageView.extend({
                 collection: this.collection[1]
               }
             ],
-            range: 'day'
+            range: 'day',
+            unit: "w"
           }
         }
       }
@@ -586,7 +588,8 @@ var PowerView = PageView.extend({
                 collection: this.collection[0]
               }
             ],
-            range: 'day'
+            range: 'day',
+            unit: "w"
           }
         }
       }
@@ -629,7 +632,8 @@ var WaterView = PageView.extend({
           collection: this.collection[0]
         }
       ],
-      range: 'day'
+      range: 'day',
+      unit: "gal"
     });
 
     consumptiondatabox = new DataBox({
@@ -694,7 +698,8 @@ var HvacView = PageView.extend({
           collection: this.collection[0]
         }
       ],
-      range: 'day'
+      range: 'day',
+      unit: "w"
     });
 
     thermostat = new Thermostat({model: this.model});
@@ -806,6 +811,7 @@ var GraphView = BaseView.extend({
     this.type = graphdata.type;
     this.timeperiod = graphdata.range;
     this.inputdata = graphdata.series;
+    this.unit = graphdata.unit;
 
     this.organizeHistoricalData();
 
@@ -1040,7 +1046,7 @@ var GraphView = BaseView.extend({
         },
         labels: {
           formatter: function(){
-            return this.value + that.inputdata[0].collection.models[0].get('unit')
+            return this.value + that.unit;
           },
           style: {
               fontFamily: "Lato-thin",
