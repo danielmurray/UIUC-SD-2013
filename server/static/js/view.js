@@ -1087,16 +1087,16 @@ var TableView = BaseView.extend({
     //views to be returned
     tableEntriesToRendered = {};
 
-    console.log(this.collection)
     var that = this;
-    _.each(this.collection.models, function(model) {
+    _.each(this.collection.models, function(model,i) {
+
       tableentry = new TableViewEntry(model, that.name, that.value, that.unit);
-      tableEntriesToRendered['#'+model.id] = tableentry;
+      tableEntriesToRendered['#tableEntry'+i] = tableentry;
       that.tableEntries[model.id] = {};
       that.tableEntries[model.id].id = model.id;
       that.tableEntries[model.id].view = tableentry;
       that.tableEntries[model.id].model = model;
-
+      console.log(tableEntriesToRendered)
     });
 
     return tableEntriesToRendered;
@@ -1120,8 +1120,7 @@ var TableViewEntry = BaseView.extend({
     return {};
   },
   render: function() {
-    console.log(this.model.get(this.value))
-    
+
     var renderedTemplate = this.template({model:this.model, name: this.name, value: this.value, unit: this.unit});
     this.$el.html(renderedTemplate);
   }

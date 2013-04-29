@@ -1,5 +1,8 @@
+
+
 .tableentrywrapper{
-	background-color: rgba(0, 15, 30, 0.8);
+	width: 100%;
+	height: 100%;
 }
 
 .tableentryid{
@@ -7,6 +10,13 @@
 	height: 100%;
 	width: 73%;
 	font-size: 40px;
+}
+
+.tableentryid .textbox{
+	width: 100%;
+	height: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 
 .tableentryvalue{

@@ -2,11 +2,11 @@
 <div class='tablewrapper'>
 	<ul class='tablelist'>
 		<% 
-        _.each(collection.models, function(data) {
+        _.each(collection.models, function(data,i) {
         %>
 
         <li>
-        	<div id='<%=data.id%>' class='datawrapper' >
+        	<div id='tableEntry<%=i%>' class='datawrapper' >
         	</div>
         </li>
 
