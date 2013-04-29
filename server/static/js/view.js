@@ -223,7 +223,7 @@ var WindoorView = PageView.extend({
   initialize: function(data) {
     PageView.prototype.initialize.apply(this, [data]);
     this.windoortemplate = loadTemplate("/static/views/windoor.html");
-    this.collection = window.Blinds;
+    this.collection = window.Windoor;
   },
   animateIn: function(){
     PageView.prototype.animateIn.apply(this);
@@ -497,10 +497,10 @@ var PowerView = PageView.extend({
     this.collection = [];
 
     this.collection[0] = window.PV;
-    //this.collection[0]._sortBy('value',true);
+    this.collection[0]._sortBy('value',true);
 
     this.collection[1] = window.Power;
-    //this.collection[1]._sortBy('power',true);
+    this.collection[1]._sortBy('power',true);
     
 
   },
@@ -730,7 +730,7 @@ var OptView = PageView.extend({
     //BRYANT BUT YOU OPTIMIZER COLLECTION RIGHT IN HERE
     this.collection = window.Optimizer;
     //this.collection._sortBy('value',true);
-    console.log(window.Optimizer)
+    
     if( this.collection.models.length >0 ){
       this.model = this.collection.models[0]
     }else{
@@ -1130,6 +1130,7 @@ var TableViewEntry = BaseView.extend({
     this.model = data;
   },
   route: function(part) {
+    this.listenTo(this.model, 'change', this.render);
     return {};
   },
   render: function() {
@@ -1145,7 +1146,6 @@ var FloorPlanView = BaseView.extend({
 
     this.template = loadTemplate("/static/views/floorplan.html");
     this.collection = data.collection;
-
     var paths = loadData("/static/paths.json");
     this.floorplanpaths = JSON.parse(paths);
   },
@@ -1248,7 +1248,7 @@ var FloorPlanDataOverlay = BaseView.extend({
     this.template = loadTemplate("/static/views/floorplandataoverlay.html");
     this.collection = data.collection;
     this.floorplanpaths = data.paths;
-
+    console.log(this.collection)
   },
   route: function(part) {
     return {};

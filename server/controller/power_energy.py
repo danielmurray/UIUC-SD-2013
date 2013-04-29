@@ -7,7 +7,7 @@ class PowerController(BackboneCollection):
   typ = "power"
   def __init__(self):
     self.ws = None # make the websocket connection + send auth
-    self.freq = 60 #in seconds
+    self.freq = 3 #in seconds
     BackboneCollection.__init__(self)
     gevent.spawn(self._data_fetch)
 
@@ -56,7 +56,7 @@ class PVController(BackboneCollection):
   typ = "pv"
   def __init__(self):
     self.ws = None # make the websocket connection + send auth
-    self.freq = 60 #in seconds
+    self.freq = 3 #in seconds
     BackboneCollection.__init__(self)
     gevent.spawn(self._data_fetch)
 
