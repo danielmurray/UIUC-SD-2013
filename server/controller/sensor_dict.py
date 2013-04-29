@@ -10,72 +10,56 @@ _sensor_list = [
 		'type':'temp',
 		'name':'kitchen',
 		'freq':0,
-		'meta_data':{
-			'zone':'kitchen',
-		}
+		'zone':'kitchen'
 	},
 	{
 		'mac_address':'mac-1',
 		'type':'pyra',
 		'name':'kitchen',
 		'freq':1,
-		'meta_data':{
-			'zone':'kitchen'
-		}
+		'zone':'kitchen'
 	},	
 	{
 		'mac_address':'mac-1',
 		'type':'humid',
 		'name':'kitchen',
 		'freq':2,
-		'meta_data':{
-			'zone':'kitchen',
-		}
+		'zone':'kitchen'
 	},
 	{
 		'mac_address':'mac-1',
 		'type':'co2',
 		'name':'kitchen',
 		'freq':3,
-		'meta_data':{
-			'zone':'kitchen',
-		}
+		'zone':'kitchen'
 	},	
 	{
 		'mac_address':'mac-1',
 		'type':'flow',
 		'name':'kitchen',
 		'freq':4,
-		'meta_data':{
-			'zone':'kitchen',
-		}
+		'zone':'kitchen'
 	},
 	{
 		'mac_address':'mac-1',
 		'type':'windoor',
 		'name':'kitchen',
 		'freq':5,
-		'meta_data':{
-			'zone':'kitchen',
-		}
+		'zone':'kitchen'
 	},
 	{
 		'mac_address':'mac-2',
 		'type':'windoor',
 		'name':'kitchen',
 		'freq':5,
-		'meta_data':{
-			'zone':'kitchen',
-		}
+		'zone':'kitchen'
 	},
 	{
 		'mac_address':'mac-2',
 		'type':'temp',
 		'name':'kitchen',
 		'freq':5,
-		'meta_data':{
-			'zone':'kitchen'
-		}
+		'zone':'kitchen'
 	},
 	# {
 	# 	'mac_address':,
