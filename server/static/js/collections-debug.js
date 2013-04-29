@@ -348,6 +348,6 @@ Power.add([
 window.Optimizer = new OptimizerCollection();
 Optimizer.add([
     {
-    id: "bedroom",
+    id: "null",
     }
 ]);
