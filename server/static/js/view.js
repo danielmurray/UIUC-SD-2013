@@ -1182,7 +1182,7 @@ var TableViewOpt = BaseView.extend({
     var that = this;
     _.each(this.collection.models, function(model,i) {
 
-      tableentry = new TableViewEntry(model, that.name, that.value, that.unit);
+      tableentry = new TableViewEntryOpt(model, that.name, that.value, that.unit);
       tableEntriesToRendered['#tableEntry'+i] = tableentry;
       that.tableEntries[model.id] = {};
       that.tableEntries[model.id].id = model.id;
@@ -1198,7 +1198,7 @@ var TableViewOpt = BaseView.extend({
   }
 });
 
-var TableViewEntry = BaseView.extend({
+var TableViewEntryOpt = BaseView.extend({
   el: 'div',
   initialize: function(data, name, value, unit) {
     this.value = value;

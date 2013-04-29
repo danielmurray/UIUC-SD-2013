@@ -71,7 +71,11 @@
          				<ul class='tips'>
          					<li class='tip-box'>
          						<div class='just-the-tip'>
-         							production is less than consump-tion
+         							<% if (Windoor.getTotalOpen() != "0") {
+                                 print('Your door is open!');
+                                 }
+                                 else {
+                                 } %>
          						</div>
          					</li>
          					<li class='tip-box'>
