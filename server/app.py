@@ -1,7 +1,7 @@
 import geventreactor; geventreactor.install()
 from twisted.internet import reactor
 from flask import Flask, send_file, url_for, render_template, request, \
-  session, redirect, flash, Markup, abort, Response
+  session, redirect, flash, Markup, abort, Response, make_response
 from socketio.server import SocketIOServer
 import os
 import hashlib
@@ -9,9 +9,10 @@ import socketio
 import logger
 import logging
 import controller
+import data
 import time
 import random
-import data
+import json
 from gevent import monkey; monkey.patch_all()
 import gevent
 
@@ -27,10 +28,9 @@ else:
   logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__) 
-
+app.debug = args.get("debug")
 app.config.update(
   SECRET_KEY = hashlib.sha1(os.urandom(24)).digest(),
-  DEBUG = args.get("debug")
 )
 
 eventLogger = logger.EventLogger()
@@ -121,12 +121,19 @@ def sensor_data():
 
 @app.route("/history", methods=["GET"])
 def history_data():
-  typ = request.args.get("type")
-  id = request.args.get("id", -1)
-  start = request.args.get("start")
-  end = request.args.get("end")
-  field = request.args.get("field")
-  
+  # required
+  typ = request.args.get("type", None)
+  field = request.args.get("field", None) # field.value
+  # optional
+  id = request.args.get("id", None)
+  start = int(request.args.get("start", 0))
+  end = int(request.args.get("end", 9999999999))
+  group = request.args.get("group", "none")
+  if not field or not typ:
+    abort(400)
+  h = history.get(typ, field, id, start, end, group)
+  return json.dumps(h)
+
 if __name__ == '__main__':
   import signal
   print "APP::Starting up"
