@@ -104,10 +104,6 @@ var HumidCollection = CollectionWS.extend({
   model: SensorModel,
   url: '/humid'
 });
-var FlowCollection = CollectionWS.extend({
-  model: SensorModel,
-  url: '/flow'
-});
 
 var WindoorCollection = CollectionWS.extend({
   model: SensorModel,
@@ -181,9 +177,9 @@ var PVCollection = CollectionWS.extend({
   }
 });
 
-var WaterCollection = CollectionWS.extend({
-  model: WaterModel,
-  url: '/water',
+var FlowCollection = CollectionWS.extend({
+  model: SensorModel,
+  url: '/flow',
   _order_by: 'id',
   _descending: 1,
   comparator: function(device) {
@@ -200,9 +196,9 @@ var WaterCollection = CollectionWS.extend({
     this.sort();
   },
 
-  getHistoricalData: function(start,end,density) {
+  getHistoricalData: function(start,end,density,callback) {
     
-    return randomArray(start, end, density, 100);
+    historyData("flow", "val", start, end, density, "sum", callback);
 
   }
 });

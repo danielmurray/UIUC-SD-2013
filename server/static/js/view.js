@@ -616,8 +616,8 @@ var WaterView = PageView.extend({
     
     this.collection = [];
 
-    this.collection[0] = window.Water;
-    this.collection[0]._sortBy('value',true);
+    this.collection[0] = window.Flow;
+    this.collection[0]._sortBy('val',true);
   },
   animateIn: function(){
     PageView.prototype.animateIn.apply(this);
@@ -643,7 +643,7 @@ var WaterView = PageView.extend({
         table: {
           id: 'table',
           view: TableView,
-          args: {collection: this.collection[0], name: "id", value: "value", unit: "gal/min"}
+          args: {collection: this.collection[0], name: "name", value: "val", unit: "gal/min"}
         },
         graphic: {
           id: 'graphic',
