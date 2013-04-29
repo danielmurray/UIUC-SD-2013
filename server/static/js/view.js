@@ -730,12 +730,6 @@ var OptView = PageView.extend({
     //BRYANT BUT YOU OPTIMIZER COLLECTION RIGHT IN HERE
     this.collection = window.Windoor;
     //this.collection._sortBy('value',true);
-    
-    if( this.collection.models.length >0 ){
-      this.model = this.collection.models[0]
-    }else{
-      console.log('No Optimizer Models Found')
-    }
 
   },
   animateIn: function(){
@@ -745,7 +739,7 @@ var OptView = PageView.extend({
     
     console.log(this.collection)
 
-    table = new TableView({collection:this.collection});
+    table = new TableView({collection: this.collection, name: "id", unit: "open"});
 
     return{
       '#optimizertabledebug': table
@@ -1090,6 +1084,7 @@ var TableView = BaseView.extend({
     this.template = loadTemplate("/static/views/table.html");
     this.name = data.name;
     this.collection = data.collection;
+    console.log(data)
   },
   route: function(part) {
     var that = this;
@@ -1109,7 +1104,6 @@ var TableView = BaseView.extend({
       that.tableEntries[model.id].id = model.id;
       that.tableEntries[model.id].view = tableentry;
       that.tableEntries[model.id].model = model;
-      console.log(tableEntriesToRendered)
     });
 
     return tableEntriesToRendered;

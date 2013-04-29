@@ -11,6 +11,8 @@ var LightModel = ModelWS.extend({
   },
   getcolor: function(){
   	var hex = this.get('value');
+  	console.log(hex);
+  	
   	var rgb = hexToRgb(hex);
     var hsl = rgbToHsl(rgb)
   	return hsl;

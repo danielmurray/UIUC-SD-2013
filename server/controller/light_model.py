@@ -99,7 +99,11 @@ class light(object):
         green_scaled = str(int(self.scale_me(green, 0,255,0,100)))
         blue_scaled = str(int(self.scale_me(blue, 0,255,0,100)))
 
+<<<<<<< Updated upstream
         final_val = blue_scaled.zfill(3)+green_scaled.zfill(3)+red_scaled.zfill(3)
+=======
+        final_val = blue_scaled.zfill(3) + green_scaled.zfill(3) + red_scaled.zfill(3)
+>>>>>>> Stashed changes
         return final_val
 
     def update_analog(self,value):
