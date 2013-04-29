@@ -1,15 +1,15 @@
 <link href="/static/css/tableentry.css" rel="stylesheet" type="text/css">
 <div class='tableentrywrapper'>
 		<div class='tableentryid'>
-			<% if (model.get('val') != "1") {
-			     print('Your door is open!');
-			}
-			else {
-			} %>
+			<% if (Windoor.getTotalOpen() != "0") { %>
+			     <% print('Your door is open!'); %>
+			<%}
+			else { %>
+			<% } %>
 		</div>
 		<div class='tableentryvalue'>
 			<span class='value'>
-				<% if (model.get('val') != "1") { %>
+				<% if (Windoor.getTotalOpen() != "0") { %>
 			    	<%= model.get('name') %> open 
 				<%}else {%>
 			
