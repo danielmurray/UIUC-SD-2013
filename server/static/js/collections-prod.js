@@ -13,3 +13,5 @@ window.CO2 = new Co2Collection();
 window.Flow = new FlowCollection();
 window.Windoor = new WindoorCollection();
 window.Power = new PowerCollection();
+
+window.Optimizer = OptimizerCollection();

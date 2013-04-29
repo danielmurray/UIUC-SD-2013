@@ -723,8 +723,15 @@ var OptView = PageView.extend({
     console.log("Opt View Initialized");
 
     //BRYANT BUT YOU OPTIMIZER COLLECTION RIGHT IN HERE
-    this.collection = window.Devices;
-    this.collection._sortBy('value',true);
+    this.collection = window.Optimizer;
+    //this.collection._sortBy('value',true);
+
+    if( this.collection[0].models.length >0 ){
+      this.model = this.collection[0].models[0]
+    }else{
+      console.log('No Optimizer Models Found')
+    }
+
   },
   animateIn: function(){
     PageView.prototype.animateIn.apply(this);
@@ -733,7 +740,7 @@ var OptView = PageView.extend({
     
     console.log(this.collection)
 
-    table = new TableViewWindoor({collection:this.collection});
+    table = new TableView({collection:this.collection});
 
     return{
       '#optimizertabledebug': table
