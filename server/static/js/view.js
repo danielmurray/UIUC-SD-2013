@@ -730,9 +730,9 @@ var OptView = PageView.extend({
     //BRYANT BUT YOU OPTIMIZER COLLECTION RIGHT IN HERE
     this.collection = window.Optimizer;
     //this.collection._sortBy('value',true);
-
-    if( this.collection[0].models.length >0 ){
-      this.model = this.collection[0].models[0]
+    console.log(window.Optimizer)
+    if( this.collection.models.length >0 ){
+      this.model = this.collection.models[0]
     }else{
       console.log('No Optimizer Models Found')
     }
@@ -1135,59 +1135,6 @@ var TableViewEntry = BaseView.extend({
   render: function() {
 
     var renderedTemplate = this.template({model:this.model, name: this.name, value: this.value, unit: this.unit});
-    this.$el.html(renderedTemplate);
-  }
-});
-
-var TableViewWindoor = BaseView.extend({
-  el: 'div',
-  initialize: function(data) {
-    this.template = loadTemplate("/static/views/table.html");
-    
-    this.collection = data.collection;
-  },
-  route: function(part) {
-    var that = this;
-
-    //pointers for this view
-    this.tableEntries = {};
-
-    //views to be returned
-    tableEntriesToRendered = {};
-
-    console.log(this.collection)
-
-    _.each(this.collection.models, function(model) {
-
-      tableentry = new TableViewEntryOpt(model);
-      tableEntriesToRendered['#'+model.id] = tableentry;
-      that.tableEntries[model.id] = {};
-      that.tableEntries[model.id].id = model.id;
-      that.tableEntries[model.id].view = tableentry;
-      that.tableEntries[model.id].model = model;
-
-    });
-
-    return tableEntriesToRendered;
-  },
-  render: function() {
-    var renderedTemplate = this.template({collection: this.collection});
-    this.$el.html(renderedTemplate);
-  }
-});
-
-var TableViewEntryOpt = BaseView.extend({
-  el: 'div',
-  initialize: function(data) {
-    this.template = loadTemplate("/static/views/optviewtable.html");
-    this.model = data;
-    // this.model.on("all",this.render);
-  },
-  route: function(part) {
-    return {};
-  },
-  render: function() {
-    var renderedTemplate = this.template({model:this.model});
     this.$el.html(renderedTemplate);
   }
 });
