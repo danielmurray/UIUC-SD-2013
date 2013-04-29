@@ -739,7 +739,7 @@ var OptView = PageView.extend({
     
     console.log(this.collection)
 
-    table = new TableView({collection: this.collection, name: "id", valueunit: "open"});
+    table = new TableView({collection: this.collection, name: "zone", value: "name", unit: "open"});
 
     return{
       '#optimizertabledebug': table
