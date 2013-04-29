@@ -107,7 +107,7 @@ for c in controllers:
 
 @app.route("/socket.io/<path:remaining>")
 def socket_path(remaining=None):
-  print "New websocket connection"
+  print "APP::New client websocket connection"
   socketio.socketio_manage(request.environ, websocketNamespaces, request)
   return "end"
 
@@ -129,11 +129,11 @@ def history_data():
   
 if __name__ == '__main__':
   import signal
-  print "Starting up"
+  print "APP::Starting up"
   server = SocketIOServer(('', args.get("port")), app, transports=["websocket", "xhr-polling"])
   
   def stop_handler(signum, stackframe):
-      print "Got signal: %s" % signum
+      print "APP::Got signal: %s" % signum
       reactor.callFromThread(reactor.stop)
       os.exit(-1)
   signal.signal(signal.SIGINT, stop_handler)

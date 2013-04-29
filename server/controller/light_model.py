@@ -21,7 +21,6 @@ class light(object):
         '''compared the uuid to internal uuids and sets the n appropriately if n found'''
         if uuid == self.state_uuid:
             self.state_n = int(n)
-            print "uuid hit", self.id
             return True
         else:
             return False
@@ -130,7 +129,6 @@ class light(object):
 
     def get_action_str(self, n, value):
         '''returns action string to be sent to the socket scaled as per action range'''
-        print "HOLA", self.id, n, value
         if self.state_n != int(n):
             return False
         if self.typ == "rgb":

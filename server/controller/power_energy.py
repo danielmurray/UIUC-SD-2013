@@ -18,7 +18,7 @@ class PowerController(BackboneCollection):
 
 
   def data_fetch(self):
-    print "FETCHING E-GAUGE DATA"
+    print "POWER::FETCHING E-GAUGE DATA"
     latest_data = self.parse_xml(self.fetch_data())
     self.update_client(latest_data)
 
@@ -67,7 +67,7 @@ class PVController(BackboneCollection):
 
 
   def data_fetch(self):
-    print "FETCHING APS DATA"
+    print "PV::FETCHING APS DATA"
     latest_data = self.parse_aps_data()
     self.update_client(latest_data)
 

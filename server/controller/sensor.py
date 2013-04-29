@@ -43,7 +43,7 @@ class ParentController(object):
     def on_message(self, mac_add, val):
         '''initialize self.typ in the init function else this will throw error'''
         if not self.typ:
-            print "type:"+str(self.typ)+" doesn't exist"
+            print "SENSOR::type:"+str(self.typ)+" doesn't exist"
             return -1
 
         hash_key = str(self.typ) + str(mac_add)
@@ -51,7 +51,7 @@ class ParentController(object):
         #make sure the sensor exists in the dict
         global sensor_list
         if not sensor_list.has_key(hash_key):
-            print "type and mac_add combo not found in the dict"
+            print "SENSOR::",hash_key,"type and mac_add combo not found in the dict"
             return -1
         #make async call to update the front end to close the req asap
         gevent.Greenlet(self.relay_update, hash_key, val).start_later(1)
@@ -67,15 +67,10 @@ class ParentController(object):
             #this also prevents relaying the same avg temp to the loxone server
             return
         sensor_list[hash_key]['val'] = val
-        print "UPDATED", str(sensor_list[hash_key])
         self.update(sensor_list[hash_key])
-        #just for debug
-        print sensor_list[hash_key] 
 
     def do_save(self, data):
-        print "Invalid call from client to update the state of sensor-------"
-        print data
-
+        print "SENSOR::What is client trying to update a sensor",data
 
 
 class TempController(BackboneCollection, ParentController):
@@ -153,10 +148,9 @@ class FlowController(BackboneCollection, ParentController):
         if  self.flowDS.has_key(hash_key):
             self.flowDS[hash_key].append(float(val))
             sensor_list[hash_key]["val"] = self.flowDS[hash_key].calc_flow()
-            print "UPDATED", str(sensor_list[hash_key])
             self.update(sensor_list[hash_key])
         else:
-            print "Flowmeter with no Datastore being updated! WHY?!"
+            print "SENSOR::FLOWMETER::Flowmeter with no Datastore being updated! WHY?!"
             return -1
 
     def _recalc_loop(self):
@@ -169,7 +163,7 @@ class FlowController(BackboneCollection, ParentController):
     def recalc_loop(self):
         '''return false to kill the loop on self in this function'''
         #loop through all the flow meter and update them
-        print "FLOW RECALCULATION"
+        print "SENSOR::FLOW RECALCULATION"
         for key,val in self.flowDS.items():
             tmp_rate = val.calc_flow()
             if sensor_list[key]['val'] != tmp_rate:
