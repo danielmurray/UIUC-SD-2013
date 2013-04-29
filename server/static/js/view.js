@@ -1273,6 +1273,7 @@ var FloorPlanView = BaseView.extend({
     };
   },
   render: function() {
+    console.log('hey we rendered')
     var that = this;
 
     var renderedTemplate = this.template();
@@ -1374,6 +1375,7 @@ var FloorPlanDataOverlay = BaseView.extend({
     this.trigger('zoneunhighlight', zone);
   },
   route: function(part) {
+    this.listenTo(this.collection, 'change', this.render);
     return {};
   },
   render: function() {
