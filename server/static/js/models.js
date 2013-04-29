@@ -153,3 +153,11 @@ var WindoorModel = ModelWS.extend({
     }
   }
 });
+
+var AlertModel = ModelWS.extend({
+  defaults: function(){
+    return{
+      id:null,
+    }
+  }
+});

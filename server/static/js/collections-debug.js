@@ -344,3 +344,10 @@ Power.add([
     tar_temp: Math.random() * 100
     }
 ]);
+
+window.Optimizer = new OptimizerCollection();
+Optimizer.add([
+    {
+    id: "bedroom",
+    }
+]);
