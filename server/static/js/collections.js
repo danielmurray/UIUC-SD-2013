@@ -90,7 +90,7 @@ var HVACCollection = CollectionWS.extend({
   },
   getTemp: function() {
     var last = "loading";
-    _.each(this, function(model) {
+    this.each(function(model) {
       last = model.get("tar_temp");
     });
     return last;
@@ -107,8 +107,8 @@ var TempCollection = CollectionWS.extend({
   },
   getAvgTemp: function() {
     var sum = 0;
-    _.each(this, function(model) {
-      sum += int(model.get("val"));
+    this.each(function(model) {
+      sum += parseInt(model.get("val"));
     });
     return sum / this.size();
   }
@@ -143,8 +143,8 @@ var WindoorCollection = CollectionWS.extend({
   },
   getTotalOpen: function() {
     var open = 0;
-    _.each(this, function(model) {
-      if (int(model.get("val")) == 0) {
+    this.each(function(model) {
+      if (parseInt(model.get("val")) == 0) {
         open += 1;
       }
     });
@@ -180,8 +180,8 @@ var PowerCollection = CollectionWS.extend({
   },
   getTotalConsumption: function() {
     var total = 0.0;
-    $.each(this.models, function() {
-      var adder = parseFloat(this.attributes.power);
+    this.each(function(model) {
+      var adder = parseFloat(model.get("power"));
       total += adder;
     });
     return Math.round(total);
@@ -212,8 +212,8 @@ var PVCollection = CollectionWS.extend({
   },
   getTotalProduction: function() {
     var total = 0.0;
-    $.each(this.models, function() {
-      var adder = parseFloat(this.attributes.power);
+    this.each(function(model) {
+      var adder = parseFloat(model.get("power"));
       total += adder;
     });
     return Math.round(total)
@@ -246,8 +246,8 @@ var FlowCollection = CollectionWS.extend({
   },
   getTotal: function() {
     var sum = 0;
-    _.each(this, function(model) {
-      sum += int(model.get("val"));
+    this.each(function(model) {
+      sum += parseInt(model.get("val"));
     });
     return sum;
   }
