@@ -223,7 +223,7 @@ var WindoorView = PageView.extend({
   initialize: function(data) {
     PageView.prototype.initialize.apply(this, [data]);
     this.windoortemplate = loadTemplate("/static/views/windoor.html");
-    this.collection = window.Blinds;
+    this.collection = window.Windoor;
   },
   animateIn: function(){
     PageView.prototype.animateIn.apply(this);
