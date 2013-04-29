@@ -89,7 +89,11 @@ var HVACCollection = CollectionWS.extend({
 
   },
   getTemp: function() {
-    return this.at(0).get("tar_temp")
+    var last = "loading";
+    _.each(this, function(model) {
+      last = model.get("tar_temp");
+    });
+    return last;
   }
 });
 
@@ -136,6 +140,15 @@ var WindoorCollection = CollectionWS.extend({
       windooropen.length,
       'Open<br />D+W'
     ]
+  },
+  getTotalOpen: function() {
+    var open = 0;
+    _.each(this, function(model) {
+      if (int(model.get("val")) == 0) {
+        open += 1;
+      }
+    });
+    return open;
   }
 });
 
