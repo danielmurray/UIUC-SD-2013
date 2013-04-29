@@ -678,6 +678,8 @@ var HvacView = PageView.extend({
     this.collection[0] = window.HVAC;
     this.collection[0]._sortBy('value',true);
     
+    this.collection[1] = window.Temp;
+
     if( this.collection[0].models.length >0 ){
       this.model = this.collection[0].models[0]
     }else{
@@ -693,21 +695,36 @@ var HvacView = PageView.extend({
       type:'line',
       series:[
         {
-          name:'Consumption',
+          name:'Temperature',
           color: [173,50,50],
+          collection: this.collection[1]
+        },
+        {
+          name:'Target',
+          color: [84,175,226],
           collection: this.collection[0]
         }
       ],
       range: 'day',
       unit: "w"
     });
-
+    tempdatabox = new DataBox({
+      id: 'Temperature',
+      databoxcontent: 'table',
+      subviews: {
+        table: {
+          id: 'table',
+          view: TableView,
+          args: {collection: this.collection[1], name: "name", value: "val", unit: "C"}
+        }
+      }
+    }); 
     thermostat = new Thermostat({model: this.model});
 
-    return{
-      '#graphwrapper': graph
-      ,'#thermostatwrapper': thermostat
-      //,'#weekviewwrapper': generationtdatabox
+    return {
+      '#graphwrapper': graph,
+      '#thermostatwrapper': thermostat,
+      '#weekviewwrapper': tempdatabox
     }
 
   },
@@ -818,7 +835,7 @@ var GraphView = BaseView.extend({
 
   },
   fetchHistoricalData: function(callback){    
-    that = this;
+    var that = this;
     
     this.series = [];
     var len = this.inputdata.length;
@@ -832,11 +849,11 @@ var GraphView = BaseView.extend({
     $.each(this.inputdata, function(i, inputdata){
       var clos = (function(j, d) {
         return function (data) {
-          console.log(data, d, j);
+          console.log(that.series, data, d, j);
           that.series[j] = {
             name: inputdata.name,
             type: 'area',
-            color: rgbaToString(that.inputdata[j].color,1),
+            color: rgbaToString(d.color,1),
             data: data
           };
           if (data) {

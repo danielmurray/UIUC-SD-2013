@@ -83,16 +83,21 @@ var HVACCollection = CollectionWS.extend({
     this.sort();
   },
 
-  getHistoricalData: function(start,end,density) {
+  getHistoricalData: function(start,end,density,callback) {
     
-    return randomArray(start, end, density, 100);
+    historyData("hvac", "tar_temp", start, end, density, "sum", callback);
 
   }
 });
 
 var TempCollection = CollectionWS.extend({
   model: SensorModel,
-  url: '/temp'
+  url: '/temp',
+  getHistoricalData: function(start,end,density,callback) {
+    
+    historyData("temp", "val", start, end, density, "avg", callback);
+
+  }
 });
 
 var PyraCollection = CollectionWS.extend({

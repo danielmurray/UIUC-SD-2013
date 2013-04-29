@@ -107,6 +107,7 @@ class History:
         group = []
         cur_time = time
       field_data = json.loads(row["data"])
+      print(field_data)
       for part in field_parts:
         field_data = field_data[part]
       group.append(float(field_data))
