@@ -22,7 +22,9 @@ class EchoIncoming(WebSocketClientProtocol):
     def onMessage(self,msg, binary):
         '''relay any message received to all the listners'''
         msg = self.parseMessage(msg) #parse it first based on the spec
+        print "\nLOX::Incoming--------"
         print msg
+        print "LOX------------------\n"
         for each in self.listners:
             each(msg) #call each listner with the message
 
@@ -73,7 +75,6 @@ class EchoIncoming(WebSocketClientProtocol):
 
     def clientToServer(self, model):
         self.light_ctrl.c2s_update(model)
-        print model
 
     def onOpen(self):
         self.a = 0
@@ -101,12 +102,8 @@ class EchoIncoming(WebSocketClientProtocol):
         for each in range(len(self.msg_list)):
             self.sendMessage(self.msg_list.pop(0))
 
-    def sample_call(self):
-        print "SAMPLE CALL TO init the child"
-
-
     def onClose(self, wasClean, code, reason):
-        print "Socket Closed--- Was Clean:"+str(wasClean)+" Code:"+str(code) + " Reason:" +reason
+        print "LOX::Socket Closed--- Was Clean:"+str(wasClean)+" Code:"+str(code) + " Reason:" +reason
         self.parent.isClosed = True
 
 class LoxoneDeviceProxy:
@@ -134,7 +131,7 @@ class LoxoneDevice(object):
     def _run_websocket(self):
         self.proxy = LoxoneDeviceProxy(self)
         while True:
-            print "(re?)starting socket------"
+            print "LOX_DEVICE::(re?)starting socket------"
             self.create_socket()
     
     def create_socket(self):
@@ -147,7 +144,7 @@ class LoxoneDevice(object):
             factory.protocol = self.proxy
             connectWS(factory)
         else:
-            print "FAIL!"+r.status_code
+            print "LOX_DEVICE::Failed to Handshake with loxone:HTTP_STATUS_CODE:"+r.status_code
             return
         self.initialized = True
         while not self.isClosed:
@@ -163,20 +160,19 @@ class LoxoneDevice(object):
 
 
     def clear_listner_list(self):
-        print "called clear listner list"
         if self.proxy:
             for each in range(len(self.listner_list)):
                 self.proxy.child.registerListner(self.listner_list.pop(0))
         else:
-            print("No proxy >.< found")
+            print("LOX_DEVICE::No proxy >.< found")
 
 
     def send_message(self, message):
         '''send a message through the socket'''
         if not self.initialized:
-            print "Too early to send message, socket not initalized yet"
+            print "LOX_DEVICE::Something tried to send message too early! Message ignore"
             return
         if self.proxy:
             self.proxy.child.send_message(message)
         else:
-            print("No proxy >.< found")
+            print("LOX_DEVICE::No proxy >.< found")

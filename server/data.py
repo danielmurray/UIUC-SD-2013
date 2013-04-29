@@ -49,3 +49,64 @@ class History:
     c = conn.cursor()
     c.executemany(insert_history, data)
     conn.commit()
+
+  def get(self, typ, field, id, start, end, group_by):
+    """
+    typ is the sensor type constant
+    field is the selector into the JSON data (hvac_data.temp)
+    id is optional
+    start, end are unix timestamps
+    group_by performs a grouping operation [sum, avg, none]
+    """
+    sql = "SELECT time, data FROM sensor_history WHERE type = ? AND time >= ? AND time <= ?"
+    args = [typ, start, end]
+    if id:
+      sql += "AND id = ? "
+      args.append(id)
+    sql += "ORDER BY time ASC"
+
+    result = conn.execute(sql, args)
+
+    group_fn = None
+    def group_sum(l):
+      sum = 0
+      for v in l:
+        sum = sum + v
+      return [sum]
+    def group_avg(l):
+      return [float(x) / len(l) for x in group_sum(l)]
+    def group_none(l):
+      return l
+
+    if group_by == "sum":
+      group_fn = group_sum
+    elif group_by == "avg":
+      group_fn = group_avg
+    elif group_by == "none":
+      group_fn = group_none
+    else:
+      abort(400)
+
+    # group the rows by the same times, then execute group_fn
+    graph = [] # (time, float(data[field]))
+    group = []
+    field_parts = field.split(".")
+    cur_time = -1
+    rows = result.fetchall()
+    rows.append({"time": -1}) # needs an extra value for the cleanup
+    for i in range(0, len(rows)):
+      row = rows[i]
+      time = row["time"] - start
+      if time != cur_time:
+        if cur_time > 0: # don't add for the first iteration
+          for g in group_fn(group):
+            graph.append((cur_time, g))
+        if i >= len(rows)-1:
+          break
+        group = []
+        cur_time = time
+      field_data = json.loads(row["data"])
+      for part in field_parts:
+        field_data = field_data[part]
+      group.append(float(field_data))
+    return graph

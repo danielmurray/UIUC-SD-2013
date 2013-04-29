@@ -23,11 +23,9 @@ class LightController(BackboneCollection):
         '''generate lights list'''
         self.lights = []
         tmp = None
-        print light_mapping, "what---------------------------------------------------"
         for each in light_mapping:
             tmp = self.dict_to_light(each)
             tmp.parent = self #set the child to be able to call parent
-            print tmp.json()
             self.lights.append(tmp)
 
     def dict_to_light(self, dic):
@@ -74,7 +72,6 @@ class LightController(BackboneCollection):
 
     def parse_state_msg(self, states):
         '''parses the state message and updates appropriate light'''
-        print states, '--trying to parse'
         for each in states:
             n = each['n']
             v = each['v']
@@ -82,9 +79,7 @@ class LightController(BackboneCollection):
                 ret_val =  each_light.try_update(n,v)
                 if ret_val:
                     self.update(each_light.json())
-                    print each_light.id, "|n:" ,n, "|v:",v, "|val:", ret_val
 
     def do_save(self, data):
         '''relay it to client to server update function'''
-        print data, 'received---------------------'
         self.c2s_update(data)

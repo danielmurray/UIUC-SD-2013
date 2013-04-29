@@ -1,7 +1,7 @@
 import geventreactor; geventreactor.install()
 from twisted.internet import reactor
 from flask import Flask, send_file, url_for, render_template, request, \
-  session, redirect, flash, Markup, abort, Response
+  session, redirect, flash, Markup, abort, Response, make_response
 from socketio.server import SocketIOServer
 import os
 import hashlib
@@ -9,9 +9,10 @@ import socketio
 import logger
 import logging
 import controller
+import data
 import time
 import random
-import data
+import json
 from gevent import monkey; monkey.patch_all()
 import gevent
 
@@ -27,10 +28,9 @@ else:
   logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__) 
-
+app.debug = args.get("debug")
 app.config.update(
   SECRET_KEY = hashlib.sha1(os.urandom(24)).digest(),
-  DEBUG = args.get("debug")
 )
 
 eventLogger = logger.EventLogger()
@@ -38,7 +38,6 @@ loxoneDevice = controller.LoxoneDevice()
 # loxone controller works fine, just have to test registering the listeners and also making sure that sending message through the proxy method works
 
 # singleton controllers
-debugController = controller.DebugController()
 lightController = controller.LightController(loxoneDevice)
 #sensor controllers
 tempController = controller.TempController()
@@ -63,10 +62,10 @@ relayDevice = controller.RelayDevice(controller_dict)
 
 #power and energy controllers
 powerController = controller.PowerController()
+pvController = controller.PVController()
 
 # every websocket controller must be in this list
 controllers = [
-  debugController,
   lightController,
   tempController,
   pyraController,
@@ -75,7 +74,8 @@ controllers = [
   windoorController,
   co2Controller,
   hvacController,
-  powerController
+  powerController,
+  pvController
 ]
 
 # add the logger to every controller
@@ -107,7 +107,7 @@ for c in controllers:
 
 @app.route("/socket.io/<path:remaining>")
 def socket_path(remaining=None):
-  print "New websocket connection"
+  print "APP::New client websocket connection"
   socketio.socketio_manage(request.environ, websocketNamespaces, request)
   return "end"
 
@@ -121,19 +121,26 @@ def sensor_data():
 
 @app.route("/history", methods=["GET"])
 def history_data():
-  typ = request.args.get("type")
-  id = request.args.get("id", -1)
-  start = request.args.get("start")
-  end = request.args.get("end")
-  field = request.args.get("field")
-  
+  # required
+  typ = request.args.get("type", None)
+  field = request.args.get("field", None) # field.value
+  # optional
+  id = request.args.get("id", None)
+  start = int(request.args.get("start", 0))
+  end = int(request.args.get("end", 9999999999))
+  group = request.args.get("group", "none")
+  if not field or not typ:
+    abort(400)
+  h = history.get(typ, field, id, start, end, group)
+  return json.dumps(h)
+
 if __name__ == '__main__':
   import signal
-  print "Starting up"
+  print "APP::Starting up"
   server = SocketIOServer(('', args.get("port")), app, transports=["websocket", "xhr-polling"])
   
   def stop_handler(signum, stackframe):
-      print "Got signal: %s" % signum
+      print "APP::Got signal: %s" % signum
       reactor.callFromThread(reactor.stop)
       os.exit(-1)
   signal.signal(signal.SIGINT, stop_handler)
