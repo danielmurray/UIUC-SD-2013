@@ -10,7 +10,8 @@
 }
 
 .tablelist li{
-	height: 60px;
+	height: 55px;
+	padding-top: 8px;
 	background-color: rgba(0, 15, 30, 0.8);
 	margin-bottom: 1%
 }

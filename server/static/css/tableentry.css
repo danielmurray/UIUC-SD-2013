@@ -8,7 +8,7 @@
 .tableentryid{
 	float:left;
 	height: 100%;
-	width: 73%;
+	width: 65%;
 	font-size: 40px;
 }
 
@@ -23,9 +23,10 @@
 
 .tableentryvalue{
 	text-align: right;
-	float:left;
+	padding-right: 5px;
+	float:right;
 	height: 100%;
-	width: 25%;
+	width: 30%;
 }
 
 .tableentryvalue .value{

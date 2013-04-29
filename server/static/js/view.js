@@ -534,6 +534,7 @@ var PowerView = PageView.extend({
     consumptiondatabox = new DataBox({
       id: 'Consumption',
       databoxcontent: 'table',
+      collection: this.collection[1],
       subviews: {
         table: {
           id: 'table',
@@ -567,6 +568,7 @@ var PowerView = PageView.extend({
     generationtdatabox = new DataBox({
       id: 'Generation',
       databoxcontent: 'table',
+      collection: this.collection[0],
       subviews: {
         table: {
           id: 'table',
@@ -715,6 +717,7 @@ var HvacView = PageView.extend({
     tempdatabox = new DataBox({
       id: 'Temperature',
       databoxcontent: 'table',
+      collection: this.collection[1],
       subviews: {
         table: {
           id: 'table',
@@ -785,6 +788,7 @@ var DataBox = BaseView.extend({
     
     this.template = loadTemplate("/static/views/databox.html");
     this.databox = data;
+    this.collection = this.databox.collection
 
     this.contentdivselector = '#databoxcontentwrapper';
     this.currcontentview = this.databox.databoxcontent; //View to be rendered to the databox
@@ -803,7 +807,7 @@ var DataBox = BaseView.extend({
     return {};
   },
   render: function() {
-    var renderedTemplate = this.template({subviews: this.views, currentcontent: this.currcontentview} );
+    var renderedTemplate = this.template({subviews: this.views, currentcontent: this.currcontentview, sum:this.collection.getSum()} );
     this.$el.html(renderedTemplate);
     this.rendercontentview()
   },
@@ -853,7 +857,6 @@ var GraphView = BaseView.extend({
     $.each(this.inputdata, function(i, inputdata){
       var clos = (function(j, d) {
         return function (data) {
-          console.log(that.series, data, d, j);
           that.series[j] = {
             name: inputdata.name,
             type: 'area',
