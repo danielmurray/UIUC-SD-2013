@@ -9,7 +9,7 @@ _sensor_list = [
 		'mac_address':'mac-1',
 		'type':'temp',
 		'name':'room-1',
-		'freq':0,
+		'freq':4,
 		'meta_data':{
 			'location':'room-1',
 		}
@@ -60,7 +60,7 @@ _sensor_list = [
 		}
 	},
 	{
-		'mac_address':'mac-2',
+		'mac_address':'90A2DAOD2753',
 		'type':'temp',
 		'name':'kitchen',
 		'freq':5,

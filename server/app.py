@@ -38,7 +38,6 @@ loxoneDevice = controller.LoxoneDevice()
 # loxone controller works fine, just have to test registering the listeners and also making sure that sending message through the proxy method works
 
 # singleton controllers
-debugController = controller.DebugController()
 lightController = controller.LightController(loxoneDevice)
 #sensor controllers
 tempController = controller.TempController()
@@ -63,10 +62,10 @@ relayDevice = controller.RelayDevice(controller_dict)
 
 #power and energy controllers
 powerController = controller.PowerController()
+pvController = controller.PVController()
 
 # every websocket controller must be in this list
 controllers = [
-  debugController,
   lightController,
   tempController,
   pyraController,
@@ -75,7 +74,8 @@ controllers = [
   windoorController,
   co2Controller,
   hvacController,
-  powerController
+  powerController,
+  pvController
 ]
 
 # add the logger to every controller
