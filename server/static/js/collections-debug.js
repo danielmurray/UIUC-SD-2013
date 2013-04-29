@@ -358,3 +358,83 @@ Blinds.add([
     value: Math.random() * 100
     }
 ]);
+
+window.HVAC = new HVACCollection();
+HVAC.add([
+    {
+    id: "bedroom",
+    state: "on", //id = room
+    avg_temp: Math.random() * 100,
+    tar_temp: Math.random() * 100
+    }
+]);
+
+window.Temp = new TempCollection();
+Temp.add([
+    {
+    id: "bedroom",
+    state: "on", //id = room
+    avg_temp: Math.random() * 100,
+    tar_temp: Math.random() * 100
+    }
+]);
+
+window.Pyra = new PyraCollection();
+Pyra.add([
+    {
+    id: "bedroom",
+    state: "on", //id = room
+    avg_temp: Math.random() * 100,
+    tar_temp: Math.random() * 100
+    }
+]);
+
+window.Humid = new HumidCollection();
+Humid.add([
+    {
+    id: "bedroom",
+    state: "on", //id = room
+    avg_temp: Math.random() * 100,
+    tar_temp: Math.random() * 100
+    }
+]);
+
+window.CO2 = new Co2Collection();
+CO2.add([
+    {
+    id: "bedroom",
+    state: "on", //id = room
+    avg_temp: Math.random() * 100,
+    tar_temp: Math.random() * 100
+    }
+]);
+
+window.Flow = new FlowCollection();
+Flow.add([
+    {
+    id: "bedroom",
+    state: "on", //id = room
+    avg_temp: Math.random() * 100,
+    tar_temp: Math.random() * 100
+    }
+]);
+
+window.Windoor = new WindoorCollection();
+Windoor.add([
+    {
+    id: "bedroom",
+    state: "on", //id = room
+    avg_temp: Math.random() * 100,
+    tar_temp: Math.random() * 100
+    }
+]);
+
+window.Power = new PowerCollection();
+Power.add([
+    {
+    id: "bedroom",
+    state: "on", //id = room
+    avg_temp: Math.random() * 100,
+    tar_temp: Math.random() * 100
+    }
+]);

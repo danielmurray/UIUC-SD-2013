@@ -75,7 +75,7 @@ var BlindModel = ModelWS.extend({
   defaults: function() {
     return {
       id: null,
-      room: null, //id = room
+      zone: null, //id = room
       value: null
     }
   }
@@ -85,7 +85,7 @@ var HVACModel = ModelWS.extend({
   defaults: function() {
     return {
       id: null,
-      room: null, //id = room
+      zone: null, //id = room
       temperature: null,
       humidity: null,
     }
