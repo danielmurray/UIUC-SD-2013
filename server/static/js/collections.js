@@ -230,6 +230,13 @@ var FlowCollection = CollectionWS.extend({
     
     historyData("flow", "val", start, end, density, "sum", callback);
 
+  },
+  getTotal: function() {
+    var sum = 0;
+    _.each(this, function(model) {
+      sum += int(model.get("val"));
+    });
+    return sum;
   }
 });
 
