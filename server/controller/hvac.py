@@ -49,7 +49,7 @@ class HvacController(BackboneCollection):
                     hvac_uuids["hvac_state_uuid"]["heating"] = False
                     change = True
             elif hvac_uuids["tar_temp_n"] == each["n"]:
-                    if hvac_uuids["tar_temp"] != each["v"]
+                    if hvac_uuids["tar_temp"] != each["v"]:
                         hvac_uuids["tar_temp"] = each["v"]
                         self.update(hvac_uuids)
 
