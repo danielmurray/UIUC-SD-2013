@@ -1314,7 +1314,7 @@ var Thermostat = BaseView.extend({
   initialize: function(data) {
     this.template = loadTemplate("/static/views/thermostat.html");
     this.model = data.model;
-    console.log(this.model.get('tar_temp').val)
+    console.log(this.model.get('tar_temp'))
   },
   route: function(part) {
     this.listenTo(this.model, 'change', this.render);
@@ -1338,14 +1338,12 @@ var Thermostat = BaseView.extend({
         ,'release' : function (v) { 
           console.log(that.model)
           that.model.save({
-            tar_temp: {
-              val: v
-            }
+            tar_temp: v
           });
         }
       })
 
-    $('.thermostatknob').val(this.model.get('tar_temp').val).trigger('change');
+    $('.thermostatknob').val(this.model.get('tar_temp')).trigger('change');
   }
 });
 
