@@ -848,10 +848,10 @@ var GraphView = BaseView.extend({
     });
   },
   organizeHistoricalData: function() {
+
     if(this.type == 'area' && this.series.length >= 2){
-
-      this.series[0].type = this.series[1].type = 'line'
-
+      this.series[0].type = this.series[1].type = 'line';
+      return; // the fancy graphs aren't rendering properly
       this.line1 = this.series[0].data;
       this.line2 = this.series[1].data;
       
@@ -934,7 +934,7 @@ var GraphView = BaseView.extend({
     this.$el.html(renderedTemplate);
 
     if (this.series) {
-      this.renderChart();
+      setTimeout(function() {that.renderChart();}, 0); // the element needs to be in the page
     }
 
     /*
@@ -956,7 +956,6 @@ var GraphView = BaseView.extend({
     //sometimes the template doesn't render in time 
     //for this chart to render correctly
     var container = this.$('#graphholder');
-
     this.$el.chart = new Highcharts.Chart({
       chart: {
           renderTo: container[0],
@@ -1091,7 +1090,7 @@ var GraphView = BaseView.extend({
       if(chart.get('transparent'))
         chart.get('transparent').area.hide();
     });
-    
+    console.log(container[0].clientTop);
   }
 });
 

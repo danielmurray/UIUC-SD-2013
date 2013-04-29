@@ -150,7 +150,7 @@ var PowerCollection = CollectionWS.extend({
     this._order_by = orderOn;
     this.sort();
   },
-  getHistoricalData: function(start,end,density) {
+  getHistoricalData: function(start,end,density,callback) {
     console.log(start, end, density);
     historyData("power", "power", start, end, density, "sum", callback);
   }
@@ -176,7 +176,7 @@ var PVCollection = CollectionWS.extend({
     this.sort();
   },
 
-  getHistoricalData: function(start,end,density) {
+  getHistoricalData: function(start,end,density,callback) {
     historyData("pv", "power", start, end, density, "sum", callback);
   }
 });
