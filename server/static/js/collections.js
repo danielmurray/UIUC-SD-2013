@@ -136,7 +136,11 @@ var Co2Collection = CollectionWS.extend({
 
 var PowerCollection = CollectionWS.extend({
   model: SensorModel,
-  url: '/power'
+  url: '/power',
+  getHistoricalData: function(start,end,density) {
+    console.log(start, end, density);
+    return randomArray(start, end, density, 100);
+  }
 });
 
 
@@ -163,49 +167,6 @@ var PVCollection = CollectionWS.extend({
     
     return randomArray(start, end, density, 100);
 
-  }
-});
-
-var DevicesCollection = CollectionWS.extend({
-  model: DevicesModel,
-  url: '/devices',
-
-
-  _order_by: 'id',
-  _descending: 1,
-  comparator: function(device) {
-    return this._descending * device.get(this._order_by);
-  },
-  _sortBy: function(orderOn,descending){
-    
-    if(descending)
-      this._descending = -1;
-    else
-      this._descending = 1;
-
-    this._order_by = orderOn;
-    this.sort();
-  },
-  
-
-  getHistoricalData: function(start,end,density) {
-    
-    return randomArray(start, end, density, 100);
-
-  },
-  zoneData: function(zone){
-    var roomwatts = 0;
-
-    _.each(this.models, function(model){
-      if(model.get('zone') == zone){
-        roomwatts += parseFloat(model.get('value').toFixed(0));
-      }
-    });
-   
-    return [
-      roomwatts,
-      'W'
-    ]    
   }
 });
 

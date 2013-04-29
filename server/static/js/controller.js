@@ -97,7 +97,7 @@ $(function() {
   };
 
   // Only fetch non-debug collections
-  var collections = [Lights, HVAC, /*PV,*/ /*Devices,* /*Water,*/ Temp, Pyra, Humid, CO2, Flow, Windoor, Power];
+  var collections = [Lights, HVAC, PV, Temp, Pyra, Humid, CO2, Flow, Windoor, Power];
   if (!DEBUG) {
     var waitingOn = collections.length;
     var start = function() {

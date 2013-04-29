@@ -148,7 +148,6 @@ var PageView = BaseView.extend({
     return{};
   },
   render: function() {
-    console.log(this)
     var renderedTemplate = this.template({currentpane: this.currentpane});
     this.$el.html(renderedTemplate);
   }
@@ -399,7 +398,6 @@ var LightView = BaseView.extend({
     this.type = this.model.get('type');
 
     this.lighttemplate = loadTemplate("/static/views/light.html");
-    console.log('did we get here')
   },
   animateIn: function(){
 
@@ -499,10 +497,10 @@ var PowerView = PageView.extend({
     this.collection = [];
 
     this.collection[0] = window.PV;
-    this.collection[0]._sortBy('value',true);
+    //this.collection[0]._sortBy('value',true);
 
-    this.collection[1] = window.Devices;
-    this.collection[1]._sortBy('value',true);
+    this.collection[1] = window.Power;
+    //this.collection[1]._sortBy('power',true);
     
 
   },
@@ -525,7 +523,8 @@ var PowerView = PageView.extend({
           collection: this.collection[1]
         }
       ],
-      range: 'day'
+      range: 'day',
+      unit: "w"
     });
 
     consumptiondatabox = new DataBox({
@@ -535,7 +534,7 @@ var PowerView = PageView.extend({
         table: {
           id: 'table',
           view: TableView,
-          args: {collection: this.collection[1]}
+          args: {collection: this.collection[1], name: "id", value: "power", unit: "w"}
         },
         graphic: {
           id: 'graphic',
@@ -554,7 +553,8 @@ var PowerView = PageView.extend({
                 collection: this.collection[1]
               }
             ],
-            range: 'day'
+            range: 'day',
+            unit: "w"
           }
         }
       }
@@ -567,7 +567,7 @@ var PowerView = PageView.extend({
         table: {
           id: 'table',
           view: TableView,
-          args: {collection: this.collection[0]}
+          args: {collection: this.collection[0], name: "id", value: "power", unit: "w"}
         },
         graphic: {
           id: 'graphic',
@@ -588,7 +588,8 @@ var PowerView = PageView.extend({
                 collection: this.collection[0]
               }
             ],
-            range: 'day'
+            range: 'day',
+            unit: "w"
           }
         }
       }
@@ -631,7 +632,8 @@ var WaterView = PageView.extend({
           collection: this.collection[0]
         }
       ],
-      range: 'day'
+      range: 'day',
+      unit: "gal"
     });
 
     consumptiondatabox = new DataBox({
@@ -641,7 +643,7 @@ var WaterView = PageView.extend({
         table: {
           id: 'table',
           view: TableView,
-          args: {collection: this.collection[0]}
+          args: {collection: this.collection[0], name: "id", value: "value", unit: "gal/min"}
         },
         graphic: {
           id: 'graphic',
@@ -696,7 +698,8 @@ var HvacView = PageView.extend({
           collection: this.collection[0]
         }
       ],
-      range: 'day'
+      range: 'day',
+      unit: "w"
     });
 
     thermostat = new Thermostat({model: this.model});
@@ -801,6 +804,7 @@ var GraphView = BaseView.extend({
     this.type = graphdata.type;
     this.timeperiod = graphdata.range;
     this.inputdata = graphdata.series;
+    this.unit = graphdata.unit;
 
     this.organizeHistoricalData();
 
@@ -1035,7 +1039,7 @@ var GraphView = BaseView.extend({
         },
         labels: {
           formatter: function(){
-            return this.value + that.inputdata[0].collection.models[0].get('unit')
+            return this.value + that.unit;
           },
           style: {
               fontFamily: "Lato-thin",
@@ -1074,8 +1078,10 @@ var GraphView = BaseView.extend({
 var TableView = BaseView.extend({
   el: 'div',
   initialize: function(data) {
+    this.value = data.value;
+    this.unit = data.unit;
     this.template = loadTemplate("/static/views/table.html");
-    
+    this.name = data.name;
     this.collection = data.collection;
   },
   route: function(part) {
@@ -1088,10 +1094,9 @@ var TableView = BaseView.extend({
     tableEntriesToRendered = {};
 
     console.log(this.collection)
-
+    var that = this;
     _.each(this.collection.models, function(model) {
-
-      tableentry = new TableViewEntry(model);
+      tableentry = new TableViewEntry(model, that.name, that.value, that.unit);
       tableEntriesToRendered['#'+model.id] = tableentry;
       that.tableEntries[model.id] = {};
       that.tableEntries[model.id].id = model.id;
@@ -1104,6 +1109,26 @@ var TableView = BaseView.extend({
   },
   render: function() {
     var renderedTemplate = this.template({collection: this.collection});
+    this.$el.html(renderedTemplate);
+  }
+});
+
+var TableViewEntry = BaseView.extend({
+  el: 'div',
+  initialize: function(data, name, value, unit) {
+    this.value = value;
+    this.unit = unit;
+    this.name = name;
+    this.template = loadTemplate("/static/views/tableentry.html");
+    this.model = data;
+  },
+  route: function(part) {
+    return {};
+  },
+  render: function() {
+    console.log(this.model.get(this.value))
+    
+    var renderedTemplate = this.template({model:this.model, name: this.name, value: this.value, unit: this.unit});
     this.$el.html(renderedTemplate);
   }
 });
@@ -1161,21 +1186,6 @@ var TableViewEntryOpt = BaseView.extend({
   }
 });
 
-var TableViewEntry = BaseView.extend({
-  el: 'div',
-  initialize: function(data) {
-    this.template = loadTemplate("/static/views/tableentry.html");
-    this.model = data;
-  },
-  route: function(part) {
-    return {};
-  },
-  render: function() {
-    var renderedTemplate = this.template({model:this.model});
-    this.$el.html(renderedTemplate);
-  }
-});
-
 var FloorPlanView = BaseView.extend({
   el: 'div',
   initialize: function(data) {
@@ -1215,11 +1225,9 @@ var FloorPlanView = BaseView.extend({
 
     this.$('#floorplanholder').height('95%');
 
-    console.log(this.$el.height())
     h = this.$('#floorplanholder').height();
     w = this.$('#floorplanholder').width();
 
-    console.log(h,w)
     var floorplancanvas = new ScaleRaphael( "floorplanholder", 350, 300);
 
     var zones = [];
@@ -1314,7 +1322,6 @@ var Thermostat = BaseView.extend({
   initialize: function(data) {
     this.template = loadTemplate("/static/views/thermostat.html");
     this.model = data.model;
-    console.log(this.model.get('tar_temp').val)
   },
   route: function(part) {
     this.listenTo(this.model, 'change', this.render);
@@ -1336,16 +1343,13 @@ var Thermostat = BaseView.extend({
         , 'bgColor': 'rgba(84,175,226,0.8)'
         , 'inputColor' : 'rgba(245,245,245,0.8)'
         ,'release' : function (v) { 
-          console.log(that.model)
           that.model.save({
-            tar_temp: {
-              val: v
-            }
+            tar_temp: v
           });
         }
       })
 
-    $('.thermostatknob').val(this.model.get('tar_temp').val).trigger('change');
+    $('.thermostatknob').val(this.model.get('tar_temp')).trigger('change');
   }
 });
 
