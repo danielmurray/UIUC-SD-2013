@@ -728,7 +728,7 @@ var OptView = PageView.extend({
     console.log("Opt View Initialized");
 
     //BRYANT BUT YOU OPTIMIZER COLLECTION RIGHT IN HERE
-    this.collection = window.Optimizer;
+    this.collection = window.Windoor;
     //this.collection._sortBy('value',true);
     console.log(window.Optimizer)
     if( this.collection.models.length >0 ){

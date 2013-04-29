@@ -17,6 +17,7 @@
 	height: 100%;
 	overflow: hidden;
 	text-overflow: ellipsis;
+	font-size: 65%;
 }
 
 .tableentryvalue{
