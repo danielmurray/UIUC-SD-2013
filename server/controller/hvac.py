@@ -50,6 +50,7 @@ class HvacController(BackboneCollection):
                     change = True
             elif hvac_uuids["tar_temp_n"] == each["n"]:
                     hvac_uuids["tar_temp"]= each["v"]
+                    self.update(hvac_uuids)
 
         if change:
         #set the hvac_state to idle if both  are doing nothing
