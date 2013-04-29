@@ -763,7 +763,7 @@ var OptView = PageView.extend({
     
     console.log(this.collection)
 
-    table = new TableView({collection: this.collection, name: "zone", value: "name", unit: "open"});
+    table = new TableViewOpt({collection: this.collection, name: "zone", value: "name", unit: "open"});
 
     return{
       '#optimizertabledebug': table
@@ -1150,6 +1150,64 @@ var TableViewEntry = BaseView.extend({
     this.unit = unit;
     this.name = name;
     this.template = loadTemplate("/static/views/tableentry.html");
+    this.model = data;
+  },
+  route: function(part) {
+    this.listenTo(this.model, 'change', this.render);
+    return {};
+  },
+  render: function() {
+
+    var renderedTemplate = this.template({model:this.model, name: this.name, value: this.value, unit: this.unit});
+    this.$el.html(renderedTemplate);
+  }
+});
+
+var TableViewOpt = BaseView.extend({
+  el: 'div',
+  initialize: function(data) {
+    this.value = data.value;
+    this.unit = data.unit;
+    this.template = loadTemplate("/static/views/table.html");
+    this.name = data.name;
+    this.collection = data.collection;
+    console.log(data)
+  },
+  route: function(part) {
+    var that = this;
+
+    //pointers for this view
+    this.tableEntries = {};
+
+    //views to be returned
+    tableEntriesToRendered = {};
+
+    var that = this;
+    _.each(this.collection.models, function(model,i) {
+
+      tableentry = new TableViewEntryOpt(model, that.name, that.value, that.unit);
+      tableEntriesToRendered['#tableEntry'+i] = tableentry;
+      that.tableEntries[model.id] = {};
+      that.tableEntries[model.id].id = model.id;
+      that.tableEntries[model.id].view = tableentry;
+      that.tableEntries[model.id].model = model;
+    });
+
+    return tableEntriesToRendered;
+  },
+  render: function() {
+    var renderedTemplate = this.template({collection: this.collection});
+    this.$el.html(renderedTemplate);
+  }
+});
+
+var TableViewEntryOpt = BaseView.extend({
+  el: 'div',
+  initialize: function(data, name, value, unit) {
+    this.value = value;
+    this.unit = unit;
+    this.name = name;
+    this.template = loadTemplate("/static/views/optviewtable.html");
     this.model = data;
   },
   route: function(part) {
