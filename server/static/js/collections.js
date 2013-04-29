@@ -87,6 +87,13 @@ var HVACCollection = CollectionWS.extend({
     
     historyData("hvac", "tar_temp", start, end, density, "sum", callback);
 
+  },
+  getTemp: function() {
+    var last = "loading";
+    _.each(this, function(model) {
+      last = model.get("tar_temp");
+    });
+    return last;
   }
 });
 
@@ -97,6 +104,13 @@ var TempCollection = CollectionWS.extend({
     
     historyData("temp", "val", start, end, density, "avg", callback);
 
+  },
+  getAvgTemp: function() {
+    var sum = 0;
+    _.each(this, function(model) {
+      sum += int(model.get("val"));
+    });
+    return sum / this.size();
   }
 });
 
@@ -126,6 +140,15 @@ var WindoorCollection = CollectionWS.extend({
       windooropen.length,
       'Open<br />D+W'
     ]
+  },
+  getTotalOpen: function() {
+    var open = 0;
+    _.each(this, function(model) {
+      if (int(model.get("val")) == 0) {
+        open += 1;
+      }
+    });
+    return open;
   }
 });
 
@@ -220,6 +243,13 @@ var FlowCollection = CollectionWS.extend({
     
     historyData("flow", "val", start, end, density, "sum", callback);
 
+  },
+  getTotal: function() {
+    var sum = 0;
+    _.each(this, function(model) {
+      sum += int(model.get("val"));
+    });
+    return sum;
   }
 });
 
