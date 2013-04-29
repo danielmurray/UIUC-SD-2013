@@ -78,6 +78,6 @@ class HvacController(BackboneCollection):
             #if nothing changes then just return
             return
         hvac_uuids["tar_temp"] = data["tar_temp"]
-        sock_str = "jdev/sps/io/"+hvac_uuids["tar_temp_uuid"]["uuid"]+"/"+str(int(hvac_uuids["tar_temp"]))
+        sock_str = "jdev/sps/io/"+hvac_uuids["tar_temp_uuid"]+"/"+str(int(hvac_uuids["tar_temp"]))
         print "HVAC:: setting temperature:", data['tar_temp']
         self.sock.send_message(sock_str)
