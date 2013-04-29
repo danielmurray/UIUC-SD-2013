@@ -670,11 +670,18 @@ var HvacView = PageView.extend({
   initialize: function(data) {
     PageView.prototype.initialize.apply(this, [data]);
     this.watertemplate = loadTemplate("/static/views/hvac.html");
-    
+    that = this
     this.collection = [];
 
-    this.collection[0] = window.Water;
+    this.collection[0] = window.HVAC;
     this.collection[0]._sortBy('value',true);
+    
+    if( this.collection[0].models.length >0 ){
+      this.model = this.collection[0].models[0]
+    }else{
+      console.log('No HVAC Models Found')
+    }
+
   },
   animateIn: function(){
     PageView.prototype.animateIn.apply(this);
@@ -692,7 +699,7 @@ var HvacView = PageView.extend({
       range: 'day'
     });
 
-    thermostat = new Thermostat();
+    thermostat = new Thermostat({model: this.model});
 
     return{
       '#graphwrapper': graph
@@ -1306,18 +1313,21 @@ var Thermostat = BaseView.extend({
   el: 'div',
   initialize: function(data) {
     this.template = loadTemplate("/static/views/thermostat.html");
-    this.model = null;
+    this.model = data.model;
+    console.log(this.model.get('tar_temp').val)
   },
   route: function(part) {
+    this.listenTo(this.model, 'change', this.render);
     return {};
   },
   render: function() {
+    that = this
     var renderedTemplate = this.template();
     this.$el.html(renderedTemplate);  
 
     $('.thermostatknob').knob({
-        'min':60
-        ,'max':80
+        'min':0
+        ,'max':40
         ,'angleOffset': 225
         ,'angleArc': 270
         , 'width': 280
@@ -1325,8 +1335,17 @@ var Thermostat = BaseView.extend({
         , 'fgColor': 'rgba(173,50,50,0.8)'
         , 'bgColor': 'rgba(84,175,226,0.8)'
         , 'inputColor' : 'rgba(245,245,245,0.8)'
-      });
+        ,'release' : function (v) { 
+          console.log(that.model)
+          that.model.save({
+            tar_temp: {
+              val: v
+            }
+          });
+        }
+      })
 
+    $('.thermostatknob').val(this.model.get('tar_temp').val).trigger('change');
   }
 });
 
