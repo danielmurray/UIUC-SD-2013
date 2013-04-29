@@ -25,6 +25,15 @@ var LightCollection = CollectionWS.extend({
       lightson.length,
       'Lights<br/>On'
     ]
+  },
+  getLightsOn: function() {
+    var sum = 0;
+    this.each(function(model) {
+      if (model.get('value') != 0) {
+        sum += 1;
+      }
+    });
+    return sum;
   }
 });
 
@@ -87,6 +96,13 @@ var HVACCollection = CollectionWS.extend({
     
     historyData("hvac", "tar_temp", start, end, density, "sum", callback);
 
+  },
+  getTemp: function() {
+    var last = "loading";
+    this.each(function(model) {
+      last = model.get("tar_temp");
+    });
+    return last;
   }
 });
 
@@ -97,6 +113,13 @@ var TempCollection = CollectionWS.extend({
     
     historyData("temp", "val", start, end, density, "avg", callback);
 
+  },
+  getAvgTemp: function() {
+    var sum = 0;
+    this.each(function(model) {
+      sum += parseInt(model.get("val"));
+    });
+    return sum / this.size();
   }
 });
 
@@ -126,6 +149,15 @@ var WindoorCollection = CollectionWS.extend({
       windooropen.length,
       'Open<br />D+W'
     ]
+  },
+  getTotalOpen: function() {
+    var open = 0;
+    this.each(function(model) {
+      if (parseInt(model.get("val")) == 0) {
+        open += 1;
+      }
+    });
+    return open;
   }
 });
 
@@ -157,8 +189,8 @@ var PowerCollection = CollectionWS.extend({
   },
   getTotalConsumption: function() {
     var total = 0.0;
-    $.each(this.models, function() {
-      var adder = parseFloat(this.attributes.power);
+    this.each(function(model) {
+      var adder = parseFloat(model.get("power"));
       total += adder;
     });
     return Math.round(total);
@@ -189,8 +221,8 @@ var PVCollection = CollectionWS.extend({
   },
   getTotalProduction: function() {
     var total = 0.0;
-    $.each(this.models, function() {
-      var adder = parseFloat(this.attributes.power);
+    this.each(function(model) {
+      var adder = parseFloat(model.get("power"));
       total += adder;
     });
     return Math.round(total)
@@ -220,6 +252,13 @@ var FlowCollection = CollectionWS.extend({
     
     historyData("flow", "val", start, end, density, "sum", callback);
 
+  },
+  getTotal: function() {
+    var sum = 0;
+    this.each(function(model) {
+      sum += parseInt(model.get("val"));
+    });
+    return sum;
   }
 });
 

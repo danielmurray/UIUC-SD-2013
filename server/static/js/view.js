@@ -159,6 +159,10 @@ var StatusView = PageView.extend({
     //console.log(data)
     this.on("assign", this.animateIn);
     this.statustemplate = loadTemplate("/static/views/status.html");
+    var that = this;
+    _.each(Collections, function(c, i) {
+      c.on("all", that.render, that);
+    });
   },
   animateIn: function(){
     PageView.prototype.animateIn.apply(this);
@@ -1226,6 +1230,21 @@ var FloorPlanView = BaseView.extend({
   selectzone: function(zone){
     this.trigger('zoneselect', zone);
   },
+  acquireRaphaelZone: function(zoneID){
+    for (var i = 0; i < this.raphzones.items.length; i++) {
+      if(zoneID == this.raphzones[i].id)
+        return this.raphzones[i]
+    }
+  },
+  highlightzone: function(zone){
+    raphzone = this.acquireRaphaelZone(zone)
+    raphzone.attr({opacity:1})
+
+  },
+  unhighlightzone: function(zone){
+    raphzone = this.acquireRaphaelZone(zone)
+    raphzone.attr({opacity:0.8})
+  },
   route: function(part) {
     that = this
 
@@ -1236,6 +1255,14 @@ var FloorPlanView = BaseView.extend({
 
     floorplandataoverlayview.on('zoneselect', function(zone){
       that.selectzone(zone)
+    });
+
+    floorplandataoverlayview.on('zonehighlight', function(zone){
+      that.highlightzone(zone)
+    });
+
+    floorplandataoverlayview.on('zoneunhighlight', function(zone){
+      that.unhighlightzone(zone)
     });
 
     return {
@@ -1300,13 +1327,10 @@ var FloorPlanView = BaseView.extend({
 
     //BINDINGS
     raphzones.mouseover(function (event) {
-        if(this.id != that.selectedlight)
-            this.attr({"opacity": 1});
+        that.highlightzone(this.id)
     });
     raphzones.mouseout(function (event) {
-        if(this.id != that.selectedlight){
-            this.attr({"opacity": .75});
-        }
+        that.unhighlightzone(this.id)
     });
     raphzones.click(function (event) {
         that.selectzone(this.id)
@@ -1330,11 +1354,21 @@ var FloorPlanDataOverlay = BaseView.extend({
     console.log(this.collection)
   },
   events: {
-    "click .zonecontainer":  "selectzone"
+    "click .zonecontainer":  "selectzone",
+    "mouseover .zonecontainer":  "highlightzone",
+    "mouseout .zonecontainer":  "unhighlightzone"
   },
   selectzone: function(click){
     zone = click.currentTarget.id
     this.trigger('zoneselect', zone);
+  },
+  highlightzone: function(click){
+    zone = click.currentTarget.id
+    this.trigger('zonehighlight', zone);
+  },
+  unhighlightzone: function(click){
+    zone = click.currentTarget.id
+    this.trigger('zoneunhighlight', zone);
   },
   route: function(part) {
     return {};
