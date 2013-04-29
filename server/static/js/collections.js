@@ -66,7 +66,28 @@ var BlindCollection = CollectionWS.extend({
 
 var HVACCollection = CollectionWS.extend({
   model: HVACModel,
-  url: '/hvac'
+  url: '/hvac',
+  _order_by: 'id',
+  _descending: 1,
+  comparator: function(device) {
+    return this._descending * device.get(this._order_by);
+  },
+  _sortBy: function(orderOn,descending){
+    
+    if(descending)
+      this._descending = -1;
+    else
+      this._descending = 1;
+
+    this._order_by = orderOn;
+    this.sort();
+  },
+
+  getHistoricalData: function(start,end,density) {
+    
+    return randomArray(start, end, density, 100);
+
+  }
 });
 
 var TempCollection = CollectionWS.extend({
@@ -90,7 +111,21 @@ var FlowCollection = CollectionWS.extend({
 
 var WindoorCollection = CollectionWS.extend({
   model: SensorModel,
-  url: '/windoor'
+  url: '/windoor',
+  zoneData: function(zone){
+    var windooropen = [];
+
+    _.each(this.models, function(model){
+      if(model.get('zone') == zone && model.get('value') != 0 ){
+        windooropen.push(model);
+      }
+    });
+
+    return [
+      windooropen.length,
+      'Open Doors <br />+ Window'
+    ]
+  }
 });
 
 var Co2Collection = CollectionWS.extend({
