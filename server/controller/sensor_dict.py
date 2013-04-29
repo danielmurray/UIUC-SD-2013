@@ -60,6 +60,15 @@ _sensor_list = [
 		}
 	},
 	{
+		'mac_address':'mac-2',
+		'type':'windoor',
+		'name':'room-1',
+		'freq':5,
+		'meta_data':{
+			'location':'room-2',
+		}
+	},
+	{
 		'mac_address':'90A2DAOD2753',
 		'type':'temp',
 		'name':'kitchen',
