@@ -8,9 +8,9 @@ _sensor_list = [
 	{
 		'mac_address':'mac-1',
 		'type':'temp',
-		'name':'kitchen',
+		'name':'livingroom',
 		'freq':0,
-		'zone':'kitchen'
+		'zone':'livingroom'
 	},
 	{
 		'mac_address':'mac-1',
@@ -60,6 +60,13 @@ _sensor_list = [
 		'name':'kitchen',
 		'freq':5,
 		'zone':'kitchen'
+	},
+	{
+		'mac_address':'mac-3',
+		'type':'temp',
+		'name':'hallway',
+		'freq':5,
+		'zone':'hallway'
 	},
 	# {
 	# 	'mac_address':,
