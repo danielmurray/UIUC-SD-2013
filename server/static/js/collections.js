@@ -25,6 +25,15 @@ var LightCollection = CollectionWS.extend({
       lightson.length,
       'Lights<br/>On'
     ]
+  },
+  getLightsOn: function() {
+    var sum = 0;
+    this.each(function(model) {
+      if (model.get('value') != 0) {
+        sum += 1;
+      }
+    });
+    return sum;
   }
 });
 
