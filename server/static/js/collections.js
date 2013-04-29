@@ -124,7 +124,7 @@ var WindoorCollection = CollectionWS.extend({
 
     return [
       windooropen.length,
-      'Open Doors <br />+ Window'
+      'Open<br />D+W'
     ]
   }
 });

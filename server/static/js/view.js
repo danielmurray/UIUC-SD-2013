@@ -954,19 +954,6 @@ var GraphView = BaseView.extend({
       setTimeout(function() {that.renderChart();}, 0); // the element needs to be in the page
     }
 
-    /*
-    $('.histdata').click(function(){
-      that.timeperiod = this.id;
-
-      $('.histdata').removeClass('selected');
-      $(this).addClass('selected')
-
-      that.organizeHistoricalData();
-
-      that.renderChart();
-
-    });
-*/
   },
   renderChart: function(){
     var that = this;
@@ -1285,7 +1272,7 @@ var FloorPlanDataOverlay = BaseView.extend({
     console.log(this.collection)
   },
   events: {
-    "click.zonecontainer":  "selectzone"
+    "click .zonecontainer":  "selectzone"
   },
   selectzone: function(click){
     zone = click.currentTarget.id
