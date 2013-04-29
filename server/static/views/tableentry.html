@@ -1,14 +1,14 @@
 <link href="/static/css/tableentry.css" rel="stylesheet" type="text/css">
 <div class='tableentrywrapper'>
 		<div class='tableentryid'>
-			<%=model.id%>
+			<%=model.get(name)%>
 		</div>
 		<div class='tableentryvalue'>
 			<span class='value'>
-				<%=model.get('value').toFixed(0)%>
+				<%=model.get(value)%>
 			</span>
 			<span class='unit'>
-				<%=model.get('unit')%>
+				<%=unit%>
 			</span>
 		</div>
 </div>

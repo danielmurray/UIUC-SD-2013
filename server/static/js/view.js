@@ -499,10 +499,10 @@ var PowerView = PageView.extend({
     this.collection = [];
 
     this.collection[0] = window.PV;
-    this.collection[0]._sortBy('value',true);
+    //this.collection[0]._sortBy('value',true);
 
-    this.collection[1] = window.Devices;
-    this.collection[1]._sortBy('value',true);
+    this.collection[1] = window.Power;
+    //this.collection[1]._sortBy('power',true);
     
 
   },
@@ -535,7 +535,7 @@ var PowerView = PageView.extend({
         table: {
           id: 'table',
           view: TableView,
-          args: {collection: this.collection[1]}
+          args: {collection: this.collection[1], name: "id", value: "power", unit: "w"}
         },
         graphic: {
           id: 'graphic',
@@ -567,7 +567,7 @@ var PowerView = PageView.extend({
         table: {
           id: 'table',
           view: TableView,
-          args: {collection: this.collection[0]}
+          args: {collection: this.collection[0], name: "id", value: "value", unit: "w"}
         },
         graphic: {
           id: 'graphic',
@@ -641,7 +641,7 @@ var WaterView = PageView.extend({
         table: {
           id: 'table',
           view: TableView,
-          args: {collection: this.collection[0]}
+          args: {collection: this.collection[0], name: "id", value: "value", unit: "gal/min"}
         },
         graphic: {
           id: 'graphic',
@@ -1074,8 +1074,10 @@ var GraphView = BaseView.extend({
 var TableView = BaseView.extend({
   el: 'div',
   initialize: function(data) {
+    this.value = data.value;
+    this.unit = data.unit;
     this.template = loadTemplate("/static/views/table.html");
-    
+    this.name = data.name;
     this.collection = data.collection;
   },
   route: function(part) {
@@ -1088,10 +1090,10 @@ var TableView = BaseView.extend({
     tableEntriesToRendered = {};
 
     console.log(this.collection)
+    var that = this;
+    _.each(this.collection, function(model) {
 
-    _.each(this.collection.models, function(model) {
-
-      tableentry = new TableViewEntry(model);
+      tableentry = new TableViewEntry(model, that.name, that.value, that.unit);
       tableEntriesToRendered['#'+model.id] = tableentry;
       that.tableEntries[model.id] = {};
       that.tableEntries[model.id].id = model.id;
@@ -1163,7 +1165,10 @@ var TableViewEntryOpt = BaseView.extend({
 
 var TableViewEntry = BaseView.extend({
   el: 'div',
-  initialize: function(data) {
+  initialize: function(data, name, value, unit) {
+    this.value = value;
+    this.unit = unit;
+    this.name = name;
     this.template = loadTemplate("/static/views/tableentry.html");
     this.model = data;
   },
@@ -1171,7 +1176,7 @@ var TableViewEntry = BaseView.extend({
     return {};
   },
   render: function() {
-    var renderedTemplate = this.template({model:this.model});
+    var renderedTemplate = this.template({model:this.model, name: this.name, value: this.value, unit: this.unit});
     this.$el.html(renderedTemplate);
   }
 });
