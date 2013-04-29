@@ -43,16 +43,16 @@ _sensor_list = [
 	{
 		'mac_address':'mac-1',
 		'type':'windoor',
-		'name':'kitchen',
+		'name':'kitchen door',
 		'freq':5,
 		'zone':'kitchen'
 	},
 	{
 		'mac_address':'mac-2',
 		'type':'windoor',
-		'name':'kitchen',
+		'name':'living room door',
 		'freq':5,
-		'zone':'kitchen'
+		'zone':'livingroom'
 	},
 	{
 		'mac_address':'mac-2',
