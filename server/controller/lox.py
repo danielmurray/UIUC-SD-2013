@@ -18,7 +18,7 @@ class EchoIncoming(WebSocketClientProtocol):
     def registerListner(self, listner):
         if callable(listner):
             self.listners.append(listner)
-        if config_received:
+        if self.config_received:
             listner(self.config_msg)
 
 
