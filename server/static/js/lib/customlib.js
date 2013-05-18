@@ -118,27 +118,6 @@ var randomArray = function(start, end, size, seed){
   return arr;
 }
 
-var historyData = function(type, field, start, end, period, group, callback) {
-  $.ajax("/history", {
-    data: {
-      type: type,
-      field: field,
-      start: start,
-      end: end,
-      period: period,
-      group: group
-    },
-    dataType: "json",
-    success: function(data) {
-      callback(data);
-    },
-    error: function(err) {
-      console.error(err);
-      callback(undefined);
-    }
-  });
-}
-
 var rgbaToString = function(color,opacity){
   
   var thing = 'rgba(' + color[0] + ',' + color[1] + ',' + color[2]  + ',' + opacity + ')';

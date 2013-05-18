@@ -3,7 +3,7 @@ import gevent
 from autobahn.websocket import WebSocketClientFactory, WebSocketClientProtocol, connectWS
 import requests, random, hmac, hashlib, base64, json
 
-LOX_ADDR = '130.126.29.12'
+LOX_ADDR = 'http://eric-johnson.net:8080/'
 PING_TIME = 10
 
 class EchoIncoming(WebSocketClientProtocol):

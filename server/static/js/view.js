@@ -202,7 +202,7 @@ var LightingView = PageView.extend({
     if(part){
       data = {}
       data['id'] = part;
-      data.lights = this.collection.getLightsByZone(part);
+      data.lights = this.collection._zoneModels(part);
 
       lightcontrolview = new LightControlView(data);
       
@@ -513,24 +513,6 @@ var PowerView = PageView.extend({
   },
   route: function(part) {
 
-    graph = new GraphView({
-      type:'area',
-      series:[
-        {
-          name:'Production',
-          color: [85,160,85],
-          collection: this.collection[0]
-        },
-        {
-          name:'Consumption',
-          color: [173,50,50],
-          collection: this.collection[1]
-        }
-      ],
-      range: 'day',
-      unit: "w"
-    });
-
     consumptiondatabox = new DataBox({
       id: 'Consumption',
       databoxcontent: 'table',
@@ -599,12 +581,31 @@ var PowerView = PageView.extend({
           }
         }
       }
-    });  
+    });
 
+    graph = new GraphView({
+      type:'area',
+      series:[
+        {
+          name:'Production',
+          color: [85,160,85],
+          collection: this.collection[0]
+        },
+        {
+          name:'Consumption',
+          color: [173,50,50],
+          collection: this.collection[1]
+        }
+      ],
+      range: 'day',
+      unit: "w"
+    });
+
+    console.log('When do we leave')
     return{
-      '#graphwrapper': graph
-      ,'#consumptionwrapper': consumptiondatabox
+      '#consumptionwrapper': consumptiondatabox
       ,'#generationwrapper': generationtdatabox
+      ,'#graphwrapper': graph
     }
   },
   render: function(pane, subpane) {
@@ -645,6 +646,7 @@ var WaterView = PageView.extend({
     consumptiondatabox = new DataBox({
       id: 'Consumption',
       databoxcontent: 'table',
+      collection: this.collection[0],
       subviews: {
         table: {
           id: 'table',
@@ -657,11 +659,11 @@ var WaterView = PageView.extend({
           args: {collection: this.collection[0]}
         }
       }
-    });   
+    });    
 
     return{
-      '#graphwrapper': graph
-      ,'#consumptionwrapper': consumptiondatabox
+      '#consumptionwrapper': consumptiondatabox
+      ,'#graphwrapper': graph
       //,'#greywaterwrapper': generationtdatabox
     }
 
@@ -729,9 +731,9 @@ var HvacView = PageView.extend({
     thermostat = new Thermostat({model: this.model});
 
     return {
-      '#graphwrapper': graph,
-      '#thermostatwrapper': thermostat,
-      '#weekviewwrapper': tempdatabox
+      '#thermostatwrapper': thermostat
+      ,'#weekviewwrapper': tempdatabox
+      ,'#graphwrapper': graph
     }
 
   },
@@ -789,7 +791,7 @@ var DataBox = BaseView.extend({
     this.template = loadTemplate("/static/views/databox.html");
     this.databox = data;
     this.collection = this.databox.collection
-
+    console.log(data)
     this.contentdivselector = '#databoxcontentwrapper';
     this.currcontentview = this.databox.databoxcontent; //View to be rendered to the databox
     this.views = this.databox.subviews;
@@ -832,14 +834,23 @@ var GraphView = BaseView.extend({
     this.inputdata = graphdata.series;
     this.unit = graphdata.unit;
     this.series = undefined;
+    this.template = loadTemplate("/static/views/graph.html");
+
+  },
+  route: function(part) {
+    return{};
+  },
+  render: function() {
     var that = this;
+
+    var renderedTemplate = this.template();
+    this.$el.html(renderedTemplate);
+
     this.fetchHistoricalData(function() {
       console.log("Got all data", that.series);
       that.organizeHistoricalData();
-      that.render();
+      that.renderChart();
     });
-
-    this.template = loadTemplate("/static/views/graph.html");
 
   },
   fetchHistoricalData: function(callback){    
@@ -947,20 +958,6 @@ var GraphView = BaseView.extend({
         var then = now - 365*24*60*60;
     }
     collection.getHistoricalData(then,now,100, callback);
-  },
-  route: function(part) {
-    return{};
-  },
-  render: function() {
-    var that = this;
-
-    var renderedTemplate = this.template();
-    this.$el.html(renderedTemplate);
-
-    if (this.series) {
-      setTimeout(function() {that.renderChart();}, 0); // the element needs to be in the page
-    }
-
   },
   renderChart: function(){
     var that = this;
@@ -1101,7 +1098,7 @@ var GraphView = BaseView.extend({
       if(chart.get('transparent'))
         chart.get('transparent').area.hide();
     });
-    console.log(container[0].clientTop);
+    // console.log(container[0].clientTop);
   }
 });
 

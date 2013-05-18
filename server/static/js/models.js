@@ -1,5 +1,5 @@
 // Models
-var BaseMode = ModelWS.extend({
+var BaseModel = ModelWS.extend({
   defaults: function() {
     return {
       id: null,
@@ -9,7 +9,7 @@ var BaseMode = ModelWS.extend({
   },
 })
 
-var LightModel = ModelWS.extend({
+var LightModel = BaseModel.extend({
   defaults: function() {
     return {
       id: null,
@@ -20,7 +20,6 @@ var LightModel = ModelWS.extend({
   },
   getcolor: function(){
   	var hex = this.get('value');
-  	console.log(hex);
   	
   	var rgb = hexToRgb(hex);
     var hsl = rgbToHsl(rgb)
@@ -46,59 +45,57 @@ var LightModel = ModelWS.extend({
     case 'digital':
       if(value < 50){
       	this.save({
-			value: 0
-		});
+    			value: 0
+    		});
       }else{
       	this.save({
-			value: 100
-		});
+    			value: 100
+    		});
       }
       break;
     default:
-    	console.log(value)
-
-		this.save({
-			value: value
-		});
+  		this.save({
+  			value: value
+  		});
     }
   },
   updateColor: function(value){
+  	color = this.getcolor()
+  	
+  	color.h = value;
+  	color.s = 1;
+  	color.l = 0.5;
 
-
-	color = this.getcolor()
+  	rgb = hslToRgb(color);
+  	hex = rgbToHex(rgb);
+  		
+  	this.save({
+  		value: hex
+  	});
 	
-	color.h = value;
-	color.s = 1;
-	color.l = 0.5;
-
-	rgb = hslToRgb(color);
-	hex = rgbToHex(rgb);
-		
-	this.save({
-		value: hex
-	});
-	
-	return hex;
+    return hex;
   }
 });
-
-var BlindModel = ModelWS.extend({
-  defaults: function() {
-    return {
-      id: null,
-      zone: null, //id = room
-      value: null
-    }
-  }
-}); 
 
 var HVACModel = ModelWS.extend({
   defaults: function() {
     return {
       id: null,
       zone: null, //id = room
-      temperature: null,
+      tar_temp: null,
       humidity: null,
+    }
+  }
+});
+
+var TemperatureModel = ModelWS.extend({
+  defaults: function(){
+    return{
+      name: null,
+      id: null,
+      value: null,
+      units: 'C',
+      timestamp: null
     }
   }
 });
@@ -131,18 +128,6 @@ var WaterModel = ModelWS.extend({
       room: null,
       value: null,
       unit: 'L'
-    }
-  }
-});
-
-var TemperatureModel = ModelWS.extend({
-  defaults: function(){
-    return{
-      name:null,
-      id:null,
-      value:null,
-      units: 'C',
-      timestamp: null
     }
   }
 });

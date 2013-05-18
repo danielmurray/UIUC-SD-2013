@@ -29,7 +29,7 @@ var CollectionWS = Backbone.Collection.extend({
         var tid = uid();
         socket.emit("fetch", {tid: tid});
         socket.once(tid, function(response) {
-          console.log(tid, response);
+          // console.log(tid, response);
           if (response.success) {
             options.success(collection, response.data, options);
           }

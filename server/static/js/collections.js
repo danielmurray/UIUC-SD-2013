@@ -1,119 +1,9 @@
 // Collection definitions
 var BaseCollection = CollectionWS.extend({
-  model: LightModel,
-  url: '/light',
-  getLightsByZone: function(zone) {
-    lightsToBeReturned = {};
-    _.each(this.models, function(model){
-      if(model.get('zone') == zone){
-        lightsToBeReturned[model.id] = model;
-      }
-    });
-    return lightsToBeReturned;
-  },
-  zoneData: function(zone){
-    var lightson = [];
-
-    _.each(this.models, function(model){
-      if(model.get('zone') == zone && model.get('value') != 0 ){
-        lightson.push(model);
-      }
-    });
-
-    return [
-      lightson.length,
-      'Lights<br/>On'
-    ]
-  },
-  getLightsOn: function() {
-    var sum = 0;
-    this.each(function(model) {
-      if (model.get('value') != 0) {
-        sum += 1;
-      }
-    });
-    return sum;
-  }
-})
-
-var LightCollection = CollectionWS.extend({
-  model: LightModel,
-  url: '/light',
-  getLightsByZone: function(zone) {
-    lightsToBeReturned = {};
-    _.each(this.models, function(model){
-      if(model.get('zone') == zone){
-        lightsToBeReturned[model.id] = model;
-      }
-    });
-    return lightsToBeReturned;
-  },
-  zoneData: function(zone){
-    var lightson = [];
-
-    _.each(this.models, function(model){
-      if(model.get('zone') == zone && model.get('value') != 0 ){
-        lightson.push(model);
-      }
-    });
-
-    return [
-      lightson.length,
-      'Lights<br/>On'
-    ]
-  },
-  getLightsOn: function() {
-    var sum = 0;
-    this.each(function(model) {
-      if (model.get('value') != 0) {
-        sum += 1;
-      }
-    });
-    return sum;
-  }
-});
-
-var BlindCollection = CollectionWS.extend({
-  model: BlindModel,
-  url: '/light',
-  getLightsByZone: function(zone) {
-    lightsToBeReturned = {};
-    _.each(this.models, function(model){
-      if(model.get('zone') == zone){
-        lightsToBeReturned[model.id] = model;
-      }
-    });
-    return lightsToBeReturned;
-  },
-  zoneData: function(zone){
-    var blindopen = [];
-
-    _.each(this.models, function(model){
-      if(model.get('zone') == zone && model.get('value') != 0 ){
-        blindopen.push(model);
-      }
-    });
-   
-    if(blindopen.length == 0){
-      return [
-        '',
-        ''
-      ]
-    }else{
-      return [
-        blindopen.length,
-        'Blinds<br/>Open'
-      ]
-    }
-    
-  }
-});
-
-var HVACCollection = CollectionWS.extend({
-  model: HVACModel,
-  url: '/hvac',
+  model: BaseModel,
   _order_by: 'id',
   _descending: 1,
+  valueID: 'value',
   comparator: function(device) {
     return this._descending * device.get(this._order_by);
   },
@@ -127,13 +17,101 @@ var HVACCollection = CollectionWS.extend({
     this._order_by = orderOn;
     this.sort();
   },
+  _zoneModels: function(zone,format) {
+    //returns a json object of all models in a zone//
+    zoneModels = {};
 
-  getHistoricalData: function(start,end,density,callback) {
+    _.each(this.models, function(model){
+      if(model.get('zone') == zone){
+        zoneModels[model.id] = model;
+      }
+    });
+
+    return zoneModels;
+  },
+  _homeData: function(key, zone){
+    var modelsOn = [];
+    var modelSum = 0;
+
+    _.each(this.models, function(model){
+      if((zone === undefined || model.get('zone') == zone) && model.get( key ) > 0 ){
+        modelsOn.push(model);
+        modelSum += parseInt(model.get( key ));
+      }
+    });
+
+    return {
+      count : modelsOn.length,
+      sum : modelSum
+    }
+  },
+  formatValue: function(value, unit) {
+    metricPrefixArray = [
+      '', 
+      'k', //kilo
+      'M', //mega
+      'G', //giga
+      'T', //tera
+      'P', //peta
+      'E', //exa
+      'Z', //zetta
+      'Y'  //yotta
+    ]
+  },
+  historyData: function(type, field, start, end, period, group, callback) {
+    $.ajax("/history", {
+      data: {
+        type: type,
+        field: field,
+        start: start,
+        end: end,
+        period: period,
+        group: group
+      },
+      async:'true',
+      dataType: "json",
+      success: function(data) {
+        console.log('going to callback')
+        callback(data);
+      },
+      error: function(err) {
+        console.error(err);
+        callback(undefined);
+      }
+    });
+  }
+})
+
+var LightCollection = BaseCollection.extend({
+  model: LightModel,
+  url: '/light',
+  valueID: 'value',
+  zoneData: function(zone){
     
-    historyData("hvac", "tar_temp", start, end, density, "sum", callback);
+    value = this._homeData(this.valueID, zone).count 
+    unit = 'Lights<br/>On'
+
+    return [
+      value,
+      unit
+    ]
 
   },
-  getTemp: function() {
+  homeData:function(){
+    return this._homeData(this.valueID).count;
+  }
+});
+
+var HVACCollection = BaseCollection.extend({
+  model: HVACModel,
+  url: '/hvac',
+  valueID: 'temperature',
+  getHistoricalData: function(start,end,density,callback) {
+    
+    this.historyData("hvac", "tar_temp", start, end, density, "sum", callback);
+
+  },
+  getSetTemp: function() {
     var last = "loading";
     this.each(function(model) {
       last = model.get("tar_temp");
@@ -142,22 +120,119 @@ var HVACCollection = CollectionWS.extend({
   }
 });
 
-var TempCollection = CollectionWS.extend({
+var TempCollection = BaseCollection.extend({
   model: SensorModel,
   url: '/temp',
+  valueID: 'value',
   getHistoricalData: function(start,end,density,callback) {
     
-    historyData("temp", "val", start, end, density, "avg", callback);
+    this.historyData("temp", "val", start, end, density, "avg", callback);
 
   },
-  getAvgTemp: function() {
-    var sum = 0;
-    this.each(function(model) {
-      sum += parseInt(model.get("val"));
-    });
-    return sum / this.size();
+  avgTemp: function() {
+    data = this._homeData(this.valueID)
+    count = data.count
+    sum = data.sum
+    return sum/count
   }
 });
+
+var WindoorCollection = BaseCollection.extend({
+  model: SensorModel,
+  url: '/windoor',
+  valueID: 'value',
+  zoneData: function(zone){
+    
+    value = this._homeData(this.valueID, zone).count
+    unit = 'Open<br />D+W'
+
+    return [
+      value,
+      unit
+    ]
+
+  },
+  homeData: function() {
+    return this._homeData(this.valueID).count;
+  }
+});
+
+var PowerCollection = BaseCollection.extend({
+  model: SensorModel,
+  url: '/power',
+  valueID: 'power',
+  getHistoricalData: function(start,end,density,callback) {
+  
+    this.historyData("power", "power", start, end, density, "sum", callback);
+  
+  },
+  getSum: function(){
+    return this._homeData(this.valueID).sum;
+  },
+  zoneData: function(zone){
+    
+    value = this._homeData(this.valueID, zone).sum
+    unit = 'W'
+
+    return [
+      value,
+      unit
+    ]
+    
+  }
+});
+
+
+var PVCollection = BaseCollection.extend({
+  model: PVModel,
+  url: '/pv',
+  valueID: 'power',
+  getHistoricalData: function(start,end,density,callback) {
+    
+    this.historyData("pv", "power", start, end, density, "sum", callback);
+  
+  },
+  getSum: function(){
+    return this._homeData(this.valueID).sum;
+  },
+  zoneData: function(zone){
+    
+    value = this._homeData(this.valueID, zone).sum
+    unit = 'W'
+
+    return [
+      value,
+      unit
+    ]
+    
+  }
+});
+
+var FlowCollection = BaseCollection.extend({
+  model: SensorModel,
+  url: '/flow',
+  valueID: 'val',
+  getHistoricalData: function(start,end,density,callback) {
+    
+    this.historyData("flow", "val", start, end, density, "sum", callback);
+
+  },
+  getSum: function(){
+    return this._homeData(this.valueID).sum;
+  },
+  zoneData: function(zone){
+    
+    value = this._homeData(this.valueID, zone) 
+    unit = 'L'
+
+    return [
+      value,
+      unit
+    ]
+    
+  }
+});
+
 
 var PyraCollection = CollectionWS.extend({
   model: SensorModel,
@@ -169,140 +244,10 @@ var HumidCollection = CollectionWS.extend({
   url: '/humid'
 });
 
-var WindoorCollection = CollectionWS.extend({
-  model: SensorModel,
-  url: '/windoor',
-  zoneData: function(zone){
-    var windooropen = [];
 
-    _.each(this.models, function(model){
-      console.log(model.get('name'), model.get('val') )
-      if(model.get('zone') == zone && model.get('val') == 0 ){
-        windooropen.push(model);
-      }
-    });
-
-    return [
-      windooropen.length,
-      'Open<br />D+W'
-    ]
-  },
-  getTotalOpen: function() {
-    var open = 0;
-    this.each(function(model) {
-      if (parseInt(model.get("val")) == 0) {
-        open += 1;
-      }
-    });
-    return open;
-  }
-});
-
-var Co2Collection = CollectionWS.extend({
+var Co2Collection = BaseCollection.extend({
   model: SensorModel,
   url: '/co2'
-});
-
-
-var PowerCollection = CollectionWS.extend({
-  model: SensorModel,
-  url: '/power',
-  comparator: function(device) {
-    return this._descending * device.get(this._order_by);
-  },
-  _sortBy: function(orderOn,descending){
-    
-    if(descending)
-      this._descending = -1;
-    else
-      this._descending = 1;
-
-    this._order_by = orderOn;
-    this.sort();
-  },
-  getHistoricalData: function(start,end,density,callback) {
-    console.log(start, end, density);
-    historyData("power", "power", start, end, density, "sum", callback);
-  },
-  getSum: function(){
-    return this.getTotalConsumption()
-  },
-  getTotalConsumption: function() {
-    var total = 0.0;
-    this.each(function(model) {
-      var adder = parseFloat(model.get("power"));
-      total += adder;
-    });
-    return Math.round(total);
-  }
-});
-
-
-var PVCollection = CollectionWS.extend({
-  model: PVModel,
-  url: '/pv',
-  _order_by: 'id',
-  _descending: 1,
-  comparator: function(device) {
-    return this._descending * device.get(this._order_by);
-  },
-  _sortBy: function(orderOn,descending){
-    
-    if(descending)
-      this._descending = -1;
-    else
-      this._descending = 1;
-
-    this._order_by = orderOn;
-    this.sort();
-  },
-  getHistoricalData: function(start,end,density,callback) {
-    historyData("pv", "power", start, end, density, "sum", callback);
-  },
-  getSum: function(){
-    return this.getTotalProduction()
-  },
-  getTotalProduction: function() {
-    var total = 0.0;
-    this.each(function(model) {
-      var adder = parseFloat(model.get("power"));
-      total += adder;
-    });
-    return Math.round(total)
-  }
-});
-
-var FlowCollection = CollectionWS.extend({
-  model: SensorModel,
-  url: '/flow',
-  _order_by: 'id',
-  _descending: 1,
-  comparator: function(device) {
-    return this._descending * device.get(this._order_by);
-  },
-  _sortBy: function(orderOn,descending){
-    
-    if(descending)
-      this._descending = -1;
-    else
-      this._descending = 1;
-
-    this._order_by = orderOn;
-    this.sort();
-  },
-
-  getHistoricalData: function(start,end,density,callback) {
-    
-    historyData("flow", "val", start, end, density, "sum", callback);
-
-  },
-  getTotal: function() {
-    var sum = 0;
-    this.each(function(model) {
-      sum += parseInt(model.get("val"));
-    });
-    return sum;
-  }
 });
 
 var OptimizerCollection = CollectionWS.extend({

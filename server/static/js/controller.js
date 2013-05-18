@@ -102,10 +102,10 @@ $(function() {
     var waitingOn = Collections.length;
     var start = function() {
       waitingOn = waitingOn - 1;
-      console.log("Waiting on", waitingOn);
+      // console.log("Waiting on", waitingOn);
       if (waitingOn == 0) {
         Backbone.history.start();
-         console.log("Started router", router);
+         // console.log("Started router", router);
       }
     }
 

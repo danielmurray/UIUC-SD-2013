@@ -175,8 +175,8 @@ PV.add([
 
 window.Flow = new FlowCollection();
 
-window.Blinds = new BlindCollection();
-Blinds.add([
+window.Windoor = new WindoorCollection();
+Windoor.add([
   {
     id: "northwindowkitchen",
     zone: "kitchen",
@@ -271,15 +271,6 @@ CO2.add([
     state: "on", //id = room
     avg_temp: Math.random() * 100,
     tar_temp: Math.random() * 100
-    }
-]);
-
-window.Windoor = new WindoorCollection();
-Windoor.add([
-    {
-    id: "6",
-    zone: "room-1",
-    value: '1'
     }
 ]);
 
