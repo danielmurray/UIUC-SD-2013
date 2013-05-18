@@ -1,4 +1,13 @@
 // Models
+var BaseMode = ModelWS.extend({
+  defaults: function() {
+    return {
+      id: null,
+      zone: "home",
+      value: 0 
+    }
+  },
+})
 
 var LightModel = ModelWS.extend({
   defaults: function() {

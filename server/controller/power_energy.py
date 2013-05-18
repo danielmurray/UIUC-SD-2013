@@ -28,7 +28,7 @@ class PowerController(BackboneCollection):
       self.update(v)
 
   def fetch_data(self):
-    server_url = "http://128.174.180.40/cgi-bin/egauge" # + "?tot"
+    server_url = "http://solardecathlon.web.cs.illinois.edu/egauge" # + "?tot"
     return self.make_request(server_url, None)
 
   def parse_xml(self,unparsed_xml):

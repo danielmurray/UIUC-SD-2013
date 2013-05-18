@@ -1,4 +1,40 @@
 // Collection definitions
+var BaseCollection = CollectionWS.extend({
+  model: LightModel,
+  url: '/light',
+  getLightsByZone: function(zone) {
+    lightsToBeReturned = {};
+    _.each(this.models, function(model){
+      if(model.get('zone') == zone){
+        lightsToBeReturned[model.id] = model;
+      }
+    });
+    return lightsToBeReturned;
+  },
+  zoneData: function(zone){
+    var lightson = [];
+
+    _.each(this.models, function(model){
+      if(model.get('zone') == zone && model.get('value') != 0 ){
+        lightson.push(model);
+      }
+    });
+
+    return [
+      lightson.length,
+      'Lights<br/>On'
+    ]
+  },
+  getLightsOn: function() {
+    var sum = 0;
+    this.each(function(model) {
+      if (model.get('value') != 0) {
+        sum += 1;
+      }
+    });
+    return sum;
+  }
+})
 
 var LightCollection = CollectionWS.extend({
   model: LightModel,
