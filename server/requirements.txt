@@ -10,3 +10,4 @@ twisted==13.0.0
 autobahn==0.5.14
 requests==1.2.0
 BeautifulSoup==3.2.1
+geventreactor
