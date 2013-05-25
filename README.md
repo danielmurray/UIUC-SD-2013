@@ -11,6 +11,8 @@ Peking Solar Decathlon 2013 - UIUC
 
 ### (If) on OSX Server
 
+- Install Xcode and Install Command Line Tools
+- Follow the directions on this site to install libevent -> http://www.cloudspace.com/blog/2009/01/13/installing-libevent-on-mac-osx/
 - `sudo apt-get install pip`
 
 ### Install pip and virtualenv
