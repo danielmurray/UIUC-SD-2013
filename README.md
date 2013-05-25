@@ -5,6 +5,14 @@ Peking Solar Decathlon 2013 - UIUC
 
 ## Setup
 
+### (If) on Debian Server
+
+- `sudo apt-get install python-pip python-dev libevent-dev`
+
+### (If) on OSX Server
+
+- `sudo apt-get install pip`
+
 ### Install pip and virtualenv
 
 - `cd SD2013-UIUC/server`
