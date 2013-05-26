@@ -583,9 +583,8 @@ var PowerView = PageView.extend({
       }
     });
 
-    graph = new GraphView({
-      type:'area',
-      series:[
+    taskbar = new PageTaskBar({
+      collections:[
         {
           name:'Production',
           color: [85,160,85],
@@ -597,15 +596,13 @@ var PowerView = PageView.extend({
           collection: this.collection[1]
         }
       ],
-      range: 'day',
-      unit: "w"
+      range: 'day'
     });
 
-    console.log('When do we leave')
     return{
       '#consumptionwrapper': consumptiondatabox
       ,'#generationwrapper': generationtdatabox
-      ,'#graphwrapper': graph
+      ,'#taskbarwrapper': taskbar
     }
   },
   render: function(pane, subpane) {
@@ -781,6 +778,37 @@ var OptView = PageView.extend({
   }
 });
 
+var PageTaskBar = BaseView.extend({
+  el: 'div',
+  events: {
+    "click .histdata":  "changerange"
+  },
+  initialize: function(data) {
+    this.template = loadTemplate("/static/views/pagetaskbar.html");
+    this.range = 'today';
+    this.collections = data.collections
+  },
+  route: function(part) {
+    return {}
+  },
+  render: function() {
+    var renderedTemplate = this.template({ range: this.range, collections: this.collections });
+    this.$el.html(renderedTemplate);
+  },
+  changerange: function(click) {
+    
+    if(click.target.id == this.range)
+      return;
+    else
+      this.range = click.target.id;
+
+    $('.histdata').removeClass('selected');
+    $(click.target).addClass('selected');
+
+    //rerender taskbar
+  }
+});
+
 var DataBox = BaseView.extend({
   el: 'div',
   events: {
@@ -791,7 +819,6 @@ var DataBox = BaseView.extend({
     this.template = loadTemplate("/static/views/databox.html");
     this.databox = data;
     this.collection = this.databox.collection
-    console.log(data)
     this.contentdivselector = '#databoxcontentwrapper';
     this.currcontentview = this.databox.databoxcontent; //View to be rendered to the databox
     this.views = this.databox.subviews;
@@ -828,7 +855,7 @@ var DataBox = BaseView.extend({
 var GraphView = BaseView.extend({
   el: 'div',
   initialize: function(graphdata) {
-
+    console.log(graphdata)
     this.type = graphdata.type;
     this.timeperiod = graphdata.range;
     this.inputdata = graphdata.series;
@@ -846,11 +873,11 @@ var GraphView = BaseView.extend({
     var renderedTemplate = this.template();
     this.$el.html(renderedTemplate);
 
-    this.fetchHistoricalData(function() {
-      console.log("Got all data", that.series);
-      that.organizeHistoricalData();
-      that.renderChart();
-    });
+    // this.fetchHistoricalData(function() {
+    //   console.log("Got all data", that.series);
+    //   that.organizeHistoricalData();
+    //   that.renderChart();
+    // });
 
   },
   fetchHistoricalData: function(callback){    
@@ -1110,7 +1137,6 @@ var TableView = BaseView.extend({
     this.template = loadTemplate("/static/views/table.html");
     this.name = data.name;
     this.collection = data.collection;
-    console.log(data)
   },
   route: function(part) {
     var that = this;

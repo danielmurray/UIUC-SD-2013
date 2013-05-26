@@ -1,0 +1,124 @@
+.taskbar{
+	background-color: rgba(0, 15, 30, 0.8);
+	height: 100%;
+	width:100%;
+}
+
+.historybuttons{
+	float:left;
+	height: 100%;
+	width: 13%;
+}
+
+.historybuttonslist{
+	height:100%;
+	list-style: none;
+}
+
+.historybuttonslist li{
+	height: 33.33333%;
+}
+
+button.histdata{
+	float:left;
+	width: 100%;
+	height: 100%;
+    font-family: 'lato-thin';
+	font-size: 20px;
+	color: rgba(245, 245, 245, 0.6);
+	background-color: rgba(0,0,0,0);
+	border: solid 0px;
+	border-bottom: solid 1px rgba(245, 245, 245, 0.2);
+	border-right: solid 1px rgba(245, 245, 245, 0.2);
+}
+
+button.histdata.selected{
+	color: rgba(245, 245, 245, 1);
+	background-color: rgba(85,160,85,1);
+}
+
+.graphwrapper{
+	float: left;
+	height: 100%;
+	width: 45%;
+	background-color: rgba(255,255,255,0.2);
+}
+
+.statuswrapper{
+	float: left;
+	height: 100%;
+	width: 42%;
+}
+
+.seriesdatalist{
+	list-style: none;
+	height: 100%;
+}
+
+.seriesdatalist li{
+	height: 33.3333%;
+}
+
+.costdata{
+	background-color: rgba(223,144,1,1);
+}
+
+.seriesdatatableheader,
+.seriesdatatable{
+	float:left;
+	table-layout: fixed;
+	border-collapse:collapse;
+
+}
+
+.seriesdatatableheader{
+	width: 73%;
+	height: 100%;
+	font-size: 20px;
+	color: rgba(245,245,245,1);
+}
+
+.seriesdatatable{
+	float: right;
+	margin-right: 5%;
+	width: 22%;
+	height: 100%;
+	font-size: 14px;
+	color: rgba(245,245,245,0.6);
+}
+
+.seriesdatatableheader .key{
+	width: 70%;	
+	text-align: left;
+}
+
+.seriesdatatableheader .value{
+	width: 30%;
+	text-align: right;
+}
+
+.seriesdatatable .key{
+	width: 30%;
+	text-align: left;
+}
+
+.seriesdatatable .value{
+	width: 70%;
+	text-align: right;
+}
+
+.seriesdatatable tr{
+	height: 33%
+}
+
+.seriesdatatable td{
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
+
+.costwrapper{
+	float: right;
+	height: 100%;
+	width: 20%;
+}

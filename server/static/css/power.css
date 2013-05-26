@@ -5,7 +5,6 @@
 
 .top{
 	margin-top: 5px;
-	text-align: right;
 	float:left;
 	height: 25%;
 	width: 100%;
@@ -29,7 +28,7 @@
 	overflow: hidden;
 }
 
-#graphwrapper{
+#taskbarwrapper{
 	height:100%;
 	width:100%;
 }

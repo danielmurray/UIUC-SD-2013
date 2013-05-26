@@ -29,5 +29,10 @@
     	"id": "opt",
 		"name": "Optimizer",
 		"color": [150, 111, 150]
+    },
+    "windoor": {
+        "id": "windoor",
+        "name": "WinDoors",
+        "color": [223, 144, 1]
     }
 }

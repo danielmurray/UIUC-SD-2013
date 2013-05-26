@@ -71,7 +71,6 @@ var BaseCollection = CollectionWS.extend({
       async:'true',
       dataType: "json",
       success: function(data) {
-        console.log('going to callback')
         callback(data);
       },
       error: function(err) {

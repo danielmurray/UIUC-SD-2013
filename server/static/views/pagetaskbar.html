@@ -1,0 +1,122 @@
+<link href="/static/css/pagetaskbar.css" rel="stylesheet" type="text/css">
+<div class="taskbar">
+	<div class='historybuttons'>
+		<ul class="historybuttonslist">
+			<li>
+				<button id='today' class='histdata selected'>Today</button>
+			</li>
+			<li>
+				<button id='day' class='histdata'>24 Hour</button>
+			</li>
+			<li>
+				<button id='week' class='histdata'>7 Day</button>
+			</li>
+		</ul>
+	</div>
+	<div id="graphwrapper" class="graphwrapper">
+	</div>
+	<div class="statuswrapper">
+		<ul class="seriesdatalist">
+		<% 
+		pro = collections[0].collection.getSum()
+		con = collections[1].collection.getSum()
+		net = pro - con
+		rate = .75
+		for( var i=0; i<collections.length; i++){
+			collection = collections[i]
+			min = (Math.random()*50);
+			max = (Math.random()*50 + 50);
+			avg = (max+min)/2
+			min = min.toFixed(1)
+			max = max.toFixed(1)
+			avg = avg.toFixed(1)
+
+		%>
+			<style>
+				.seriesdata.<%=collection.name%>{
+					background-color: <%=rgbaToString(collection.color, 1)%>;
+				}
+			</style>
+		
+			<li class="seriesdata <%=collection.name%>">
+				<table class="seriesdatatableheader">
+					<tr>
+						<th class='key'>
+							<%=collection.name%>
+						</th>
+						<th class='value'>
+							<%=collection.collection.getSum()%> W
+						</th>
+					</tr>
+				</table>
+				<table class="seriesdatatable">
+					<tr class='seriesdatatablerow'>
+						<td class='key'>
+							Min
+						</td>
+						<td class='value'>
+							<%=min%> W
+						</td>
+					</tr>
+					<tr class='seriesdatatablerow'>
+						<td class='key'>
+							Max
+						</td>
+						<td class='value'>
+							<%=max%> W
+						</td>
+					</tr>
+					<tr class='seriesdatatablerow'>
+						<td class='key'>
+							Avg
+						</td>
+						<td class='value'>
+							<%=avg%> W
+						</td>
+					</tr>
+				</table>
+			</li>
+		<%
+		}
+		%>
+			<li class="costdata">
+				<table class="seriesdatatableheader">
+					<tr>
+						<th class='key'>
+							Cost <span style='font-size:14px;'>(<%=rate%>元/kWh)</span>
+						</th>
+						<th class='value'>
+							<%=(net*rate).toFixed(0)%>元
+						</th>
+					</tr>
+				</table>
+				<table class="seriesdatatable">
+					<tr class='seriesdatatablerow'>
+						<td class='key'>
+							Pro
+						</td>
+						<td class='value'>
+							<%=pro%> Wh
+						</td>
+					</tr>
+					<tr class='seriesdatatablerow'>
+						<td class='key'>
+							Con
+						</td>
+						<td class='value'>
+							<%=con%> Wh
+						</td>
+					</tr>
+					<tr class='seriesdatatablerow'>
+						<td class='key'>
+							Net
+						</td>
+						<td class='value'>
+							<%=net%> Wh
+						</td>
+					</tr>
+				</table>
+			</li>
+		</ul>
+	</div>
+</div>
