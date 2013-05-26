@@ -515,6 +515,7 @@ var PowerView = PageView.extend({
 
     consumptiondatabox = new DataBox({
       id: 'Consumption',
+      color: [173,50,50],
       databoxcontent: 'table',
       collection: this.collection[1],
       subviews: {
@@ -549,6 +550,7 @@ var PowerView = PageView.extend({
     
     generationtdatabox = new DataBox({
       id: 'Generation',
+      color: [85,160,85],
       databoxcontent: 'table',
       collection: this.collection[0],
       subviews: {
@@ -836,7 +838,7 @@ var DataBox = BaseView.extend({
     return {};
   },
   render: function() {
-    var renderedTemplate = this.template({subviews: this.views, currentcontent: this.currcontentview, sum:this.collection.getSum()} );
+    var renderedTemplate = this.template({subviews: this.views, currentcontent: this.currcontentview, databox: this.databox} );
     this.$el.html(renderedTemplate);
     this.rendercontentview()
   },

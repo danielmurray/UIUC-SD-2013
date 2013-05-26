@@ -1,14 +1,23 @@
 <link href="/static/css/databox.css" rel="stylesheet" type="text/css">
-<div class='header'>
-	<h2 class='subheader'><%=this.databox.id%></h2>
+<style>
+	.header.<%=databox.id%>{
+		background-color: <%=rgbaToString(databox.color, 1)%>;
+	}
+
+	.header.<%=databox.id%> input[type="radio"]:checked + label{
+		color: <%=rgbaToString(databox.color, 1)%>;
+	}
+
+</style>
+<div class='header <%=databox.id%>'>
+	<img class='databoxicon' src="/static/images/icons/<%=databox.id%>.png"</img>
 	<div class='dataviewselection'>
 		<% 
-			var that = this
 			$.each(subviews, function(i,subview){
 		%>
 
 		<span>
-		<input id="<%=subview.id+'/'+that.id%>" name="<%=that.id%>-view-selection" type="radio" value="table" class='contentselection'
+		<input id="<%=subview.id+'/'+databox.id%>" name="<%=databox.id%>-view-selection" type="radio" value="table" class='contentselection'
 
 		<%
 			if(subview.id == currentcontent){
@@ -20,27 +29,13 @@
 		
 		>
 		</input>
-		<label for="<%=subview.id+'/'+that.id%>"><%=subview.id%></label>
+		<label for="<%=subview.id+'/'+databox.id%>"><%=subview.id%></label>
 		</span>
 
 		<%
 		});
 		%>
 	</div>
-</div>
-
-<div class='summarywrapper'>
-		<div class='summaryheader'>
-			TOTAL
-		</div>
-		<div class='summaryvalue'>
-			<span class='value'>
-				<%= sum %>
-			</span>
-			<span class='unit'>
-				kw
-			</span>
-		</div>
 </div>
 
 <div id='databoxcontentwrapper' class='content'>

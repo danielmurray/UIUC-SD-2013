@@ -1,26 +1,35 @@
-.bottom .header{
+.header{
 	height: 50px;
 	position: relative;
-	border-bottom: 5px solid;
+	color: whitesmoke;
 }
 
-.subheader{
-	position: absolute;
-	bottom:0;
-	font-family: 'Lato-light';
-	width:40%;
-	float:left;
+.databoxicon{
+	margin: 5px 0 0 5px;
+	height: 40px;
+	width: 40px;
 }
 
 .dataviewselection{
 	position: absolute;
-	width: 60%;
-	bottom: 5px;
+	width: 80%;
 	right: 0;
+	top: 0;
+}
+
+.dataviewselection span {
+    /* style this span element so we can display nicely, 
+    this stlying is not neccessary */
+    text-align: center;
+    display: block;
+    float: right;
+    margin-right: 25px;
+    padding-top: 12px;
+    font-size: 25px;
 }
 
 .dataviewselection input[type='radio']{
-	opacity: 0;
+	display: none;
 }
 
 
@@ -28,65 +37,21 @@
     /* keep pointer so that you get the little hand showing when you are on a button */
     cursor: pointer;
     /* the following are the styles */
+    padding: 10px;
     background: rgba(0,0,0,0);
-    color: rgba(41,41,41,1);
-    border-radius: 10px;
-    text-shadow: 1px 1px 0 rgba(0,0,0,0);
-}
+    color: rgba(245,245,245,1);
 
-.dataviewselection span {
-    /* style this span element so we can display nicely, this stlying is not neccessary */
-    margin-top: 15px;
-
-    text-align: center;
-    display: block;
-    width: 33%;
-    float: right;
 }
 
 input[type="radio"]:checked + label{
     /* style for the checked/selected state */
-    padding-left: 10px;
-    padding-right: 10px;
-    background: #777;
-    border: 1px solid #444;
-    text-shadow: 1px 1px 0 rgba(0,0,0,0.4);
-    color: white;
-    -webkit-box-shadow: 0 0 20px #383838;
-}
 
-.summarywrapper{
-	background-color: rgba(0, 15, 30, 0.8);
-	color: rgba(245,245,245,0.6);
-	height: 60px;
-	padding-top: 10px;
-	border-bottom: 5px solid;
-}
-
-.summaryheader{
-	float:left;
-	height: 100%;
-	width: 60%;
-	font-size: 50px;
-}
-
-.summaryvalue{
-	text-align: right;
-	padding-right: 5px;
-	float:right;
-	height: 100%;
-	width: 35%;
-}
-
-.summaryvalue .value{
-	font-size: 50px;
-}
-
-.summaryvalue .unit{
-	font-size: 15px;
+    background: rgba(245,245,245,1);
+    height: 100%;
+    width: 100%;
 }
 
 .content{
-	height: 325px;
+	height: 375px;
 	-webkit-box-shadow: 0 0 45px #383838;
 }
