@@ -4,7 +4,6 @@ var BaseView = Backbone.View.extend({
   },
 
   assign: function(view, selector) {
-    //console.log(view,selector)
     view.setElement(this.$(selector));
   },
 
@@ -114,15 +113,15 @@ var HomeView = BaseView.extend({
   },
   navigateTo: function(click){
     
-    that = click.currentTarget;
+    var that = click.currentTarget;
 
     //How do I improve this This information is written in HTML
     var next = $(that).context.classList[2];
 
-    if(this.currentpane == next)
-      return;
-
-    navigate(next, false); 
+    console.log(this.currentpane.id, next)
+    if(this.currentpane.id != next){
+      navigate(next, false); 
+    }
   }
 });
 
@@ -513,6 +512,12 @@ var PowerView = PageView.extend({
   },
   route: function(part) {
 
+    var that = this;
+
+    if (!part) {
+      navigate("power/today", false); // don't trigger nav inside route
+    }
+
     consumptiondatabox = new DataBox({
       id: 'Consumption',
       color: [173,50,50],
@@ -586,6 +591,7 @@ var PowerView = PageView.extend({
     });
 
     taskbar = new PageTaskBar({
+      color: [85,160,85],
       collections:[
         {
           name:'Production',
@@ -598,7 +604,11 @@ var PowerView = PageView.extend({
           collection: this.collection[1]
         }
       ],
-      range: 'day'
+      range: part
+    });
+
+    taskbar.on('timeselect', function(time){
+      that.selecttime(time);
     });
 
     return{
@@ -611,6 +621,9 @@ var PowerView = PageView.extend({
     PageView.prototype.render.apply(this);
     var renderedTemplate = this.powertemplate();
     this.$('#pagecontent').html(renderedTemplate);
+  },
+  selecttime: function(timeperiod) {
+    navigate('power/'+ timeperiod, false);
   }
 });
 
@@ -629,21 +642,16 @@ var WaterView = PageView.extend({
     PageView.prototype.animateIn.apply(this);
   },
   route: function(part) {
-    graph = new GraphView({
-      type:'line',
-      series:[
-        {
-          name:'Consumption',
-          color: [84,175,226],
-          collection: this.collection[0]
-        }
-      ],
-      range: 'day',
-      unit: "gal"
-    });
+    
+    var that = this;
+    
+    if (!part) {
+      navigate("water/today", false); // don't trigger nav inside route
+    }
 
     consumptiondatabox = new DataBox({
-      id: 'Consumption',
+      id: 'Waterconsumption',
+      color: [84,175,226],
       databoxcontent: 'table',
       collection: this.collection[0],
       subviews: {
@@ -658,11 +666,27 @@ var WaterView = PageView.extend({
           args: {collection: this.collection[0]}
         }
       }
-    });    
+    });
+
+    taskbar = new PageTaskBar({
+      color: [84,175,226],
+      collections:[
+        {
+          name:'Water',
+          color: [84,175,226],
+          collection: this.collection[0]
+        }
+      ],
+      range: part
+    }); 
+
+    taskbar.on('timeselect', function(time){
+      that.selecttime(time);
+    });
 
     return{
       '#consumptionwrapper': consumptiondatabox
-      ,'#graphwrapper': graph
+      ,'#taskbarwrapper': taskbar
       //,'#greywaterwrapper': generationtdatabox
     }
 
@@ -671,6 +695,9 @@ var WaterView = PageView.extend({
     PageView.prototype.render.apply(this);
     var renderedTemplate = this.watertemplate();
     this.$('#pagecontent').html(renderedTemplate);
+  },
+  selecttime: function(timeperiod) {
+    navigate('water/'+ timeperiod, false);
   }
 });
 
@@ -698,25 +725,16 @@ var HvacView = PageView.extend({
     PageView.prototype.animateIn.apply(this);
   },
   route: function(part) {
-    graph = new GraphView({
-      type:'line',
-      series:[
-        {
-          name:'Temperature',
-          color: [173,50,50],
-          collection: this.collection[1]
-        },
-        {
-          name:'Target',
-          color: [84,175,226],
-          collection: this.collection[0]
-        }
-      ],
-      range: 'day',
-      unit: "w"
-    });
+
+    var that = this;
+    
+    if (!part) {
+      navigate("hvac/today", false); // don't trigger nav inside route
+    }
+    
     tempdatabox = new DataBox({
       id: 'Temperature',
+      color: [173, 50, 50],
       databoxcontent: 'table',
       collection: this.collection[1],
       subviews: {
@@ -726,13 +744,33 @@ var HvacView = PageView.extend({
           args: {collection: this.collection[1], name: "name", value: "val", unit: "C"}
         }
       }
-    }); 
-    thermostat = new Thermostat({model: this.model});
+    });
 
+    taskbar = new PageTaskBar({
+      color: [173, 50, 50],
+      collections:[
+        {
+          name:'Temperature',
+          color: [173, 50, 50],
+          collection: this.collection[1]
+        }
+      ],
+      range: part
+    }); 
+
+    taskbar.on('timeselect', function(time){
+      that.selecttime(time);
+    });
+
+    thermostat = new Thermostat({
+      model: this.model
+    });
+
+    console.log(that)
     return {
       '#thermostatwrapper': thermostat
       ,'#weekviewwrapper': tempdatabox
-      ,'#graphwrapper': graph
+      ,'#taskbarwrapper': taskbar
     }
 
   },
@@ -742,6 +780,9 @@ var HvacView = PageView.extend({
     this.$('#pagecontent').html(renderedTemplate);
     
     $('.thermostatknob').knob();
+  },
+  selecttime: function(timeperiod) {
+    navigate('hvac/'+ timeperiod, false);
   }
 });
 
@@ -762,8 +803,6 @@ var OptView = PageView.extend({
   },
   route: function(part) {
     
-    console.log(this.collection)
-
     table = new TableViewOpt({collection: this.collection, name: "zone", value: "name", unit: "open"});
 
     return{
@@ -787,27 +826,51 @@ var PageTaskBar = BaseView.extend({
   },
   initialize: function(data) {
     this.template = loadTemplate("/static/views/pagetaskbar.html");
-    this.range = 'today';
+    this.range = data.range;
+    this.color = data.color;
     this.collections = data.collections
   },
-  route: function(part) {
-    return {}
+  route: function(part, remaining) {
+
+    taskbarstatus = new TaskBarStatus({
+      collections: this.collections
+    });
+
+    return {
+      '#statuswrapper': taskbarstatus
+    }
   },
   render: function() {
-    var renderedTemplate = this.template({ range: this.range, collections: this.collections });
+    var renderedTemplate = this.template({ range: this.range, color: this.color});
     this.$el.html(renderedTemplate);
   },
   changerange: function(click) {
     
-    if(click.target.id == this.range)
-      return;
-    else
-      this.range = click.target.id;
+    if(click.target.id == this.range){
+      
+    }else{
+      this.trigger('timeselect', click.target.id );
+    }
+  }
+});
 
-    $('.histdata').removeClass('selected');
-    $(click.target).addClass('selected');
+var TaskBarStatus = BaseView.extend({
+  el: 'div',
+  initialize: function(data) {
+    this.template = loadTemplate("/static/views/taskbarstatus.html");
+    this.collections = data.collections
+  },
+  route: function(part) {
+    for( var i=0; i<this.collections.length; i++){
+      collection = this.collections[i]
+      this.listenTo(collection.collection, 'change', this.render);
+    }
 
-    //rerender taskbar
+    return {}
+  },
+  render: function() {
+    var renderedTemplate = this.template({collections: this.collections });
+    this.$el.html(renderedTemplate);
   }
 });
 

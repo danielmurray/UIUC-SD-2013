@@ -41,7 +41,6 @@ button.histdata.selected{
 	float: left;
 	height: 100%;
 	width: 45%;
-	background-color: rgba(255,255,255,0.2);
 }
 
 .statuswrapper{
@@ -50,75 +49,3 @@ button.histdata.selected{
 	width: 42%;
 }
 
-.seriesdatalist{
-	list-style: none;
-	height: 100%;
-}
-
-.seriesdatalist li{
-	height: 33.3333%;
-}
-
-.costdata{
-	background-color: rgba(223,144,1,1);
-}
-
-.seriesdatatableheader,
-.seriesdatatable{
-	float:left;
-	table-layout: fixed;
-	border-collapse:collapse;
-
-}
-
-.seriesdatatableheader{
-	width: 73%;
-	height: 100%;
-	font-size: 20px;
-	color: rgba(245,245,245,1);
-}
-
-.seriesdatatable{
-	float: right;
-	margin-right: 5%;
-	width: 22%;
-	height: 100%;
-	font-size: 14px;
-	color: rgba(245,245,245,0.6);
-}
-
-.seriesdatatableheader .key{
-	width: 70%;	
-	text-align: left;
-}
-
-.seriesdatatableheader .value{
-	width: 30%;
-	text-align: right;
-}
-
-.seriesdatatable .key{
-	width: 30%;
-	text-align: left;
-}
-
-.seriesdatatable .value{
-	width: 70%;
-	text-align: right;
-}
-
-.seriesdatatable tr{
-	height: 33%
-}
-
-.seriesdatatable td{
-	overflow: hidden;
-	text-overflow: ellipsis;
-	white-space: nowrap;
-}
-
-.costwrapper{
-	float: right;
-	height: 100%;
-	width: 20%;
-}

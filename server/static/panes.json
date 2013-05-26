@@ -9,16 +9,10 @@
 		"name": "HVAC",
 		"color": [173, 50, 50]
     },
-    "windoor": {
-    	"id": "windoor",
-		"name": "WinDoors",
-		"color": [223, 144, 1]
-    },
     "power": {
     	"id": "power",
 		"name": "Power",
 		"color": [85, 160, 85]
-
     },
     "water": {
     	"id": "water",
@@ -29,10 +23,5 @@
     	"id": "opt",
 		"name": "Optimizer",
 		"color": [150, 111, 150]
-    },
-    "windoor": {
-        "id": "windoor",
-        "name": "WinDoors",
-        "color": [223, 144, 1]
     }
 }

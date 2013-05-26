@@ -104,7 +104,7 @@ var LightCollection = BaseCollection.extend({
 var HVACCollection = BaseCollection.extend({
   model: HVACModel,
   url: '/hvac',
-  valueID: 'temperature',
+  valueID: 'tar_temp',
   getHistoricalData: function(start,end,density,callback) {
     
     this.historyData("hvac", "tar_temp", start, end, density, "sum", callback);
@@ -116,6 +116,10 @@ var HVACCollection = BaseCollection.extend({
       last = model.get("tar_temp");
     });
     return last;
+  },
+  getSum: function(){
+    data = this._homeData(this.valueID)
+    return data.sum/data.count;
   }
 });
 
@@ -133,6 +137,9 @@ var TempCollection = BaseCollection.extend({
     count = data.count
     sum = data.sum
     return sum/count
+  },
+  getSum: function(){
+    return this.avgTemp();
   }
 });
 
@@ -180,7 +187,6 @@ var PowerCollection = BaseCollection.extend({
     
   }
 });
-
 
 var PVCollection = BaseCollection.extend({
   model: PVModel,
@@ -232,7 +238,6 @@ var FlowCollection = BaseCollection.extend({
   }
 });
 
-
 var PyraCollection = CollectionWS.extend({
   model: SensorModel,
   url: '/pyra'
@@ -242,7 +247,6 @@ var HumidCollection = CollectionWS.extend({
   model: SensorModel,
   url: '/humid'
 });
-
 
 var Co2Collection = BaseCollection.extend({
   model: SensorModel,
