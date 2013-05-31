@@ -45,6 +45,29 @@ var BaseCollection = CollectionWS.extend({
       sum : modelSum
     }
   },
+  jsonTree: function(){
+    var that = this
+
+    var root = {
+      name: 'home',
+      children:[]
+    }
+
+    _.each(this.models, function(model){
+      node = {
+        name: model.get('id'),
+        children:[
+          {
+            name: model.get('id'),
+            value: model.get(that.valueID)
+          }
+        ]
+      }
+      root.children.push(node)
+    });
+
+    return root
+  },
   formatValue: function(value, unit) {
     metricPrefixArray = [
       '', 
@@ -168,7 +191,7 @@ var PowerCollection = BaseCollection.extend({
   url: '/power',
   valueID: 'power',
   getHistoricalData: function(start,end,density,callback) {
-  
+    
     this.historyData("power", "power", start, end, density, "sum", callback);
   
   },

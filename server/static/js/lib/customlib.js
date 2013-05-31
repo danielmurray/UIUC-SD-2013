@@ -119,7 +119,6 @@ var randomArray = function(start, end, size, seed){
 }
 
 var rgbaToString = function(color,opacity){
-  
   var thing = 'rgba(' + color[0] + ',' + color[1] + ',' + color[2]  + ',' + opacity + ')';
 
   return thing;
