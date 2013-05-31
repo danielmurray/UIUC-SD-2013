@@ -499,7 +499,7 @@ var PowerView = PageView.extend({
     this.collection = [];
 
     this.collection[0] = window.PV;
-    this.collection[0]._sortBy('value',true);
+    this.collection[0]._sortBy('power',true);
 
     this.collection[1] = window.Power;
     this.collection[1]._sortBy('power',true);
@@ -887,6 +887,7 @@ var DataBox = BaseView.extend({
     this.rendercontentview();
   },
   route: function(part) {
+    // this.listenTo(this.collection, 'change', this.render);
     return {};
   },
   render: function() {
@@ -1267,7 +1268,6 @@ var TreeMapView = BaseView.extend({
     // Aggregate the values for internal nodes. This is normally done by the
     // treemap layout, but not here because of our custom implementation.
     function accumulate(d) {
-      console.log(d)
       nodes.push(d);
       return d.children
           ? d.value = d.children.reduce(function(p, v) { return p + accumulate(v); }, 0)
@@ -1324,36 +1324,42 @@ var TreeMapView = BaseView.extend({
       g.filter(function(d) { return d.children; })
           .classed("children", true)
           .on("click", transition);
+
+
+      svgwrapper = g.selectAll(".child")
+        .data(function(d) { return d.children || [d]; })
+        .enter()
+        .append('svg')
+        .call(wrapper)
+
+      svgwrapper.append("rect")
+        .attr("class", "child")
+        .call(rect)
+        .style("fill", function(d) {
+          var paletteindex = d.id%(palette.length)
+          var randomPalette = palette[paletteindex];
+          if( !d.children){
+            color =  rgbaToString( randomPalette, 1 )
+          }else{
+            color = null
+          }
+          return color
+        });
    
-      g.selectAll(".child")
-          .data(function(d) { return d.children || [d]; })
-        .enter().append("rect")
-          .attr("class", "child")
-          .call(rect)
-          .style("fill", function(d) { 
-            var randomNumber = Math.floor(Math.random()*(palette.length))
-            var randomPalette = palette[randomNumber];
-            if( !d.children){
-              // color =  rgbaToString( randomPalette, 1 )
-              color = colorpalette(d.name)
-            }else{
-              color = null
-            }
-            return color
-          });
-   
-      g.append("rect")
+      svgbox = svgwrapper.append("rect")
           .attr("class", "parent")
           .call(rect)
-        .append("title")
+          
+      svgtitle = svgwrapper.append("title")
           .text(function(d) { return formatNumber(d.value); });
    
-      g.append("text")
-          .attr("dy", ".75em")
+      svgtext = svgwrapper.append("text")
+          .attr("dy", "3px")
           .text(function(d) { return d.name; })
           .call(text);
    
       function transition(d) {
+        console.log(d)
         if (transitioning || !d) return;
         transitioning = true;
    
@@ -1379,7 +1385,9 @@ var TreeMapView = BaseView.extend({
         t2.selectAll("text").call(text).style("fill-opacity", 1);
         t1.selectAll("rect").call(rect);
         t2.selectAll("rect").call(rect);
-   
+        t1.selectAll("svg").call(wrapper);
+        t2.selectAll("svg").call(wrapper);
+
         // Remove the old node when the transition is finished.
         t1.remove().each("end", function() {
           svg.style("shape-rendering", "crispEdges");
@@ -1390,16 +1398,23 @@ var TreeMapView = BaseView.extend({
       return g;
     }
    
+   function wrapper(wrapper) {
+      wrapper.attr("x", function(d) { return x(d.x); })
+          .attr("y", function(d) { return y(d.y); })
+          .attr("width", function(d) { return x(d.x + d.dx) - x(d.x); })
+          .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); })
+    }
+
     function text(text) {
-      text.attr("x", function(d) { return x(d.x) + 6; })
-          .attr("y", function(d) { return y(d.y) + 6; });
+      text.attr("x", function(d) { return 0; })
+          .attr("y", function(d) { return 12; })
+          .style("overflow", "hidden")
+          .style("width", function(d) { return x(d.x + d.dx) - x(d.x);  });
     }
    
     function rect(rect) {
-      rect.attr("x", function(d) { return x(d.x); })
-          .attr("y", function(d) { return y(d.y); })
-          .attr("width", function(d) { return x(d.x + d.dx) - x(d.x); })
-          .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); });
+      rect.attr("width", function(d) { return '100%'; })
+          .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); })
     }
    
     function name(d) {
@@ -1457,7 +1472,6 @@ var TableViewEntry = BaseView.extend({
     this.model = data;
   },
   route: function(part) {
-    this.listenTo(this.model, 'change', this.render);
     return {};
   },
   render: function() {

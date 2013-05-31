@@ -53,17 +53,22 @@ var BaseCollection = CollectionWS.extend({
       children:[]
     }
 
+    var modelID = 0;
+
     _.each(this.models, function(model){
       node = {
         name: model.get('id'),
+        id: modelID,
         children:[
           {
-            name: model.get('id'),
-            value: model.get(that.valueID)
+            name: model.get('id') + ' - ' + model.get(that.valueID) + 'W' , 
+            id: modelID,
+            value: model.get(that.valueID)  
           }
         ]
       }
       root.children.push(node)
+      modelID++;
     });
 
     return root
