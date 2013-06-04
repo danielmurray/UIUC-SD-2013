@@ -499,10 +499,8 @@ var PowerView = PageView.extend({
     this.collection = [];
 
     this.collection[0] = window.PV;
-    this.collection[0]._sortBy('power',true);
 
     this.collection[1] = window.Power;
-    this.collection[1]._sortBy('power',true);
     
 
   },
@@ -875,8 +873,9 @@ var DataBox = BaseView.extend({
     this.collection = this.databox.collection
     this.contentdivselector = '#databoxcontentwrapper';
     this.currcontentview = this.databox.databoxcontent; //View to be rendered to the databox
-    this.views = this.databox.subviews;
-    
+    this.views = this.databox.subviews;   
+    this.listenTo(this.collection, 'change', this.updatecontentview);
+
   },
   changecontent: function(click){
     //acquiring selected view id
@@ -887,7 +886,6 @@ var DataBox = BaseView.extend({
     this.rendercontentview();
   },
   route: function(part) {
-    // this.listenTo(this.collection, 'change', this.render);
     return {};
   },
   render: function() {
@@ -896,13 +894,21 @@ var DataBox = BaseView.extend({
     this.rendercontentview()
   },
   rendercontentview: function() {
+
+    console.log('render')
     //prepare content view
     var obj = this.views[this.currcontentview]
-    var currview = new obj.view(obj.args);
-    currview.setElement(this.$(this.contentdivselector));
+    this.currview = new obj.view(obj.args);
+    this.currview.setElement(this.$(this.contentdivselector));
 
     //render and animate
-    router.displayPart(0,currview,[])
+    router.displayPart(0,this.currview,[])
+
+  },
+  updatecontentview: function() {
+
+    //render and animate
+    router.displayPart(0,this.currview,[])
 
   }
 });
@@ -1191,23 +1197,30 @@ var TreeMapView = BaseView.extend({
     this.color = data.color;
     this.collection = data.collection;
     this.jsonTree = this.collection.jsonTree();
+    this.currentNode = 'home';
   },
   route: function(part) {
     return {};
   },
   render: function() {
-    var renderedTemplate = this.template();
-    this.$el.html(renderedTemplate);
-    this.renderTreeMap()
+    console.log(this.currentNode)
+    
+    if(this.currentNode == 'home'){
+      var renderedTemplate = this.template();
+      this.$el.html(renderedTemplate);
+      this.renderTreeMap()
+    }
+    
   },
   renderTreeMap: function(){
 
-    var that = this;
+    var view = this;
     var root = this.jsonTree
 
     var margin = {top: 30, right: 0, bottom: 0, left: 0},
     width = 456,
     height = 375 - margin.top - margin.bottom,
+    totalArea = width * height,
     formatNumber = d3.format(",d"),
     transitioning;
 
@@ -1225,7 +1238,7 @@ var TreeMapView = BaseView.extend({
           return a.value - b.value + 1; 
         })
         .value(function(d) { return d.value; })
-        .ratio(height / width * 0.5 * (1 + Math.sqrt(5)))
+        .ratio(.25)
         .round(false);
      
     var svg = d3.select(this.el).select('#treemap').append("svg")
@@ -1297,33 +1310,31 @@ var TreeMapView = BaseView.extend({
    
     function display(d) {
       var palette = [
-        [170, 184, 26],
-        [173, 50, 50],
         [85, 160, 85],
         [223, 144, 1],
         [84, 175, 226],
-        [150, 111, 150]
+        [150, 111, 150],
+        [170, 184, 26],
+        [173, 50, 50]
       ]
 
-      var colorpalette = d3.scale.category20();
-
       grandparent
-          .datum(d.parent)
-          .on("click", transition)
+        .datum(d.parent)
+        .on("click", transition)
         .select("text")
-          .text(name(d));
+        .text(name(d));
    
       var g1 = svg.insert("g", ".grandparent")
-          .datum(d)
-          .attr("class", "depth");
+        .datum(d)
+        .attr("class", "depth");
    
       var g = g1.selectAll("g")
-          .data(d.children)
+        .data(d.children)
         .enter().append("g");
    
       g.filter(function(d) { return d.children; })
-          .classed("children", true)
-          .on("click", transition);
+        .classed("children", true)
+        .on("click", transition);
 
 
       svgwrapper = g.selectAll(".child")
@@ -1349,20 +1360,36 @@ var TreeMapView = BaseView.extend({
       svgbox = svgwrapper.append("rect")
           .attr("class", "parent")
           .call(rect)
-          
-      svgtitle = svgwrapper.append("title")
-          .text(function(d) { return formatNumber(d.value); });
    
-      svgtext = svgwrapper.append("text")
-          .attr("dy", "3px")
-          .text(function(d) { return d.name; })
+      svgbody = svgwrapper.append('foreignObject').call(rect)
+        .append("xhtml:body")
+        .attr("class", "bodywrapper")
+        .call(body)
+
+      svgdiv = svgbody.append("div")
+        .attr("class", "divholder")
+        .append("div")
+        .attr("class", "divwrapper");
+
+      svgtext = svgdiv.append("div")
+          .attr("class", "nodename")
+          .style("font-size", function(d){
+            console.log(d)
+            return (d.dy/2 - 5) + 'px';
+          })
+          .text(function(d) {
+            area = d.dx * d.dy
+            percentage = Math.floor(area/totalArea*100) + '%'
+            return percentage + ' ' + d.name; 
+          })
           .call(text);
    
       function transition(d) {
-        console.log(d)
         if (transitioning || !d) return;
         transitioning = true;
    
+        view.currentNode = d.name
+
         var g2 = display(d),
             t1 = g1.transition().duration(750),
             t2 = g2.transition().duration(750);
@@ -1406,17 +1433,18 @@ var TreeMapView = BaseView.extend({
     }
 
     function text(text) {
-      text.attr("x", function(d) { return 0; })
-          .attr("y", function(d) { return 12; })
-          .style("overflow", "hidden")
-          .style("width", function(d) { return x(d.x + d.dx) - x(d.x);  });
+      
     }
    
     function rect(rect) {
       rect.attr("width", function(d) { return '100%'; })
           .attr("height", function(d) { return y(d.y + d.dy) - y(d.y); })
     }
-   
+
+    function body(body) {
+      body.style("height", function(d) { return y(d.y + d.dy) - y(d.y) +'px'; })
+    }
+
     function name(d) {
       return d.parent
           ? name(d.parent) + "/" + d.name
@@ -1433,8 +1461,12 @@ var TableView = BaseView.extend({
     this.template = loadTemplate("/static/views/table.html");
     this.name = data.name;
     this.collection = data.collection;
+    this.sortBy = this.value
+    this.collection._sortBy(this.sortBy, true);
+
   },
   route: function(part) {
+
     var that = this;
 
     //pointers for this view
@@ -1457,8 +1489,10 @@ var TableView = BaseView.extend({
     return tableEntriesToRendered;
   },
   render: function() {
+    this.collection._sortBy(this.sortBy, true);
     var renderedTemplate = this.template({collection: this.collection});
     this.$el.html(renderedTemplate);
+
   }
 });
 

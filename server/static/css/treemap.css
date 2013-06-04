@@ -41,3 +41,13 @@ rect.parent {
   fill: #aaa;
 }
 
+.bodywrapper,
+.divwrapper{
+  height: 100%;
+  width:100%;
+}
+
+.nodename{
+  color: whitesmoke;
+  word-wrap:break-word;
+}

@@ -108,67 +108,99 @@ Lights.add([
     }
 ]);
 
+window.Power = new PowerCollection();
+Power.add([
+    {
+    id: "CERV",
+    power: Math.random() * 500
+    },
+    {
+    id: "Oven",
+    power: Math.random() * 300
+    },
+    {
+    id: "Fridge",
+    power: Math.random() * 100
+    },
+    {
+    id: "Lights",
+    power: Math.random() * 50
+    },
+    {
+    id: "North Sockets",
+    power: Math.random() * 40
+    },
+    {
+    id: "South Sockets",
+    power: Math.random() * 20
+    },
+    {
+    id: "Toaster",
+    power: Math.random() * 20
+    }
+]);
+
 window.PV = new PVCollection();
 PV.add([
   {
     id: "PV1",
-    value: Math.random() * 100
+    power: Math.random() * 100
     },
     {
     id: "PV2",
-    value: Math.random() * 100
+    power: Math.random() * 100
     },
     {
     id: "PV3",
-    value: Math.random() * 100
+    power: Math.random() * 100
     },
     {
     id: "PV4",
-    value: Math.random() * 100
+    power: Math.random() * 100
     },
     {
     id: "PV5",
-    value: Math.random() * 100
+    power: Math.random() * 100
     },
     {
     id: "PV6",
-    value: Math.random() * 100
+    power: Math.random() * 100
     },
     {
     id: "PV7",
-    value: Math.random() * 100
+    power: Math.random() * 100
     },
     {
     id: "PV8",
-    value: Math.random() * 100
+    power: Math.random() * 100
     },
     {
     id: "PV9",
-    value: Math.random() * 100
+    power: Math.random() * 100
     },
     {
     id: "PV10",
-    value: Math.random() * 100
+    power: Math.random() * 100
     },
     {
     id: "PV11",
-    value: Math.random() * 100
+    power: Math.random() * 100
     },
     {
     id: "PV12",
-    value: Math.random() * 100
+    power: Math.random() * 100
     },
     {
     id: "PV13",
-    value: Math.random() * 100
+    power: Math.random() * 100
     },
     {
     id: "PV14",
-    value: Math.random() * 100
+    power: Math.random() * 100
     },
     {
     id: "PV15",
-    value: Math.random() * 100
+    power: Math.random() * 100
     }
 ]);
 
@@ -266,16 +298,6 @@ Humid.add([
 
 window.CO2 = new Co2Collection();
 CO2.add([
-    {
-    id: "bedroom",
-    state: "on", //id = room
-    avg_temp: Math.random() * 100,
-    tar_temp: Math.random() * 100
-    }
-]);
-
-window.Power = new PowerCollection();
-Power.add([
     {
     id: "bedroom",
     state: "on", //id = room

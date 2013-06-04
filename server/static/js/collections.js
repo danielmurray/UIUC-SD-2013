@@ -48,6 +48,7 @@ var BaseCollection = CollectionWS.extend({
   jsonTree: function(){
     var that = this
 
+    console.log(this)
     var root = {
       name: 'home',
       children:[]
@@ -61,7 +62,7 @@ var BaseCollection = CollectionWS.extend({
         id: modelID,
         children:[
           {
-            name: model.get('id') + ' - ' + model.get(that.valueID) + 'W' , 
+            name: model.get('id'), 
             id: modelID,
             value: model.get(that.valueID)  
           }
