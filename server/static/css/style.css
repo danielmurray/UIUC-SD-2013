@@ -13,10 +13,7 @@
 @font-face {
     font-family: 'Lato-light';
     src: url('../images/LatoFontSetFixed/lato-lig-webfont.eot');
-    src: url('../images/LatoFontSetFixed/lato-lig-webfont.eot?#iefix') format('embedded-opentype'),
-         url('../images/LatoFontSetFixed/lato-lig-webfont.woff') format('woff'),
-         url('../images/LatoFontSetFixed/lato-lig-webfont.ttf') format('truetype'),
-         url('../images/LatoFontSetFixed/lato-lig-webfont.svg#Lato-light') format('svg');
+    src: url('../images/LatoFontSetFixed/lato-lig-webfont.svg#Lato-light') format('svg');
     font-weight: normal;
     font-style: normal;
 
@@ -98,10 +95,16 @@ body.site{
 
 h1{
     font-size: 75px;
+    font-family: 'Lato-light';
 }
 
 h2{
     font-size: 30px;
+    font-family: 'Lato-light';
+}
+
+h4{
+    font-family: 'Lato-light';
 }
 
 #viewport{

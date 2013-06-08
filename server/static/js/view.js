@@ -815,16 +815,16 @@ var PageTaskBar = BaseView.extend({
       collections: this.collections
     });
 
-    // graph = new GraphView({
-    //   type:'area',
-    //   range: 'day',
-    //   series: this.collections,
-    //   unit: 'W'
-    // });
+    graph = new NUGraphView({
+      type:'area',
+      range: this.range,
+      series: this.collections,
+      unit: 'W'
+    });
 
     return {
       '#statuswrapper': taskbarstatus
-      // ,'#graphwrapper': graph
+      ,'#graphwrapper': graph
     }
   },
   render: function() {
@@ -843,9 +843,13 @@ var PageTaskBar = BaseView.extend({
 
 var TaskBarStatus = BaseView.extend({
   el: 'div',
+  events: {
+    "click .seriesdatalist li":  "accordianselect"
+  },
   initialize: function(data) {
     this.template = loadTemplate("/static/views/taskbarstatus.html");
     this.collections = data.collections
+    this.currentaccordionselection = 'Cost'
   },
   route: function(part) {
     for( var i=0; i<this.collections.length; i++){
@@ -856,8 +860,15 @@ var TaskBarStatus = BaseView.extend({
     return {}
   },
   render: function() {
-    var renderedTemplate = this.template({collections: this.collections });
+    var renderedTemplate = this.template({collections: this.collections, accordianselection: this.currentaccordionselection });
     this.$el.html(renderedTemplate);
+  },
+  accordianselect: function(click){
+    $('.seriesdatalist li').removeClass('selected')
+    this.currentaccordionselection = $(click.currentTarget)[0].classList[1]
+    console.log(this.currentaccordionselection)
+    $(click.currentTarget).addClass('selected')
+
   }
 });
 
@@ -895,7 +906,6 @@ var DataBox = BaseView.extend({
   },
   rendercontentview: function() {
 
-    console.log('render')
     //prepare content view
     var obj = this.views[this.currcontentview]
     this.currview = new obj.view(obj.args);
@@ -913,10 +923,142 @@ var DataBox = BaseView.extend({
   }
 });
 
+var NUGraphView = BaseView.extend({
+  el:'div',
+  initialize: function(graphdata){
+    this.timeperiod = graphdata.range;
+    this.inputdata = graphdata.series;
+    this.unit = graphdata.unit;
+    this.series = undefined;
+    this.template = loadTemplate("/static/views/graph.html");
+  },
+  route: function(part) {
+    return{};
+  },
+  render: function() {
+    var that = this;
+
+    var renderedTemplate = this.template();
+    this.$el.html(renderedTemplate);
+
+    this.fetchHistoricalData(function() {
+      that.renderChart(that.series[1]);
+    });
+  },
+  fetchHistoricalData: function(callback){    
+    var that = this;
+    
+    this.series = [];
+    var len = this.inputdata.length;
+    var allGraphs = function() {
+      len = len - 1;
+      if (!len) {
+        callback();
+      }
+    };
+
+    $.each(this.inputdata, function(i, inputdata){
+      var clos = (function(j, d) {
+        return function (data) {
+          that.series[j] = {
+            name: inputdata.name,
+            type: 'area',
+            color: rgbaToString(d.color,1),
+            data: data
+          };
+          if (data) {
+            allGraphs();
+          }
+        }
+      })(i, inputdata);
+      that.getHistoricalData(inputdata.collection, clos);
+    });
+  },
+  getHistoricalData:function(collection, callback){
+    var now = Math.round((new Date()).getTime()/1000);
+    
+    switch(this.timeperiod){
+      case 'day':
+        var then = now - 24*60*60;
+        break;
+      case 'week':
+        var then = now - 7*24*60*60;
+        break;
+      case 'month':
+        var then = now - 30*24*60*60;
+        break;
+      default:
+        var then = now - 24*60*60;
+    }
+    collection.getHistoricalData(then,now, 100, callback);
+  },
+  renderChart: function(data){
+    series = data.data
+    console.log(series)
+    $('#graphholder').empty()
+
+    var margin = {top: 0, right: 0, bottom: 0, left: 0},
+    w = 681 - margin.left - margin.right,
+    h = 183 - margin.top - margin.bottom;
+
+    minDate = series[0][0]
+    maxDate = series[series.length-1][0]
+
+    var x = d3.time.scale().domain([minDate, maxDate]).range([0, w]);
+    var y = d3.scale.linear().domain([0, 1.5 * d3.max(series, function(d) { 
+      return d[1]; 
+    } )]).range([h, 0]);
+
+    var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("left");
+
+    var line = d3.svg.area()
+      // .interpolate("basis") 
+        // assign the X function to plot our line as we wish
+      .x(function(d, i) {
+        // return the X coordinate where we want to plot this datapoint
+        return x(d[0]); //x(i);
+      })
+      .y0(h)
+      .y1(function(d) { 
+        // return the Y coordinate where we want to plot this datapoint
+        return y(d[1]); 
+      });
+
+  var graph = d3.select("#graphholder").append("svg:svg")
+    .attr("width", w + margin.right + margin.left)
+    .attr("height", h + margin.top + margin.bottom)
+    .append("svg:g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  var xx = function(e) { return x(e[0]); };
+  var yy = function(e) { return y(e[1]); };
+
+  graph.append("svg:path")
+    .attr("d", line(series))
+    .attr("class", "graphline")
+    .attr("stroke", data.color)
+    .attr("fill", data.color);
+
+  graph
+    .selectAll("circle")
+    .data(series)
+    .enter().append("circle")
+    .attr("fill", data.color)
+    .attr("r", 5)
+    .attr("cx", xx)
+    .attr("cy", yy)
+  }
+});
+
 var GraphView = BaseView.extend({
   el: 'div',
   initialize: function(graphdata) {
-    console.log(graphdata)
     this.type = graphdata.type;
     this.timeperiod = graphdata.range;
     this.inputdata = graphdata.series;
@@ -1203,7 +1345,6 @@ var TreeMapView = BaseView.extend({
     return {};
   },
   render: function() {
-    console.log(this.currentNode)
     
     if(this.currentNode == 'home'){
       var renderedTemplate = this.template();
@@ -1218,8 +1359,8 @@ var TreeMapView = BaseView.extend({
     var root = this.jsonTree
 
     var margin = {top: 30, right: 0, bottom: 0, left: 0},
-    width = 456,
-    height = 375 - margin.top - margin.bottom,
+    width = 482,
+    height = 385 - margin.top - margin.bottom,
     totalArea = width * height,
     formatNumber = d3.format(",d"),
     transitioning;
@@ -1372,18 +1513,22 @@ var TreeMapView = BaseView.extend({
         .attr("class", "divwrapper");
 
       svgtext = svgdiv.append("div")
-          .attr("class", "nodename")
-          .style("font-size", function(d){
-            console.log(d)
-            return (d.dy/2 - 5) + 'px';
-          })
-          .text(function(d) {
-            area = d.dx * d.dy
-            percentage = Math.floor(area/totalArea*100) + '%'
-            return percentage + ' ' + d.name; 
-          })
-          .call(text);
-   
+        .call(text);
+
+      svgpercentage = svgtext.append('span')
+        .text(function(d){
+          area = d.dx * d.dy
+          percentage = Math.floor(area/totalArea*100) + '%'
+          return percentage; 
+        })
+        .attr('class', 'nodepercentage')
+
+      svgname = svgtext.append('span')
+        .text(function(d){
+          return d.name; 
+        })
+        .attr('class', 'nodename')
+
       function transition(d) {
         if (transitioning || !d) return;
         transitioning = true;
@@ -1433,7 +1578,20 @@ var TreeMapView = BaseView.extend({
     }
 
     function text(text) {
-      
+
+      text.attr("class", function(d){
+            if(d.dx < d.dy){
+              return "nodetext rotated"
+            }else{
+              return "nodetext"
+            }
+          }).style("font-size", function(d){
+            if(d.dx < d.dy){
+              return (d.dy/3 - 5) + 'px';              
+            }else{
+              return (d.dy/2 - 5) + 'px';
+            }
+          })
     }
    
     function rect(rect) {
@@ -1624,7 +1782,6 @@ var FloorPlanView = BaseView.extend({
     };
   },
   render: function() {
-    console.log('hey we rendered')
     var that = this;
 
     var renderedTemplate = this.template();

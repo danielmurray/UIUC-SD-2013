@@ -88,6 +88,26 @@ var BaseCollection = CollectionWS.extend({
     ]
   },
   historyData: function(type, field, start, end, period, group, callback) {
+    // var arr = [];
+
+    // var now = start;
+    // var then = end;
+    // var size = period/4;
+
+    // step = (now-then)/size;
+    // arr[0] = [];
+    // arr[0][0] = then;
+    // arr[0][1] = Math.random() * size;
+
+    // for(var i=1; i<size; i++){
+    //   arr[i] = [];
+    //   arr[i][0] = then + step *i;
+      
+    //   arr[i][1] = arr[i-1][1] + (Math.random()*5 - 2.5)
+    // }
+
+    // callback(arr)
+
     $.ajax("/history", {
       data: {
         type: type,

@@ -32,7 +32,7 @@ function loadTemplate(url) {
      text = t;
    },
    error: function() {
-       console.log('hello world')
+       console.log('template loading is failing')
    },
    async: false
   });

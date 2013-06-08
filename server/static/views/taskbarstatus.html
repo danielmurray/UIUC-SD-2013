@@ -22,7 +22,16 @@ for( var i=0; i<collections.length; i++){
 		}
 	</style>
 
-	<li class="seriesdata <%=collection.name%>">
+
+	<li class="seriesdata <%=collection.name%>
+	<%
+		if(accordianselection == collection.name){
+	%>
+		selected
+	<%
+	}
+	%>
+	">
 		<table class="seriesdatatableheader">
 			<tr>
 				<th class='key'>
@@ -41,16 +50,12 @@ for( var i=0; i<collections.length; i++){
 				<td class='value'>
 					<%=min%> W
 				</td>
-			</tr>
-			<tr class='seriesdatatablerow'>
 				<td class='key'>
 					Max
 				</td>
 				<td class='value'>
 					<%=max%> W
 				</td>
-			</tr>
-			<tr class='seriesdatatablerow'>
 				<td class='key'>
 					Avg
 				</td>
@@ -63,7 +68,15 @@ for( var i=0; i<collections.length; i++){
 <%
 }
 %>
-	<li class="costdata">
+	<li class="costdata Cost
+	<%
+		if(accordianselection == 'Cost'){
+	%>
+		selected
+	<%
+	}
+	%>
+	">
 		<table class="seriesdatatableheader">
 			<tr>
 				<th class='key'>
@@ -82,16 +95,12 @@ for( var i=0; i<collections.length; i++){
 				<td class='value'>
 					<%=pro%> Wh
 				</td>
-			</tr>
-			<tr class='seriesdatatablerow'>
 				<td class='key'>
 					Con
 				</td>
 				<td class='value'>
 					<%=con%> Wh
 				</td>
-			</tr>
-			<tr class='seriesdatatablerow'>
 				<td class='key'>
 					Net
 				</td>

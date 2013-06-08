@@ -52,6 +52,6 @@ input[type="radio"]:checked + label{
 }
 
 .content{
-	height: 375px;
+	height: 385px;
 	-webkit-box-shadow: 0 0 45px #383838;
 }

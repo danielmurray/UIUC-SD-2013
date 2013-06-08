@@ -4,9 +4,8 @@
 		background-color: <%=rgbaToString(color, 1)%>;
 	}
 </style>
-<% console.log(range) %>
 <div class="taskbar">
-	<div class='historybuttons'>
+	<!-- <div class='historybuttons'>
 		<ul class="historybuttonslist">
 			<li>
 				<button id='today' class='histdata <%= (range == "today") ? 'selected' : '' %>'>
@@ -24,10 +23,14 @@
 				</button>
 			</li>
 		</ul>
+	</div> -->
+	<div class="statuswrapper">
+		<div class='timeselection'>
+			<p>This Week</p>
+		</div>
+		<div id="statuswrapper">
+		</div>
 	</div>
 	<div id="graphwrapper" class="graphwrapper">
-	</div>
-	<div id="statuswrapper" class="statuswrapper">
-		
 	</div>
 </div>

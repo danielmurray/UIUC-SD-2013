@@ -1,5 +1,5 @@
 .graph{
-	background-color: rgba(0, 15, 30, 0.8);
+	background-color: rgba(43, 52, 61, 1);
 	height: 100%;
 	width:100%;
 }
@@ -8,4 +8,18 @@
 	float:left;
 	height:100%;
 	width:100%;
+}
+
+.loadingicon{
+	margin: 9% 0 0 40%;
+}
+
+.graphline{
+	stroke-width: 2px;
+	stroke: rgba(43, 52, 61, 1);
+}
+
+circle{
+	stroke-width: 3px;
+	stroke: rgba(43, 52, 61, 1);
 }

@@ -42,12 +42,21 @@ rect.parent {
 }
 
 .bodywrapper,
+.divholder,
 .divwrapper{
   height: 100%;
   width:100%;
 }
 
-.nodename{
-  color: whitesmoke;
+.nodetext{
   word-wrap:break-word;
+}
+
+.nodename{
+  color:black;
+}
+
+.nodepercentage{
+  color:whitesmoke;
+  font-family: 'Lato-light';
 }
