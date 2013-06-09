@@ -1,33 +1,30 @@
 .seriesdatalist{
 	list-style: none;
 	height: 100%;
+	background-color: rgba(0, 15, 30, 0.8);
 }
 
 .seriesdatalist li{
-	height: 20%;
-	width: 100%;
+	width: 292px;
 	float:left;
-	cursor:pointer;
-
+	border-bottom: solid rgba(0, 15, 30, 1) 1px; 
 	-webkit-transition:height .25s linear;
 }
 
-.seriesdatalist li .seriesdatatable{   
-	display:none;
-
-	-webkit-transition:display .25s linear;
+.seriesdatalist li .seriesdatatable{  
+	opacity: 0;
+	display: none;
+	-webkit-transition:all .25s linear;
 } 
 
-.seriesdatalist li.selected{   
-	height: 35%;
+.seriesdatalist li.selected .seriesdatatableheader .key,
+.seriesdatalist li.selected .seriesdatatableheader .icon{
+	background-color: rgba(0,0,0,0.15)
 }
 
-.seriesdatalist li.selected .seriesdatatable{   
-      display:block;
-} 
-
-.costdata{
-	background-color: rgba(223,144,1,1);
+.seriesdatalist li.selected .seriesdatatable{
+	opacity: 1;
+	display: table;
 }
 
 .seriesdatatableheader,
@@ -35,51 +32,61 @@
 	float:left;
 	table-layout: fixed;
 	border-collapse:collapse;
-	width: 100%;
-}
-
-tbody,
-tr{
-	width:100%;
 }
 
 .seriesdatatableheader{
 	font-size: 20px;
 	color: rgba(245,245,245,1);
-	margin-top:5px;
 }
 
-.seriesdatatable{
-	font-size: 14px;
-	color: rgba(245,245,245,0.7);
-	border-collapse: separate;
-	border-spacing: 5px;
-	height:30px;
+.seriesdatatableheader tr{
+}
+
+.seriesdatatableheader .icon{
+	width: 10%;
+	text-align: center;
+	cursor: pointer;	
 }
 
 .seriesdatatableheader .key{
-	width: 70%;	
+	padding-left: 5px;
+	width: 65%;	
 	text-align: left;
 }
 
 .seriesdatatableheader .value{
-	width: 30%;
-	text-align: right;
+	width: 75px;
+	text-align: center;
+	background-color: rgba(0,0,0,0.15);
+}
+
+
+.seriesdatatable{
+	font-size: 14px;
+	color: rgba(245,245,245,0.7);
+	width: 292px;
+}
+
+.seriesdatatablerow{
+	height: 20px;
+}
+
+.seriesdatatable .icon{
+	width: 5%;
 }
 
 .seriesdatatable .key{
-	width: 15%;
+	padding-right: 10px;
+	width: 70%;	
 	text-align: right;
 }
 
 .seriesdatatable .value{
-	width: 15%;
-	text-align: left;
+	width: 71px;
+	text-align: center;
+	background-color: rgba(0,0,0,0.15);
 }
 
-.seriesdatatable tr{
-	height: 33%
-}
 
 .seriesdatatable td{
 	overflow: hidden;

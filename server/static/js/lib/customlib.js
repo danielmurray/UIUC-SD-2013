@@ -58,6 +58,52 @@ function loadData(url) {
   return data;
 }
 
+var randomArray = function(start, end, size, seed){
+
+  var arr = [];
+
+  var now = start;
+  var then = end;
+
+  step = (now-then)/size;
+  arr[0] = [];
+  arr[0][0] = then;
+  arr[0][1] = Math.random() * seed;
+
+  for(var i=1; i<size; i++){
+    arr[i] = [];
+    arr[i][0] = then + step *i;
+    
+    arr[i][1] = arr[i-1][1] + (Math.random()*2 - 1)
+  }
+
+  console.log(arr);
+  return arr;
+}
+
+var stringToUTC = function(timeperiod){
+  var now = Math.round((new Date()).getTime()/1000);
+    
+    switch(timeperiod){
+      case 'day':
+        var then = now - 24*60*60;
+        break;
+      case 'week':
+        var then = now - 7*24*60*60;
+        break;
+      case 'month':
+        var then = now - 30*24*60*60;
+        break;
+      default:
+        var then = now - 24*60*60;
+    }
+
+  return {
+    start: then,
+    end: now
+  }
+}
+
 var componentToHex = function(c) {
    var hex = c.toString(16);
    return hex.length == 1 ? "0" + hex : hex;
@@ -95,28 +141,7 @@ var hexToRgb = function(hex) {
    } : null;
 }
 
-var randomArray = function(start, end, size, seed){
 
-  var arr = [];
-
-  var now = start;
-  var then = end;
-
-  step = (now-then)/size;
-  arr[0] = [];
-  arr[0][0] = then;
-  arr[0][1] = Math.random() * seed;
-
-  for(var i=1; i<size; i++){
-    arr[i] = [];
-    arr[i][0] = then + step *i;
-    
-    arr[i][1] = arr[i-1][1] + (Math.random()*2 - 1)
-  }
-
-  console.log(arr);
-  return arr;
-}
 
 var rgbaToString = function(color,opacity){
   var thing = 'rgba(' + color[0] + ',' + color[1] + ',' + color[2]  + ',' + opacity + ')';

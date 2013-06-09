@@ -812,7 +812,8 @@ var PageTaskBar = BaseView.extend({
   route: function(part, remaining) {
 
     taskbarstatus = new TaskBarStatus({
-      collections: this.collections
+      collections: this.collections,
+      range: this.range
     });
 
     graph = new NUGraphView({
@@ -848,27 +849,92 @@ var TaskBarStatus = BaseView.extend({
   },
   initialize: function(data) {
     this.template = loadTemplate("/static/views/taskbarstatus.html");
-    this.collections = data.collections
-    this.currentaccordionselection = 'Cost'
+    this.collections = data.collections;
+    this.range = data.range
+
+    var height = 182;
+    var width = 292;
+    this.taskbarcollapsed = (2*height/3)/(this.collections.length + 1);
+    this.taskbaropen = height - this.collections.length * this.taskbarcollapsed
+    this.accordionselection = this.collections.length;
   },
   route: function(part) {
     for( var i=0; i<this.collections.length; i++){
       collection = this.collections[i]
-      this.listenTo(collection.collection, 'change', this.render);
+      // this.listenTo(collection.collection, 'change', this.render);
     }
 
     return {}
   },
   render: function() {
-    var renderedTemplate = this.template({collections: this.collections, accordianselection: this.currentaccordionselection });
+    var statusArray = this.statusdata();
+    var renderedTemplate = this.template({ 
+      statusArray: statusArray, 
+      taskbarcollapsed: this.taskbarcollapsed,
+      taskbaropen: this.taskbaropen,  
+      accordianselection: this.accordionselection 
+    });
     this.$el.html(renderedTemplate);
   },
   accordianselect: function(click){
     $('.seriesdatalist li').removeClass('selected')
-    this.currentaccordionselection = $(click.currentTarget)[0].classList[1]
-    console.log(this.currentaccordionselection)
+    $('.seriesdatalist li .icon').text('+')
+    
+    //selected li index
+    this.accordionselection = $('.seriesdatalist li').index(click.currentTarget)
+    
     $(click.currentTarget).addClass('selected')
+    $(click.currentTarget).find('.icon').text('-')
 
+  },
+  statusdata:function(){
+    statusarray = [];
+    range = this.range + '\'s '
+
+    for(var i =0; i < this.collections.length; i++){
+      var collection = this.collections[i];
+      statusmodel = {};
+      statusmodel.name = collection.name;
+      statusmodel.color = collection.color;
+      statusmodel.value = collection.collection.getSum();
+      statusmodel.subvalues = []
+      minimum = {
+        key: range + 'minimum',
+        value: statusmodel.value * Math.random()
+      };
+      maximum = {
+        key: range + 'maximum',
+        value: statusmodel.value * (Math.random()+1)
+      }
+      average = {
+        key: range + 'average',
+        value: statusmodel.value * (Math.random()+1)
+      }
+      statusmodel.subvalues.push(minimum, maximum, average)
+      statusarray.push(statusmodel)
+    }
+
+    costmodel = {};
+    costmodel.name = 'Cost';
+    costmodel.color = [223,144,1];
+    costmodel.value = Math.floor(Math.random() * 100);
+    costmodel.subvalues = []
+    minimum = {
+      key: range + 'production',
+      value: costmodel.value * Math.random()
+    };
+    maximum = {
+      key: range + 'consumption',
+      value: costmodel.value * (Math.random()+1)
+    }
+    average = {
+      key: range + 'net',
+      value: costmodel.value * (Math.random()+1)
+    }
+    costmodel.subvalues.push(minimum, maximum, average)
+    statusarray.push(costmodel)
+
+    return statusarray
   }
 });
 
@@ -942,7 +1008,7 @@ var NUGraphView = BaseView.extend({
     this.$el.html(renderedTemplate);
 
     this.fetchHistoricalData(function() {
-      that.renderChart(that.series[1]);
+      that.renderChart(that.series[0]);
     });
   },
   fetchHistoricalData: function(callback){    
@@ -994,7 +1060,6 @@ var NUGraphView = BaseView.extend({
   },
   renderChart: function(data){
     series = data.data
-    console.log(series)
     $('#graphholder').empty()
 
     var margin = {top: 0, right: 0, bottom: 0, left: 0},
