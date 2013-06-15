@@ -48,7 +48,6 @@ var BaseCollection = CollectionWS.extend({
   jsonTree: function(){
     var that = this
 
-    console.log(this)
     var root = {
       name: 'home',
       children:[]
@@ -88,45 +87,45 @@ var BaseCollection = CollectionWS.extend({
     ]
   },
   historyData: function(type, field, start, end, period, group, callback) {
-    var arr = [];
+    // var arr = [];
 
-    var now = start;
-    var then = end;
-    var size = period/4;
+    // var now = end;
+    // var then = start;
+    // var size = period/4;
 
-    step = (now-then)/size;
-    arr[0] = [];
-    arr[0][0] = then;
-    arr[0][1] = Math.random() * size;
+    // step = (now-then)/size;
+    // arr[0] = [];
+    // arr[0][0] = then;
+    // arr[0][1] = Math.random() * size;
 
-    for(var i=1; i<size; i++){
-      arr[i] = [];
-      arr[i][0] = then + step *i;
+    // for(var i=1; i<size; i++){
+    //   arr[i] = [];
+    //   arr[i][0] = then + step *i;
       
-      arr[i][1] = arr[i-1][1] + (Math.random()*5 - 2.5)
-    }
+    //   arr[i][1] = arr[i-1][1] + (Math.random()*5 - 2.5)
+    // }
 
-    callback(arr)
+    // callback(arr)
 
-    // $.ajax("/history", {
-    //   data: {
-    //     type: type,
-    //     field: field,
-    //     start: start,
-    //     end: end,
-    //     period: period,
-    //     group: group
-    //   },
-    //   async:'true',
-    //   dataType: "json",
-    //   success: function(data) {
-    //     callback(data);
-    //   },
-    //   error: function(err) {
-    //     console.error(err);
-    //     callback(undefined);
-    //   }
-    // });
+    $.ajax("/history", {
+      data: {
+        type: type,
+        field: field,
+        start: start,
+        end: end,
+        period: period,
+        group: group
+      },
+      async:'true',
+      dataType: "json",
+      success: function(data) {
+        callback(data);
+      },
+      error: function(err) {
+        console.error(err);
+        callback(undefined);
+      }
+    });
   }
 })
 
