@@ -91,7 +91,7 @@ var BaseCollection = CollectionWS.extend({
 
     // var now = end;
     // var then = start;
-    // var size = period/4;
+    // var size = period;
 
     // step = (now-then)/size;
     // arr[0] = [];

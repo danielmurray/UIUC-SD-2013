@@ -801,13 +801,22 @@ var OptView = PageView.extend({
 var PageTaskBar = BaseView.extend({
   el: 'div',
   events: {
-    "click .histdata":  "changerange"
+    "click #dateselect":  "showdates",
+    "click #dateselect li": "changerange"
   },
   initialize: function(data) {
     this.template = loadTemplate("/static/views/pagetaskbar.html");
     this.range = data.range;
     this.color = data.color;
     this.collections = data.collections
+    this.dataselect = [
+      'today',
+      'last24',
+      'thisweek',
+      'last7',
+      'thismonth',
+      'last28'
+    ]
   },
   route: function(part, remaining) {
 
@@ -829,16 +838,14 @@ var PageTaskBar = BaseView.extend({
     }
   },
   render: function() {
-    var renderedTemplate = this.template({ range: this.range, color: this.color});
+    var renderedTemplate = this.template({ range: this.range, dates: this.dataselect, color: this.color});
     this.$el.html(renderedTemplate);
   },
-  changerange: function(click) {
-    
-    if(click.target.id == this.range){
-      
-    }else{
-      this.trigger('timeselect', click.target.id );
-    }
+  showdates: function(click){
+    $(click.currentTarget).toggleClass('active');
+  },
+  changerange: function(click){
+    this.trigger('timeselect', click.currentTarget.id)
   }
 });
 
@@ -852,8 +859,8 @@ var TaskBarStatus = BaseView.extend({
     this.collections = data.collections;
     this.range = data.range
 
-    var height = 182;
-    var width = 292;
+    var height = 172;
+    var width = 282;
     this.taskbarcollapsed = (2*height/3)/(this.collections.length + 1);
     this.taskbaropen = height - this.collections.length * this.taskbarcollapsed
     this.accordionselection = this.collections.length;
@@ -985,7 +992,6 @@ var DataBox = BaseView.extend({
 
   },
   updatecontentview: function() {
-
     //render and animate
     router.displayPart(0,this.currview,[])
 
@@ -1032,7 +1038,7 @@ var NUGraphView = BaseView.extend({
           that.series[j] = {
             name: inputdata.name,
             type: 'area',
-            color: rgbaToString(d.color,1),
+            color: d.color,
             data: data
           };
           if (data) {
@@ -1044,45 +1050,37 @@ var NUGraphView = BaseView.extend({
     });
   },
   getHistoricalData:function(collection, callback){
-    var now = Math.round((new Date()).getTime()/1000);
-    
-    switch(this.timeperiod){
-      case 'day':
-        var then = now - 24*60*60;
-        break;
-      case 'week':
-        var then = now - 7*24*60*60;
-        break;
-      case 'month':
-        var then = now - 30*24*60*60;
-        break;
-      default:
-        var then = now - 24*60*60;
-    }
-    collection.getHistoricalData(then,now, 1000, callback);
+    startEndUTC = stringToUTC(this.timeperiod)
+    start = startEndUTC.start;
+    end = startEndUTC.end;
+    collection.getHistoricalData(start,end, 100, callback);
   },
   renderChart: function(series){
 
     $('#graphholder').empty()
 
-    var margin = {top: 10, right: 0, bottom: 0, left: 0},
+    var areaData = this.formatGraphData(series)
+
+    var margin = {top: 50, right: 6, bottom: 0, left: 0},
     w = 681 - margin.left - margin.right,
     h = 183 - margin.top - margin.bottom;
 
-    minDate = series[0].data[0][0]*1000
-    maxDate = series[0].data[series[0].data.length-1][0]*1000
+    minDate = series[0].data[0][0]
+    maxDate = series[0].data[series[0].data.length-1][0]
+
+    console.log(minDate, maxDate)
 
     var x = d3.time.scale().domain([minDate, maxDate]).range([0, w]);
     var y = d3.scale.linear().domain([0, d3.max(series, function(s) { 
 
-        return d3.max(s.data, function(d){ return d[1]; } )
+      return d3.max(s.data, function(d){ return d[1]; } )
 
     })]).range([h, 0]);
 
     var xAxis = d3.svg.axis()
       .scale(x)
       .orient("top")
-      .ticks(5)
+      .ticks(7)
       .tickSize(0)
       .tickFormat(this.timeFormat());
 
@@ -1103,21 +1101,47 @@ var NUGraphView = BaseView.extend({
         // assign the X function to plot our line as we wish
       .x(function(d, i) {
         // return the X coordinate where we want to plot this datapoint
-        return x(d[0]*1000); //x(i);
+        return x(d[0]); //x(i);
       })
       .y(function(d) { 
         // return the Y coordinate where we want to plot this datapoint
         return y(d[1]); 
       });
 
-    var area = d3.svg.area()
+    //when collection 0 is greater than collection 1
+    var area0 = d3.svg.area()
       .x(function(d, i) {
         // return the X coordinate where we want to plot this datapoint
-        return x(d[0]*1000); //x(i);
+        return x(d.date); //x(i);
+      })
+      .y0(function(d){
+        if(d.data1 < d.data0){
+          return y(d.data1); 
+        }else{
+          return y(d.data0)
+        } 
       })
       .y1(function(d) { 
         // return the Y coordinate where we want to plot this datapoint
-        return y(d[1]); 
+        return y(d.data0); 
+      });
+
+    //when collection1 is greater than colleciton0
+    var area1 = d3.svg.area()
+      .x(function(d, i) {
+        // return the X coordinate where we want to plot this datapoint
+        return x(d.date); //x(i);
+      })
+      .y0(function(d){
+        if(d.data0 < d.data1){
+          return y(d.data0); 
+        }else{
+          return y(d.data1)
+        }
+      })
+      .y1(function(d) { 
+        // return the Y coordinate where we want to plot this datapoint
+        return y(d.data1); 
       });
 
     var graph = d3.select("#graphholder").append("svg:svg")
@@ -1130,51 +1154,57 @@ var NUGraphView = BaseView.extend({
     var yy = function(e) { return y(e[1]); };
 
     // Draw Y-axis grid lines
-    graph.selectAll("line.y")
-      .data(y.ticks(5))
-      .enter().append("line")
-      .attr("class", "y")
-      .attr("x1", 0)
-      .attr("x2", w)
-      .attr("y1", y)
-      .attr("y2", y)
-      .style("stroke", "rgba(245,245,245,0.4)")
-      .style("stroke-dasharray", "5,5");
+    // graph.selectAll("line.y")
+    //   .data(y.ticks(5))
+    //   .enter().append("line")
+    //   .attr("class", "y")
+    //   .attr("x1", 0)
+    //   .attr("x2", w)
+    //   .attr("y1", y)
+    //   .attr("y2", y)
+    //   .style("stroke", "rgba(245,245,245,0.2)")
+    //   .style("stroke-dasharray", "10,20");
 
-    for(var i=0; i<series.length; i++){
-      serie = series[i]
-      
-      graph.append("svg:path")
-        .attr("d", line(serie.data))
-        .attr("class", "graphline")
-        .attr("stroke", serie.color)
-        .attr("fill", serie.color);
-
-      // graph.selectAll("circle"+i)
-      //   .data(serie.data)
-      //   .enter().append("circle")
-      //   .attr("fill", serie.color)
-      //   .attr("r", 5)
-      //   .attr("cx", xx)
-      //   .attr("cy", yy)
-
-    }
+    
 
     //rendering areas
     if(series.length == 1){
 
     }else if (series.length == 2) {
 
-      // console.log(area)
-      // graph.append("path")
-      //     .attr("class", "area above")
-      //     .attr("d", area(series[0].data));
+      graph.datum(areaData);
 
-      // graph.append("path")
-      //     .attr("class", "area below")
-      //     .attr("clip-path", "url(#clip-below)")
-      //     .data(series[1].data)
-      //     .attr("d", area);
+      graph.append("path")
+        .attr("d", area0)
+        .attr("class", "area below")
+        .attr("fill", rgbaToString(series[0].color,0.95));
+
+      graph.append("path")
+        .attr("d", area1)
+        .attr("class", "area below")
+        .attr("fill", rgbaToString(series[1].color,0.95));
+
+    }
+
+    for(var i=0; i<series.length; i++){
+      serie = series[i]
+
+      graph.datum(serie.data)
+      
+      graph.append("svg:path")
+        .attr("d", line)
+        .attr("class", "graphline")
+        .attr("stroke", rgbaToString(serie.color,1))
+        .attr("fill", rgbaToString(serie.color,1));
+
+      // graph.selectAll("circle"+i)
+      //   .data(serie.data)
+      //   .enter()
+      //   .append("circle")
+      //   .attr("fill", serie.color)
+      //   .attr("r", 5)
+      //   .attr("cx", xx)
+      //   .attr("cy", yy)
 
     }
 
@@ -1183,11 +1213,11 @@ var NUGraphView = BaseView.extend({
       .attr('transform', 'translate(0, ' + h + ')')
       .call(xAxis);
 
-    graph.append("g")
-      .attr("class", "y-axis")
-      .call(yAxis)
-      .selectAll('text')
-      .attr("y", "-10");
+    // graph.append("g")
+    //   .attr("class", "y-axis")
+    //   .call(yAxis)
+    //   .selectAll('text')
+    //   .attr("y", "-10");
 
 
   },
@@ -1195,7 +1225,7 @@ var NUGraphView = BaseView.extend({
     var formats = [
       [function(d) { return Date.create(d).format('{MON}') }, function() { return true; }],
       [function(d) { return Date.create(d).format('{M}/{d}') }, function(d) { return d.getMonth(); }],
-      [function(d) { return Date.create(d).format('{DOW}') }, function(d) { return d.getDate() != 1; }],
+      [function(d) { return Date.create(d).format('{M}/{d}') }, function(d) { return d.getDate() != 1; }],
       [function(d) { return Date.create(d).format('{DOW}') }, function(d) { return d.getDay() && d.getDate() != 1; }],
       [function(d) { return Date.create(d).format('{12hr}{tt}') }, function(d) { return d.getHours() && d.getDate(); }],
       [function(d) { return Date.create(d).relative() }, function(d) { return d.getMinutes(); }],
@@ -1209,8 +1239,24 @@ var NUGraphView = BaseView.extend({
       while (!f[1](date)){
         f = formats[--i];
       }
+      console.log(date)
       return f[0](date)
     };
+  },
+  formatGraphData: function(series){
+    data = []
+    //for each data point create a chart data object "d"
+    for(var i = 0; i < series[0].data.length; i++){
+      d = {}
+      d.date = series[0].data[i][0]
+      for(var j = 0; j < series.length; j++){
+        datum = series[j].data[i]
+        key = "data"+j
+        d[key] = datum[1]
+      }
+      data.push(d)
+    }
+    return data
   }
 });
 
@@ -1503,7 +1549,6 @@ var TreeMapView = BaseView.extend({
     return {};
   },
   render: function() {
-    
     if(this.currentNode == 'home'){
       var renderedTemplate = this.template();
       this.$el.html(renderedTemplate);
@@ -1524,8 +1569,8 @@ var TreeMapView = BaseView.extend({
     transitioning;
 
     var x = d3.scale.linear()
-    .domain([0, width])
-    .range([0, width]);
+      .domain([0, width])
+      .range([0, width]);
  
     var y = d3.scale.linear()
         .domain([0, height])

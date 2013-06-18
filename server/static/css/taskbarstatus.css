@@ -1,11 +1,11 @@
 .seriesdatalist{
+	margin: 5px;
 	list-style: none;
-	height: 100%;
 	background-color: rgba(0, 15, 30, 0.8);
 }
 
 .seriesdatalist li{
-	width: 292px;
+	width: 282px;
 	float:left;
 	border-bottom: solid rgba(0, 15, 30, 1) 1px; 
 	-webkit-transition:height .25s linear;
@@ -64,7 +64,7 @@
 .seriesdatatable{
 	font-size: 14px;
 	color: rgba(245,245,245,0.7);
-	width: 292px;
+	width: 282px;
 }
 
 .seriesdatatablerow{
