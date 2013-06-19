@@ -1061,7 +1061,7 @@ var NUGraphView = BaseView.extend({
 
     var areaData = this.formatGraphData(series)
 
-    var margin = {top: 50, right: 6, bottom: 0, left: 0},
+    var margin = {top: 50, right: 6, bottom: 20, left: 0},
     w = 681 - margin.left - margin.right,
     h = 183 - margin.top - margin.bottom;
 
@@ -1079,7 +1079,7 @@ var NUGraphView = BaseView.extend({
 
     var xAxis = d3.svg.axis()
       .scale(x)
-      .orient("top")
+      .orient("bottom")
       .ticks(7)
       .tickSize(0)
       .tickFormat(this.timeFormat());
