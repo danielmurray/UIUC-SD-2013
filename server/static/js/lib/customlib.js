@@ -83,16 +83,25 @@ var randomArray = function(start, end, size, seed){
 
 var stringToUTC = function(timeperiod){
   var now = Math.round((new Date()).getTime()/1000);
-    
+  
     switch(timeperiod){
-      case 'day':
+      case 'today':
+        var then = Math.round((new Date()).setHours(0,0,0,0)/1000);
+        break;
+      case 'last24':
         var then = now - 24*60*60;
         break;
-      case 'week':
+      case 'thisweek':
+        var then = Math.round(Date.create('monday').getTime()/1000)
+        break;
+      case 'last7':
         var then = now - 7*24*60*60;
         break;
-      case 'month':
-        var then = now - 30*24*60*60;
+      case 'thismonth':
+        var then = Math.round(Date.create('the beginning of this month').getTime()/1000)
+        break;
+      case 'last28':
+        var then = now - 28*24*60*60;
         break;
       default:
         var then = now - 24*60*60;
