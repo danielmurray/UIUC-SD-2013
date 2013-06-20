@@ -3,7 +3,9 @@ import gevent
 from autobahn.websocket import WebSocketClientFactory, WebSocketClientProtocol, connectWS
 import requests, random, hmac, hashlib, base64, json
 
-LOX_ADDR = 'http://eric-johnson.net:8080/'
+LOX_ADDR = '192.168.89.7'
+LOX_USER = 'admin'
+LOX_PASS = 'admin'
 PING_TIME = 10
 
 class EchoIncoming(WebSocketClientProtocol):
@@ -142,20 +144,31 @@ class LoxoneDevice(object):
     
     def create_socket(self):
         num = random.random()
-        r = requests.get('http://'+LOX_ADDR+'/jdev/sys/getkey?'+str(num))
-        self.isClosed = False
-        if(r.status_code == 200):
-            protocol = hmac.new(r.json()['LL']['value'].decode("hex"), "admin:admin", digestmod=hashlib.sha1).digest().encode("hex")
-            factory = WebSocketClientFactory("ws://"+LOX_ADDR+"/ws/",protocols = [protocol], debug=True)
-            factory.protocol = self.proxy
-            connectWS(factory)
+        try:
+            r = requests.get('http://'+LOX_ADDR+'/jdev/sys/getkey?'+str(num))
+            pass
+        except Exception, e:
+            print "LOX_DEVICE::auth key request failed"
+            raise
         else:
-            print "LOX_DEVICE::Failed to Handshake with loxone:HTTP_STATUS_CODE:"+r.status_code
-            return
-        self.initialized = True
-        while not self.isClosed:
-            print random.choice(["(>'.')>", "<('.'<)", ":)", ":(", "XD","oo","||","u"])
-            gevent.sleep(1) # don't block event loop
+            if(r.status_code == 200):
+                protocol = hmac.new(r.json()['LL']['value'].decode("hex"), LOX_USER+":"+LOX_PASS, digestmod=hashlib.sha1).digest().encode("hex")
+                factory = WebSocketClientFactory("ws://"+LOX_ADDR+"/ws/",protocols = [protocol], debug=True)
+                factory.protocol = self.proxy
+                connectWS(factory)
+                self.isClosed = False
+            else:
+                print "LOX_DEVICE::Failed to Handshake with loxone:HTTP_STATUS_CODE:"+r.status_code
+                return
+            self.initialized = True
+            while not self.isClosed:
+                print random.choice(["(>'.')>", "<('.'<)", ":)", ":(", "XD","oo","||","u"])
+                gevent.sleep(1) # don't block event loop
+            gevent.sleep(1)
+            print "End: create_socket"
+            # Put Reconnect code here???
+        finally:
+            pass
 
     def register_listner(self, listner):
         '''register a function that will be called whenever a message is received on the socket'''
