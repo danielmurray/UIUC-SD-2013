@@ -20,7 +20,11 @@ class PowerController(BackboneCollection):
 
   def data_fetch(self):
     print "POWER::FETCHING E-GAUGE DATA"
-    latest_data = self.parse_xml(self.fetch_data())
+    xml = self.fetch_data()
+    if xml == '':
+      print"eGauge: No power data"
+      return {}
+    latest_data = self.parse_xml(xml)
     self.update_client(latest_data)
 
   def update_client(self, data_dict):
@@ -53,8 +57,19 @@ class PowerController(BackboneCollection):
 
   def make_request(self,url, data):
     req = urllib2.Request(url, data)
-    response = urllib2.urlopen(req)
-    return response.read()
+    html = ''
+    try: 
+      response = urllib2.urlopen(req)
+      return response.read()
+    except urllib2.HTTPError, e:
+      print('eGauge: HTTPError = ' + str(e.code))
+    except urllib2.URLError, e:
+      print('eGauge: URLError = ' + str(e.reason))
+    except httplib.HTTPException, e:
+      print('eGauge: HTTPException')
+    except Exception:
+      print('eGauge: urllib2 generic exception')
+    return ''
 
 class PVController(BackboneCollection):
   typ = "pv"
@@ -86,7 +101,11 @@ class PVController(BackboneCollection):
 
   def parse_aps_data(self):
     html = BeautifulSoup(self.make_request('http://solardecathlon.web.cs.illinois.edu/APS-ECU/parameters.php',None))
-    table = html.findAll('table')[0]
+    tables = html.findAll('table')
+    if len(tables) == 0:
+      print "APS: No data table found"
+      return {}
+    table = tables[0]
     panels = {}
     rows = table.tbody('tr')
     rows.pop(0)
@@ -104,5 +123,16 @@ class PVController(BackboneCollection):
 
   def make_request(self,url, data):
     req = urllib2.Request(url, data)
-    response = urllib2.urlopen(req)
-    return response.read()
+    html = ''
+    try: 
+      response = urllib2.urlopen(req)
+      return response.read()
+    except urllib2.HTTPError, e:
+      print('APS: HTTPError = ' + str(e.code))
+    except urllib2.URLError, e:
+      print('APS: URLError = ' + str(e.reason))
+    except httplib.HTTPException, e:
+      print('APS: HTTPException')
+    except Exception:
+      print('APS: urllib2 generic exception')
+    return ''

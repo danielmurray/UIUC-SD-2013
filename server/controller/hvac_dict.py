@@ -1,6 +1,6 @@
 hvac_uuids = {
 	"avg_temp":22,
-	"avg_temp_uuid":"ec016bfe-a16a-11e2-82d0eb875f37995e",
+	"avg_temp_uuid":"8208bb0c-9197-11e0-806c9f19214c414c",
 	"tar_temp":22,
 	"tar_temp_uuid":"58094eba-a164-11e2-9ebdeb875f37995e",
 	"hvac_state_uuid":{

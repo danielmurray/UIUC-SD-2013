@@ -165,6 +165,13 @@ var HVACCollection = BaseCollection.extend({
     });
     return last;
   },
+  getAvgTemp: function() {
+    var last = "loading";
+    this.each(function(model) {
+      last = model.get("avg_temp");
+    });
+    return last;
+  },
   getSum: function(){
     data = this._homeData(this.valueID)
     return data.sum/data.count;

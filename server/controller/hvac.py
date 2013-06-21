@@ -28,6 +28,8 @@ class HvacController(BackboneCollection):
                 hvac_uuids["hvac_state_uuid"]["n_heat"] = each["n"]
             elif each['UUID'] == hvac_uuids["tar_temp_uuid"]:
                 hvac_uuids["tar_temp_n"] = each["n"]
+            elif each['UUID'] == hvac_uuids["avg_temp_uuid"]:
+                hvac_uuids["avg_temp_n"] = each["n"]
 
     def parse_state(self, msg):
         change = False
@@ -49,9 +51,14 @@ class HvacController(BackboneCollection):
                     hvac_uuids["hvac_state_uuid"]["heating"] = False
                     change = True
             elif hvac_uuids["tar_temp_n"] == each["n"]:
-                    if hvac_uuids["tar_temp"] != each["v"]:
-                        hvac_uuids["tar_temp"] = each["v"]
-                        self.update(hvac_uuids)
+                if hvac_uuids["tar_temp"] != each["v"]:
+                    hvac_uuids["tar_temp"] = each["v"]
+                    self.update(hvac_uuids)
+            elif hvac_uuids["avg_temp_n"] == each["n"]:
+                print "avg temp"
+                if hvac_uuids["avg_temp"] != each["v"]:
+                    hvac_uuids["avg_temp"] = each["v"]
+                    self.update(hvac_uuids)
 
         if change:
         #set the hvac_state to idle if both  are doing nothing
