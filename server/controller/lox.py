@@ -141,6 +141,7 @@ class LoxoneDevice(object):
         while True:
             print "LOX_DEVICE::(re?)starting socket------"
             self.create_socket()
+            gevent.sleep(10)
     
     def create_socket(self):
         num = random.random()
@@ -149,7 +150,6 @@ class LoxoneDevice(object):
             pass
         except Exception, e:
             print "LOX_DEVICE::auth key request failed"
-            raise
         else:
             if(r.status_code == 200):
                 protocol = hmac.new(r.json()['LL']['value'].decode("hex"), LOX_USER+":"+LOX_PASS, digestmod=hashlib.sha1).digest().encode("hex")
