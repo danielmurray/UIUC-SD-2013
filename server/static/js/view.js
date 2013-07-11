@@ -58,7 +58,8 @@ var HomeView = BaseView.extend({
       'windoor': WindoorView,
       'power': PowerView,
       'water': WaterView,
-      'opt': OptView
+      'opt': OptView,
+      'graphdata': GraphDataView
     }
 
     //establish pane data to be passed to view
@@ -770,11 +771,6 @@ var OptView = PageView.extend({
   initialize: function(data) {
     PageView.prototype.initialize.apply(this, [data]);    
     this.opttemplate = loadTemplate("/static/views/optimizer.html");
-    console.log("Opt View Initialized");
-
-    //BRYANT BUT YOU OPTIMIZER COLLECTION RIGHT IN HERE
-    this.collection = window.Windoor;
-    //this.collection._sortBy('value',true);
 
   },
   animateIn: function(){
@@ -798,6 +794,127 @@ var OptView = PageView.extend({
   }
 });
 
+var GraphDataView = PageView.extend({
+  el: 'div',
+  events: {
+    "click #dateselect":  "showdates",
+    "click #dateselect li": "changerange",
+    "click .collectionwrapper.notselected": "pushcollection",
+    "click .collectionwrapper.selected": "popcollection"
+  },
+  initialize: function(data) {
+    PageView.prototype.initialize.apply(this, [data]);    
+    this.datatemplate = loadTemplate("/static/views/graphdata.html");
+    this.range = 'today';
+
+    this.collections = historyCollections();
+    this.dataselect = [
+      'today',
+      'last24',
+      'thisweek',
+      'last7',
+      'thismonth',
+      'last28'
+    ]
+
+    this.selectedcollections = []
+
+  },
+  animateIn: function(){
+    PageView.prototype.animateIn.apply(this);
+  },
+  route: function(part, remaining) {
+    
+    if (!part) {
+      this.selectedcollections = [
+        'power'
+      ]
+      this.refresh();
+      return
+    }
+
+    request = part.split('&');
+    this.range = request[0];
+    this.selectedcollections = [];
+    for(var i=1; i < request.length; i++){
+      this.selectedcollections.push(request[i])
+    }
+
+    graph = new BigGraphView({
+      type:'area',
+      range: this.range,
+      series: this.acquirecollections(this.selectedcollections),
+      unit: 'W'
+    });
+
+    return {
+      '#graphWrapper': graph
+    }
+
+  },
+  render: function(pane, subpane) {
+    PageView.prototype.render.apply(this);
+    var renderedTemplate = this.datatemplate({
+      collections: this.collections,
+      selectedcollections: this.selectedcollections,
+      range: this.range,
+      dates: this.dataselect
+    });
+    this.$('#pagecontent').html(renderedTemplate);
+    
+  },
+  pushcollection: function(click){
+    if(this.selectedcollections.length < 2){
+      this.selectedcollections.push(click.currentTarget.id);
+    }
+    this.refresh();
+  },
+  popcollection: function(click){
+    var index;
+    for(var i =0; i < this.selectedcollections.length; i++){
+      deselectedcollection = click.currentTarget.id;
+      if(deselectedcollection == this.selectedcollections[i])
+        index = i;
+    }
+    
+    if(index == 0 ){
+      this.selectedcollections.shift();
+    }else if(index ==1){
+      this.selectedcollections.pop();
+    }
+
+    this.refresh();
+  },
+  showdates: function(click){
+    $(click.currentTarget).toggleClass('active');
+  },
+  changerange: function(click){
+    this.range = click.currentTarget.id
+    this.refresh()
+  },
+  refresh: function(){
+    questString = this.range
+    for(var i=0; i < this.selectedcollections.length; i++){
+      selectedcollection = this.selectedcollections[i]
+      questString += "&" + selectedcollection
+    }
+    navigate('graphdata/'+ questString, false);
+  },
+  acquirecollections: function(selectedcollections){
+    this.collectionarray = []
+    for(var i =0; i < selectedcollections.length; i++){
+      selectedcollection = selectedcollections[i]
+      for(var j=0; j< this.collections.length; j++){
+        collection = this.collections[j]
+        if(collection.id == selectedcollection){
+          this.collectionarray.push(collection)
+        }
+      }
+    }
+    return this.collectionarray;
+  }
+});
+
 var PageTaskBar = BaseView.extend({
   el: 'div',
   events: {
@@ -816,7 +933,7 @@ var PageTaskBar = BaseView.extend({
       'last7',
       'thismonth',
       'last28'
-    ]
+    ];
   },
   route: function(part, remaining) {
 
@@ -825,7 +942,7 @@ var PageTaskBar = BaseView.extend({
       range: this.range
     });
 
-    graph = new NUGraphView({
+    graph = new SmallGraphView({
       type:'area',
       range: this.range,
       series: this.collections,
@@ -838,7 +955,11 @@ var PageTaskBar = BaseView.extend({
     }
   },
   render: function() {
-    var renderedTemplate = this.template({ range: this.range, dates: this.dataselect, color: this.color});
+    var renderedTemplate = this.template({
+      range: this.range,
+      dates: this.dataselect,
+      color: this.color
+    });
     this.$el.html(renderedTemplate);
   },
   showdates: function(click){
@@ -874,6 +995,7 @@ var TaskBarStatus = BaseView.extend({
     return {}
   },
   render: function() {
+    console.log('rendered this time')
     var statusArray = this.statusdata();
     var renderedTemplate = this.template({ 
       statusArray: statusArray, 
@@ -898,50 +1020,35 @@ var TaskBarStatus = BaseView.extend({
     statusarray = [];
     range = this.range + '\'s '
 
+    //Cycle through all of the page's collections
     for(var i =0; i < this.collections.length; i++){
       var collection = this.collections[i];
       statusmodel = {};
       statusmodel.name = collection.name;
+      statusmodel.title = collection.name;
       statusmodel.color = collection.color;
       statusmodel.value = collection.collection.getSum();
       statusmodel.subvalues = []
-      min = statusmodel.value * Math.random()
-      max = statusmodel.value * (Math.random()+1)
-      avg = (max + min)/2
+
+      statusData = collection.collection.dataStatus();
+
       minimum = {
         key: range + 'minimum',
-        value: min
+        value: collection.collection.formatValue(statusData.min)
       };
       maximum = {
         key: range + 'maximum',
-        value: max 
+        value: collection.collection.formatValue(statusData.max)
       }
       average = {
         key: range + 'average',
-        value: avg
+        value: collection.collection.formatValue(statusData.avg)
       }
       statusmodel.subvalues.push(minimum, maximum, average)
       statusarray.push(statusmodel)
     }
 
-    costmodel = {};
-    costmodel.name = 'Cost';
-    costmodel.color = [223,144,1];
-    costmodel.value = Math.floor(Math.random() * 100);
-    costmodel.subvalues = []
-    minimum = {
-      key: range + 'production',
-      value: costmodel.value * Math.random()
-    };
-    maximum = {
-      key: range + 'consumption',
-      value: costmodel.value * (Math.random()+1)
-    }
-    average = {
-      key: range + 'net',
-      value: costmodel.value * (Math.random()+1)
-    }
-    costmodel.subvalues.push(minimum, maximum, average)
+    costmodel = this.collections[0].collection.generateCostModel(range);
     statusarray.push(costmodel)
 
     return statusarray
@@ -998,7 +1105,7 @@ var DataBox = BaseView.extend({
   }
 });
 
-var NUGraphView = BaseView.extend({
+var GraphView = BaseView.extend({
   el:'div',
   initialize: function(graphdata){
     this.timeperiod = graphdata.range;
@@ -1055,15 +1162,231 @@ var NUGraphView = BaseView.extend({
     end = startEndUTC.end;
     collection.getHistoricalData(start,end, 100, callback);
   },
+  timeFormat: function(){
+    var formats = [
+      [function(d) { return Date.create(d).format('{MON}') }, function() { return true; }],
+      [function(d) { return Date.create(d).format('{M}/{d}') }, function(d) { return d.getMonth(); }],
+      [function(d) { return Date.create(d).format('{M}/{d}') }, function(d) { return d.getDate() != 1; }],
+      [function(d) { return Date.create(d).format('{DOW}') }, function(d) { return d.getDay() && d.getDate() != 1; }],
+      [function(d) { return Date.create(d).format('{12hr}{tt}') }, function(d) { return d.getHours() && d.getDate(); }],
+      [function(d) { return Date.create(d).format('{12hr}:{mm}{tt}')  }, function(d) { return d.getMinutes(); }],
+      [function(d) { return Date.create(d).format('{12hr}:{mm}{tt}')  }, function(d) { return d.getSeconds(); }],
+      [function(d) { return Date.create(d).format('{12hr}:{mm}{tt}')  }, function(d) { return d.getMilliseconds(); }]
+    ];
+
+    return function(date) {
+      var i = formats.length - 1;
+      var f = formats[i];
+      while (!f[1](date)){
+        f = formats[--i];
+      }
+      return f[0](date)
+    };
+  },
+  formatGraphData: function(series){
+    data = []
+    //for each data point create a chart data object "d"
+    for(var i = 0; i < series[0].data.length; i++){
+      d = {}
+      d.date = series[0].data[i][0]
+      for(var j = 0; j < series.length; j++){
+        datum = series[j].data[i]
+        key = "data"+j
+        d[key] = datum[1]
+      }
+      data.push(d)
+    }
+    return data
+  }
+});
+
+var SmallGraphView = GraphView.extend({
+  el:'div',
   renderChart: function(series){
 
     $('#graphholder').empty()
 
     var areaData = this.formatGraphData(series)
 
-    var margin = {top: 50, right: 6, bottom: 20, left: 0},
-    w = 681 - margin.left - margin.right,
+    var margin = {top: 50, right: 0, bottom: 5, left: 0},
+    w = 675 - margin.left - margin.right,
     h = 183 - margin.top - margin.bottom;
+
+    minDate = series[0].data[0][0]
+    maxDate = series[0].data[series[0].data.length-1][0]
+
+    var x = d3.time.scale().domain([minDate, maxDate]).range([0, w]);
+    var y = d3.scale.linear().domain([0, d3.max(series, function(s) { 
+
+      return d3.max(s.data, function(d){ return d[1]; } )
+
+    })]).range([h, 0]);
+
+    var xAxis = d3.svg.axis()
+      .scale(x)
+      .orient("top")
+      .ticks(6)
+      .tickSize(0)
+      .tickFormat(this.timeFormat());
+
+    var yAxis = d3.svg.axis()
+      .scale(y)
+      .orient("right")
+      .ticks(5)
+      .tickSize(0)
+      .tickFormat(function(d){
+        if(d != 0){
+          return d
+        }
+      });
+
+
+    var line = d3.svg.area()
+      // .interpolate("basis") 
+        // assign the X function to plot our line as we wish
+      .x(function(d, i) {
+        // return the X coordinate where we want to plot this datapoint
+        return x(d[0]); //x(i);
+      })
+      .y(function(d) { 
+        // return the Y coordinate where we want to plot this datapoint
+        return y(d[1]); 
+      });
+
+    //when collection 0 is greater than collection 1
+    var area0 = d3.svg.area()
+      .x(function(d, i) {
+        // return the X coordinate where we want to plot this datapoint
+        return x(d.date); //x(i);
+      })
+      .y0(function(d){
+        if(!d.data1){
+          return y(0)
+        }else if(d.data1 < d.data0){
+          return y(d.data1); 
+        }else{
+          return y(d.data0)
+        } 
+      })
+      .y1(function(d) { 
+        // return the Y coordinate where we want to plot this datapoint
+        return y(d.data0); 
+      });
+
+    //when collection1 is greater than colleciton0
+    var area1 = d3.svg.area()
+      .x(function(d, i) {
+        // return the X coordinate where we want to plot this datapoint
+        return x(d.date); //x(i);
+      })
+      .y0(function(d){
+        if(d.data0 < d.data1){
+          return y(d.data0); 
+        }else{
+          return y(d.data1)
+        }
+      })
+      .y1(function(d) { 
+        // return the Y coordinate where we want to plot this datapoint
+        return y(d.data1); 
+      });
+
+    var graph = d3.select("#graphholder").append("svg:svg")
+      .attr("width", w + margin.right + margin.left)
+      .attr("height", h + margin.top + margin.bottom)
+      .append("svg:g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    var xx = function(e) { return x(e[0]); };
+    var yy = function(e) { return y(e[1]); };
+
+    // Draw Y-axis grid lines
+    // graph.selectAll("line.y")
+    //   .data(y.ticks(5))
+    //   .enter().append("line")
+    //   .attr("class", "y")
+    //   .attr("x1", 0)
+    //   .attr("x2", w)
+    //   .attr("y1", y)
+    //   .attr("y2", y)
+    //   .style("stroke", "rgba(245,245,245,0.2)")
+    //   .style("stroke-dasharray", "10,20");
+
+    
+
+    //rendering areas
+    if(series.length == 1){
+
+      graph.datum(areaData);
+
+      graph.append("path")
+        .attr("d", area0)
+        .attr("class", "area below")
+        .attr("fill", rgbaToString(series[0].color,0.95));
+
+    }else if (series.length == 2) {
+
+      graph.datum(areaData);
+
+      graph.append("path")
+        .attr("d", area0)
+        .attr("class", "area below")
+        .attr("fill", rgbaToString(series[0].color,0.95));
+
+      graph.append("path")
+        .attr("d", area1)
+        .attr("class", "area below")
+        .attr("fill", rgbaToString(series[1].color,0.95));
+
+    }
+
+    for(var i=0; i<series.length; i++){
+      serie = series[i]
+
+      graph.datum(serie.data)
+      
+      graph.append("svg:path")
+        .attr("d", line)
+        .attr("class", "graphline")
+        .attr("stroke", rgbaToString(serie.color,1))
+        .attr("fill", rgbaToString(serie.color,1));
+
+      // console.log(serie)
+      // graph.selectAll("circle"+i)
+      //   .data(serie.data)
+      //   .enter()
+      //   .append("circle")
+      //   .attr("fill", rgbaToString(serie.color,1) )
+      //   .attr("r", 5)
+      //   .attr("cx", xx)
+      //   .attr("cy", yy)
+
+    }
+
+    graph.append('g')
+      .attr('class', 'x-axis')
+      .attr('transform', 'translate(0, ' + h + ')')
+      .call(xAxis);
+
+    // graph.append("g")
+    //   .attr("class", "y-axis")
+    //   .call(yAxis)
+    //   .selectAll('text')
+    //   .attr("y", "-10");
+  },
+});
+
+var BigGraphView = GraphView.extend({
+  el:'div',
+  renderChart: function(series){
+
+    $('#graphholder').empty()
+
+    var areaData = this.formatGraphData(series)
+
+    var margin = {top: 50, right: 0, bottom: 5, left: 0},
+    w = 973 - margin.left - margin.right,
+    h = 400 - margin.top - margin.bottom;
 
     minDate = series[0].data[0][0]
     maxDate = series[0].data[series[0].data.length-1][0]
@@ -1079,7 +1402,7 @@ var NUGraphView = BaseView.extend({
 
     var xAxis = d3.svg.axis()
       .scale(x)
-      .orient("bottom")
+      .orient("top")
       .ticks(7)
       .tickSize(0)
       .tickFormat(this.timeFormat());
@@ -1115,7 +1438,9 @@ var NUGraphView = BaseView.extend({
         return x(d.date); //x(i);
       })
       .y0(function(d){
-        if(d.data1 < d.data0){
+        if(!d.data1){
+          return y(0)
+        }else if(d.data1 < d.data0){
           return y(d.data1); 
         }else{
           return y(d.data0)
@@ -1150,7 +1475,7 @@ var NUGraphView = BaseView.extend({
       .append("svg:g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    var xx = function(e) { return x(e[0]*1000); };
+    var xx = function(e) { return x(e[0]); };
     var yy = function(e) { return y(e[1]); };
 
     // Draw Y-axis grid lines
@@ -1169,6 +1494,13 @@ var NUGraphView = BaseView.extend({
 
     //rendering areas
     if(series.length == 1){
+
+      graph.datum(areaData);
+
+      graph.append("path")
+        .attr("d", area0)
+        .attr("class", "area below")
+        .attr("fill", rgbaToString(series[0].color,0.95));
 
     }else if (series.length == 2) {
 
@@ -1197,11 +1529,12 @@ var NUGraphView = BaseView.extend({
         .attr("stroke", rgbaToString(serie.color,1))
         .attr("fill", rgbaToString(serie.color,1));
 
+      // console.log(serie)
       // graph.selectAll("circle"+i)
       //   .data(serie.data)
       //   .enter()
       //   .append("circle")
-      //   .attr("fill", serie.color)
+      //   .attr("fill", rgbaToString(serie.color,1) )
       //   .attr("r", 5)
       //   .attr("cx", xx)
       //   .attr("cy", yy)
@@ -1218,322 +1551,7 @@ var NUGraphView = BaseView.extend({
     //   .call(yAxis)
     //   .selectAll('text')
     //   .attr("y", "-10");
-
-
   },
-  timeFormat: function(){
-    var formats = [
-      [function(d) { return Date.create(d).format('{MON}') }, function() { return true; }],
-      [function(d) { return Date.create(d).format('{M}/{d}') }, function(d) { return d.getMonth(); }],
-      [function(d) { return Date.create(d).format('{M}/{d}') }, function(d) { return d.getDate() != 1; }],
-      [function(d) { return Date.create(d).format('{DOW}') }, function(d) { return d.getDay() && d.getDate() != 1; }],
-      [function(d) { return Date.create(d).format('{12hr}{tt}') }, function(d) { return d.getHours() && d.getDate(); }],
-      [function(d) { return Date.create(d).relative() }, function(d) { return d.getMinutes(); }],
-      [function(d) { return Date.create(d).relative() }, function(d) { return d.getSeconds(); }],
-      [function(d) { return Date.create(d).relative() }, function(d) { return d.getMilliseconds(); }]
-    ];
-
-    return function(date) {
-      var i = formats.length - 1;
-      var f = formats[i];
-      while (!f[1](date)){
-        f = formats[--i];
-      }
-      console.log(date)
-      return f[0](date)
-    };
-  },
-  formatGraphData: function(series){
-    data = []
-    //for each data point create a chart data object "d"
-    for(var i = 0; i < series[0].data.length; i++){
-      d = {}
-      d.date = series[0].data[i][0]
-      for(var j = 0; j < series.length; j++){
-        datum = series[j].data[i]
-        key = "data"+j
-        d[key] = datum[1]
-      }
-      data.push(d)
-    }
-    return data
-  }
-});
-
-var GraphView = BaseView.extend({
-  el: 'div',
-  initialize: function(graphdata) {
-    this.type = graphdata.type;
-    this.timeperiod = graphdata.range;
-    this.inputdata = graphdata.series;
-    this.unit = graphdata.unit;
-    this.series = undefined;
-    this.template = loadTemplate("/static/views/graph.html");
-
-  },
-  route: function(part) {
-    return{};
-  },
-  render: function() {
-    var that = this;
-
-    var renderedTemplate = this.template();
-    this.$el.html(renderedTemplate);
-
-    this.fetchHistoricalData(function() {
-      console.log("Got all data", that.series);
-      that.organizeHistoricalData();
-      that.renderChart();
-    });
-
-  },
-  fetchHistoricalData: function(callback){    
-    var that = this;
-    
-    this.series = [];
-    var len = this.inputdata.length;
-    var allGraphs = function() {
-      len = len - 1;
-      if (!len) {
-        callback();
-      }
-    };
-
-    $.each(this.inputdata, function(i, inputdata){
-      var clos = (function(j, d) {
-        return function (data) {
-          that.series[j] = {
-            name: inputdata.name,
-            type: 'area',
-            color: rgbaToString(d.color,1),
-            data: data
-          };
-          if (data) {
-            allGraphs();
-          }
-        }
-      })(i, inputdata);
-      that.getHistoricalData(inputdata.collection, clos);
-    });
-  },
-  organizeHistoricalData: function() {
-
-    if(this.type == 'area' && this.series.length >= 2){
-      this.series[0].type = this.series[1].type = 'line';
-      return; // the fancy graphs aren't rendering properly
-      this.line1 = this.series[0].data;
-      this.line2 = this.series[1].data;
-      
-      this.area1 = {
-        type: 'area',
-        color: rgbaToString(this.inputdata[0].color,0.1),
-        data:[]
-      };
-
-      this.area2 = {
-        type: 'area',
-        color: rgbaToString(this.inputdata[0].color,0.1),
-        data:[]
-      };
-
-      this.erase = {
-          id: 'transparent',
-          color: 'rgba(255,255,255,0)',
-          data: []
-      };
-
-      $.each(this.series[0].data, function(i){
-
-        that.area1.data[i] = [];
-        that.area2.data[i] = [];
-        that.erase.data[i] = [];
-
-        //assign x-value
-        that.area1.data[i][0] = that.area2.data[i][0] = that.erase.data[i][0] = that.line1[i][0];
-
-
-        //determine y-value
-        if(that.line2[i][1] <0){
-          that.line2[i][1] = 0;
-        }
-        
-        if(that.line1[i][1] <0){
-          that.line1[i][1] = 0;
-        }
-
-        if(that.line2[i][1] < that.line1[i][1]){
-            that.area1.data[i][1] = that.line1[i][1] - that.line2[i][1];
-            that.area2.data[i][1] = 0;
-            that.erase.data[i][1] = that.line2[i][1];
-        } else {
-            that.area1.data[i][1] = 0;
-            that.area2.data[i][1] = that.line2[i][1] - that.line1[i][1];
-            that.erase.data[i][1] = that.line1[i][1];
-        }
-      });
-
-      this.series.push(this.area1,this.area2,this.erase);
-    }
-  },
-  getHistoricalData:function(collection, callback){
-    var now = Math.round((new Date()).getTime()/1000);
-    
-    switch(this.timeperiod){
-      case 'day':
-        var then = now - 24*60*60;
-        break;
-      case 'week':
-        var then = now - 7*24*60*60;
-        break;
-      case 'month':
-        var then = now - 30*24*60*60;
-        break;
-      default:
-        var then = now - 365*24*60*60;
-    }
-    collection.getHistoricalData(then,now, 100, callback);
-  },
-  renderChart: function(){
-    var that = this;
-    //sometimes the template doesn't render in time 
-    //for this chart to render correctly
-    var container = this.$('#graphholder');
-    this.$el.chart = new Highcharts.Chart({
-      chart: {
-          renderTo: container[0],
-          type: that.type,
-          color: 'rgba(245, 245, 245, 0.2)',
-          backgroundColor:'rgba(255, 255, 255, 0)',
-          marginRight: 0,
-          marginLeft: 0,
-          marginTop: 0,
-          marginBottom: 0
-      },
-      plotOptions: {
-          area: {
-            fillOpacity: 0.4,
-            marker: {
-              symbol: 'circle',
-              radius: 0,
-              enabled:false,
-              fillOpacity: 0
-            },
-            stacking: true,
-            lineWidth: '3px',
-            shadow: false,
-            showInLegend: true        
-          },
-          line: {
-            zIndex: 5
-          },
-          series: {
-            marker: {
-                enabled: false
-            }
-          }
-      },
-      title: {
-        text: '',
-        style: {
-            font: '12px neou'
-         }
-      },
-      tooltip: {
-        enabled:false
-        /*
-        formatter: function() {
-          var date = new Date(this.x);
-          
-          var months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-
-          var year = date.getFullYear();
-          var month = months[date.getMonth()];
-          var day = date.getDate();
-          var hour = date.getHours();
-          var min = date.getMinutes();
-          var sec = date.getSeconds();
-          console.log(this.points)
-          var s = month+' '+day+' '+hour+':'+min + '<br />'+
-          'Production: ' + this.points[0].y.toFixed(0)+ 'kW<br />'+
-          'Consumption: ' + this.points[1].y.toFixed(0) + 'kW'
-          
-          return s;
-        },
-        */
-      },
-      xAxis: {
-        oppposite: true,
-        showFirstLabel: true,
-        lineWidth:0,
-        type: 'datetime',
-        tickPixelInterval: 150,
-        showLastLabel: true,
-        dateTimeLabelFormats: {
-          second: '%H:%M',
-          minute: '%H:%M',
-          hour: '%l%p',
-          day: '%a',
-          week: '%b %e',
-          month: '%b \'%y',
-          year: '%Y'  
-        },
-        labels: {
-            style: {
-              fontFamily: "Lato-thin",
-              fontSize: "20px",
-              color: 'rgba(245, 245, 245, 0.4)',
-              fontWeight: 'bold'
-            },
-            y: -5
-        }
-      },
-      yAxis: {
-        opposite: true,
-        showFirstLabel: false,
-        allowDecimals: false,
-        title: {
-            text: '',
-            style: {
-                color: '#FFF',
-                font: '8px neou'
-            }
-        },
-        labels: {
-          formatter: function(){
-            return this.value + that.unit;
-          },
-          style: {
-              fontFamily: "Lato-thin",
-              fontSize: "20px",
-              color: 'rgba(245, 245, 245, 0.4)',
-              fontWeight: 'bold'
-            },
-          x:-65
-        },
-        gridLineWidth: 1,
-        gridLineColor: 'rgba(245, 245, 245, 0.4)',
-        gridLineDashStyle: 'dash',
-        plotLines: [{
-                value: 0,
-                width: 1
-        }]
-      },
-      legend: {
-        enabled: false
-      },
-      exporting: {
-        enabled: false
-      },
-      credits: {
-        enabled: false
-      },
-      series: that.series,
-    }, function(chart){
-      if(chart.get('transparent'))
-        chart.get('transparent').area.hide();
-    });
-    // console.log(container[0].clientTop);
-  }
 });
 
 var TreeMapView = BaseView.extend({

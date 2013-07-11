@@ -39,7 +39,16 @@
 	height: 75px;
 	width: 75px;
 	opacity: 0.8;
-	-webkit-box-shadow: 0 0 45px #383838;
+	
+	border-width: 0px 5px 5px 0px;
+	/*border-width: 5px 0px 0px 4px;*/
+
+
+	border-style: inset;
+	border-color: rgba(0, 0, 0, 0.2);
+
+	border-left-color: rgba(0, 0, 0, 0.5);
+	border-right-color: rgba(0, 0, 0, 0.5);
 }
 
 .slider{

@@ -19,9 +19,9 @@
 		"name": "Water",
 		"color": [84, 175, 226]
     },
-    "opt": {
-    	"id": "opt",
-		"name": "Optimizer",
+    "graphdata": {
+    	"id": "graphdata",
+		"name": "Data",
 		"color": [150, 111, 150]
     }
 }

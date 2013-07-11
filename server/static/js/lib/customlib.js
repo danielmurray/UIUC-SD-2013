@@ -267,3 +267,71 @@ var rgbToHsl = function(color){
     'l': l
   } 
 }
+
+var historyCollections = function(){
+  return [
+    {
+      id: 'pv',
+      name: 'PV',
+      color: [85,160,85],
+      collection: window.PV
+    },
+    {
+      id: 'pyra',
+      name: 'Sun',
+      color: [170, 184, 26],
+      collection: window.Pyra
+    }, {
+      id: 'power',
+      name: 'Appliances',
+      color: [173, 50, 50],
+      collection: window.Power
+    }, {
+      id: 'flow',
+      name: 'Water',
+      color: [84, 175, 226],
+      collection: window.Flow
+    }, {
+      id: 'temp',
+      name: 'Temp',
+      color: [173, 50, 50],
+      collection: window.Temp
+    }, {
+      id: 'co2',
+      name: 'CO2',
+      color: [150, 111, 150],
+      collection: window.CO2
+    }, {
+      id: 'humid',
+      name: 'Humid',
+      color: [84, 175, 226],
+      collection: window.Humid
+    }
+  ]
+}
+
+var prettyDate = function(timestamp){
+  // create a new javascript Date object based on the timestamp
+  var date = new Date(timestamp);
+  // hours part from the timestamp
+  var hours = date.getHours();
+  // minutes part from the timestamp
+  var minutes = date.getMinutes();
+  // seconds part from the timestamp
+  var seconds = date.getSeconds();
+
+  // will display time in 10:30:23 format
+  var formattedTime = hours + ':' + minutes + ':' + seconds;
+
+  return formattedTime
+}
+
+
+
+
+
+
+
+
+
+
