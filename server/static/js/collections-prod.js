@@ -13,4 +13,5 @@ window.Flow = new FlowCollection();
 window.Windoor = new WindoorCollection();
 window.Power = new PowerCollection();
 
-window.Optimizer = OptimizerCollection();
+window.Optimizer = new OptimizerCollection();
+

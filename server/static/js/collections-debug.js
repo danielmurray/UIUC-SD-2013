@@ -312,3 +312,13 @@ Optimizer.add([
     id: "null",
     }
 ]);
+
+window.HistoryCollections = [
+    window.PV,
+    window.Pyra,
+    window.Power,
+    window.Flow,
+    window.Temp,
+    window.CO2,
+    window.Humid
+]

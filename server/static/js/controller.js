@@ -83,6 +83,9 @@ $(function() {
       //console.log("Path parts", pathParts);
       this.currentPath = pathParts;
      //console.log("Views after displayUrl", this.currentViews);
+    },
+    rerender: function(){
+      return this.displayPart(0, this.rootView, this.currentPath);      
     }
   });
 
@@ -94,6 +97,11 @@ $(function() {
       trigger: !noTrigger
     });
     router.currentPath = str.split("/");
+  };
+
+  window.rerender = function() {
+    //console.log("Navigating to", str, noTrigger);
+    return router.rerender();
   };
 
   // Only fetch non-debug collections

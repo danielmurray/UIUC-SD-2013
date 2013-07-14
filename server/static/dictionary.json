@@ -1,138 +1,186 @@
-{
-  "home":{
-    "en": "etHome",
-    "zh": "内"
+[
+  {
+    "id": "changelanguage",
+    "en": "中文",
+    "zh": "EN"
   },
-  "lights":{
+  {
+    "id":"home",
+    "en": "eth0"
+  },
+  {
+    "id":"lights",
     "en": "Lights",
-    "zh": "内"
+    "zh": "灯火"
   },
-  "hvac":{
+  {
+    "id":"hvac",
     "en": "HVAC",
-    "zh": "hvac"
+    "zh": "内部温度"
   },
-  "windoor":{
+  {
+    "id":"windoor",
     "en": "WinDoors",
-    "zh": "功率"
+    "zh": "门窗"
   },
-  "power":{
+  {
+    "id":"windoorlong",
+    "en": "Windows & Doors",
+    "zh": "门窗"
+  },
+  {
+    "id": "power",
     "en": "Power",
-    "zh": "功率"
+    "zh": "电力"
   },
-  "water":{
+  {
+    "id": "water",
     "en": "Water",
-    "zh": "内"
+    "zh": "用水量"
   },
-  "opt":{
+  {
+    "id": "opt",
     "en": "Optimizer",
-    "zh": "内"
+    "zh": "提示"
   },
-  "media":{
+  {
+    "id": "graphdata",
+    "en": "Data",
+    "zh": "数据"
+  },
+  {
+    "id": "media",
     "en": "media",
     "zh": "内"
   },
-  "on":{
+  {
+    "id": "on",
     "en": "on",
     "zh": "内"
   },
-  "out":{
+  {
+    "id": "out",
     "en": "out",
     "zh": "外"
   },
-  "off":{
+  {
+    "id": "off",
     "en": "off",
     "zh": "内"
   },
-  "kitchen":{
+  {
+    "id": "kitchen",
     "en": "kitchen",
     "zh": "厨房"
   },
-  "kitchenaccent":{
+  {
+    "id": "kitchenaccent",
     "en": "accent",
     "zh": "色灯"
   },
-  "kitchencounter":{
+  {
+    "id": "kitchencounter",
     "en": "counter",
     "zh": "对抗"
   },
-  "kitchentrack":{
+  {
+    "id": "kitchentrack",
     "en": "track",
     "zh": "天花板"
   },
-  "kitchenpendant":{
+  {
+    "id": "kitchenpendant",
     "en": "pendant",
     "zh": "垂饰"
   },
-  "bathroom":{
+  {
+    "id": "bathroom",
     "en": "bathroom",
     "zh": "浴室"
   },
-  "bathroomsconces":{
+  {
+    "id": "bathroomsconces",
     "en": "sconces",
     "zh": "壁灯"
   },
-  "bathroomtrack":{
+  {
+    "id": "bathroomtrack",
     "en": "track",
     "zh": "天花板"
   },
-  "mechanical":{
+  {
+    "id": "mechanical",
     "en": "tobereplaced",
     "zh": "tobereplaced"
   },
-  "washer":{
+  {
+    "id": "washer",
     "en": "tobereplaced",
     "zh": "tobereplaced"
   },
-  "bedroom":{
+  {
+    "id": "bedroom",
     "en": "tobereplaced",
     "zh": "tobereplaced"
   },
-  "bedroomaccent":{
+  {
+    "id": "bedroomaccent",
     "en": "tobereplaced",
     "zh": "tobereplaced"
   },
-  "bedroomsconces":{
+  {
+    "id": "bedroomsconces",
     "en": "tobereplaced",
     "zh": "tobereplaced"
   },
-  "hallway":{
+  {
+    "id": "hallway",
     "en": "tobereplaced",
     "zh": "tobereplaced"
   },
-  "hallwaytrack":{
+  {
+    "id": "hallwaytrack",
     "en": "track",
     "zh": "天花板"
   },
-  "hallwayfixture":{
+  {
+    "id": "hallwayfixture",
     "en": "tobereplaced",
     "zh": "tobereplaced"
   },
-  "livingroom":{
+  {
+    "id": "livingroom",
     "en": "tobereplaced",
     "zh": "tobereplaced"
   },
-  "livingroomaccent":{
+  {
+    "id": "livingroomaccent",
     "en": "tobereplaced",
     "zh": "tobereplaced"
   },
-  "livingroomtrack":{
+  {
+    "id": "livingroomtrack",
     "en": "track",
     "zh": "天花板"
   },
-  "closet":{
+  {
+    "id": "closet",
     "en": "closet",
     "zh": "壁橱"
   },
-  "master":{
+  {
+    "id": "master",
     "en": "tobereplaced",
     "zh": "tobereplaced"
   },
-  "masteraccent":{
+  {
+    "id": "masteraccent",
     "en": "tobereplaced",
     "zh": "tobereplaced"
   },
-  "mastersconces":{
+  {
+    "id": "mastersconces",
     "en": "tobereplaced",
     "zh": "tobereplaced"
   }
-}
+]

@@ -1,17 +1,6 @@
+<link href="/static/css/backgrid.css" rel="stylesheet" type="text/css">
+
 <link href="/static/css/table.css" rel="stylesheet" type="text/css">
-<div class='tablewrapper'>
-	<ul class='tablelist'>
-		<% 
-        _.each(collection.models, function(data,i) {
-        %>
 
-        <li>
-        	<div id='tableEntry<%=i%>' class='datawrapper' >
-        	</div>
-        </li>
 
-        <%
-        });
-        %>
-	</ul>
-</div>
+<div id='grid' class='table'>

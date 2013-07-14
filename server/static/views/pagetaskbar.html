@@ -1,26 +1,5 @@
 <link href="/static/css/pagetaskbar.css" rel="stylesheet" type="text/css">
-<style>
-	.dropdownwrapper{
-		background-color: <%=rgbaToString(color, 1)%>;
-	}
-	.dropdownwrapper.active {
-		background: <%=rgbaToString(color, 1)%>
-	}    
-</style>
-<div class="dropdownholder">
-	<div id="dateselect" class="dropdownwrapper" tabindex="1">
-	    <span><%=range.charAt(0).toUpperCase() + range.slice(1)%></span>
-	    <ul class="dropdown">
-<% 
-	for(var i = 0; i< dates.length; i++){
-%>
-	        <li id= <%=dates[i]%> > <%=dates[i]%></li>
-<%
-	}
-%>
-	    </ul>
-	</div>
-</div>
+
 <div class="taskbar">
 	<div id="statuswrapper" class="statuswrapper">
 	</div>

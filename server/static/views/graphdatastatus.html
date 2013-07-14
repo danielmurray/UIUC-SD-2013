@@ -1,28 +1,16 @@
-<link href="/static/css/taskbarstatus.css" rel="stylesheet" type="text/css">
-<style>
-	.seriesdatalist li{
-		height: <%=taskbarcollapsed + 'px'%>;
-	}
-
-	.seriesdatalist li.selected{
-		height: <%=taskbaropen + 'px'%>;
-	}
-</style>
+<link href="/static/css/graphdatastatus.css" rel="stylesheet" type="text/css">
 <ul class="seriesdatalist">
 <% 
 for( var i=0; i<statusArray.length; i++){
 	statusdata = statusArray[i]
-	selected = (i == accordianselection) ? 'selected' : '';
-	icon = (i == accordianselection) ? '-' : '+';
 %>
 	<style>
 		.seriesdata.<%=statusdata.name%>{
 			background-color: <%=rgbaToString(statusdata.color, 1)%>;
 		}
 
-		.seriesdata.<%=statusdata.name%> .seriesdatatableheader{
-			height: <%=taskbarcollapsed + 'px'%>;
-			width:100%;
+		.seriesdata{
+			width: <%=width + 'px'%>;
 		}
 	</style>
 
@@ -30,9 +18,6 @@ for( var i=0; i<statusArray.length; i++){
 	<li class="seriesdata <%=statusdata.name%> <%=selected%>">
 		<table class="seriesdatatableheader">
 			<tr>
-				<td class='icon'>
-					<%=icon%>
-				</td>
 				<th class='key'>
 					<%=statusdata.title%>
 				</th>

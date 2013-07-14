@@ -267,3 +267,180 @@ var rgbToHsl = function(color){
     'l': l
   } 
 }
+
+var historyCollections = function(){
+  return [
+    {
+      id: 'pv',
+      name: 'PV',
+      color: [85,160,85],
+      collection: window.PV
+    },
+    {
+      id: 'pyra',
+      name: 'Sun',
+      color: [170, 184, 26],
+      collection: window.Pyra
+    }, {
+      id: 'power',
+      name: 'Appliances',
+      color: [173, 50, 50],
+      collection: window.Power
+    }, {
+      id: 'flow',
+      name: 'Water',
+      color: [84, 175, 226],
+      collection: window.Flow
+    }, {
+      id: 'temp',
+      name: 'Temp',
+      color: [173, 50, 50],
+      collection: window.Temp
+    }, {
+      id: 'co2',
+      name: 'CO2',
+      color: [150, 111, 150],
+      collection: window.CO2
+    }, {
+      id: 'humid',
+      name: 'Humid',
+      color: [84, 175, 226],
+      collection: window.Humid
+    }
+  ]
+}
+
+var prettyDate = function(timestamp){
+  // create a new javascript Date object based on the timestamp
+  var date = new Date(timestamp);
+  // hours part from the timestamp
+  var hours = date.getHours();
+  // minutes part from the timestamp
+  var minutes = date.getMinutes();
+  // seconds part from the timestamp
+  var seconds = date.getSeconds();
+
+  // will display time in 10:30:23 format
+  var formattedTime = hours + ':' + minutes + ':' + seconds;
+
+  return formattedTime
+}
+
+var biggestArray = function(arrays){
+
+  var largestArrayIndex = 0; 
+  var largestArrayCount = 0;
+
+  for(var i = 0; i < arrays.length; i++){
+    array = arrays[i]
+    if(array.length > largestArrayCount){
+      largestArrayIndex = i
+    }
+  }
+
+  return arrays[largestArrayIndex]
+}
+
+var zeroedArray = function(size){
+
+  var array = [];
+
+  for(var i=0; i < size; i++){
+    array.push(0);
+  }
+
+  return array
+}
+
+var allCountersLessThanSeries = function(counters, series){
+  // given an array of counters returns true as long as all three
+  // values are less than their corresponding array in the array of 
+  // arrays
+
+
+  if(counters.length != series.length)
+    return false;
+
+  var keepGoing = counters.length;
+
+  for(var i=0; i < counters.length; i++){
+    var counter = counters[i];
+    var serie = series[i];
+
+    var data = serie.data
+
+    if( counter >= data.length){
+      keepGoing--;
+    } 
+  }
+
+  return keepGoing;
+}
+
+var smallestValueAtCounters = function( counters, arrays){
+  // this function will return the smallest value at 
+  // the indices supplied by the counters
+
+  var smallestIndex = Number.MAX_VALUE;
+  var pickedIndex = 0;
+
+  for( var i =0; i < counters.length; i++){
+
+    if( counters[i] < arrays[i].data.length){
+      var valueAtIndex = arrays[i].data[counters[i]][0];
+
+      if(valueAtIndex < smallestIndex){
+        smallestIndex = valueAtIndex;
+        pickedIndex = i;        
+      }
+    }
+
+  }
+
+  return smallestIndex;
+}
+
+var missingPoint = function(timestamp, index, data){
+  // While graphing, there may be instances where one history data
+  // has data for a specific timestamp and the other doesn't
+  // this function computes what it would be by finding the mid point
+  // between the value just before and after the timestamp
+
+
+  var startX, endX, startY, endY;
+
+  startX = endX = data[index][0]
+  startY = endY = data[index][1]
+
+  if( index != 0 ) {
+    startX = data[index-1][0]
+    startY = data[index-1][1] 
+  }
+
+  return calculateMidPoint(timestamp, startX, startY, endX, endY)
+
+}
+
+var calculateMidPoint = function(midX, startX, startY, endX, endY ){
+  //this function is to calculate the mid point between
+  //two x and y coordinates
+
+
+  var deltaTime = endX - startX;
+  var deltaY = 0;
+
+  if( deltaTime != 0 ){
+    var slope = (endY -startY)/deltaTime
+    deltaY = slope * (midX - startX)
+  }
+
+  return startY + deltaY;
+
+}
+
+
+
+
+
+
+

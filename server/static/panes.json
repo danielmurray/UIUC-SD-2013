@@ -4,6 +4,11 @@
 		"name": "Lights",
 		"color": [170, 184, 26]
     },
+    "windoor": {
+        "id": "windoor",
+        "name": "Windoor",
+        "color": [223, 144, 1]
+    },
     "hvac": {
     	"id": "hvac",
 		"name": "HVAC",
@@ -19,9 +24,9 @@
 		"name": "Water",
 		"color": [84, 175, 226]
     },
-    "opt": {
-    	"id": "opt",
-		"name": "Optimizer",
+    "graphdata": {
+    	"id": "graphdata",
+		"name": "Data",
 		"color": [150, 111, 150]
     }
 }

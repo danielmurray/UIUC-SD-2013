@@ -10,6 +10,10 @@
 .pagetitle{
 	float: left;
 	margin-left: 15px;
+	width: 300px;
+
+	overflow-x: hidden;
+	text-overflow: ellipsis;
 }
 
 .home-nav{
@@ -21,7 +25,7 @@
 
 .topbar{
 	float:right;
-	width: 550px;
+	width: 630px;
 }
 
 .main-nav{
@@ -31,15 +35,24 @@
 	height: inherit;
 }
 
-.icon-nav{
-	margin-right: 15px;
+.main-nav li{
+	margin-right: 10px;
 	position: relative;
 	display:inline;
 	float:left;
 	height: 75px;
 	width: 75px;
 	opacity: 0.8;
-	-webkit-box-shadow: 0 0 45px #383838;
+	
+	border-width: 0px 5px 5px 0px;
+	/*border-width: 5px 0px 0px 4px;*/
+
+
+	border-style: inset;
+	border-color: rgba(0, 0, 0, 0.2);
+
+	border-left-color: rgba(0, 0, 0, 0.5);
+	border-right-color: rgba(0, 0, 0, 0.5);
 }
 
 .slider{
@@ -64,12 +77,25 @@
 	opacity: 0;
 }
 
-#shadow{
-	position: absolute;
-	top: 0;
-	left: 0;
-	height:100%;
-	width:100%;
-    background-color: rgba(0,0,0,0.3);
-    display: none;
+.main-nav li#en{
+	background-color: rgb(228, 26, 26);
+}
+
+.main-nav li#zh{
+	background-color: rgb(20, 49, 167);
+}
+
+.main-nav li h2{
+	font-family: 'Lato-bold';
+	color: rgb(228, 228, 228)
+}
+
+.main-nav li#en h2{
+	margin: 15px 0 0 7px;
+	font-size: 30px;
+}
+
+.main-nav li#zh h2{
+	margin: 17px 0 0 13px;
+	font-size: 35px;
 }

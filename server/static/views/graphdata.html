@@ -1,0 +1,84 @@
+<link href="/static/css/graphdata.css" rel="stylesheet" type="text/css">
+
+<div class="dataPickers">
+	<div class='seriesPickerWapper'>
+		<div class="seriesPickerHeaderWrapper">
+			<h3 class="seriesPickerHeader">Pick 2</h3>
+		</div>
+		<div class="collectionPicker">
+			<ul class="collectionList">
+<% 	
+	for(var i = 0; i< collections.length; i++){
+		collection = collections[i]
+		if(selectedcollections.length < 2){
+			selected = 'notselected'
+		}else{
+			selected = 'cantselected'
+		}
+
+		for(var j = 0; j < selectedcollections.length; j++){
+			selectedcollection = selectedcollections[j]
+			if(collection.id == selectedcollection){
+				selected ='selected'
+			}
+		}
+%>
+			<style>
+				.collectionwrapper.<%=collection.id%>.cantselected{
+					background-color: <%=rgbaToString(collection.color,0)%>;
+					display: none;
+				}
+
+				.collectionwrapper.<%=collection.id%>.notselected{
+					background-color: <%=rgbaToString(collection.color,0.5)%>;
+				}
+
+				.collectionwrapper.<%=collection.id%>.selected{
+					background-color: <%=rgbaToString(collection.color,1)%>;
+				}
+			</style>
+				<li id="<%=collection.id%>" class="collectionwrapper <%=collection.id + ' ' + selected%> ">
+					<div class="collectionbutton">
+						<table><tr>
+							<td>
+								<h4><%=collection.name%></h4>
+							</td>
+							<td>
+								<img id="<%=collection.id%>" class="collectionexit" src="static/images/newicons/exit.png"></img>
+							</td>
+						</tr></table>
+					</div>
+				</li>
+<%
+	}
+%>
+			</ul>
+		</div>
+	</div>
+
+	<div class='datePickerWapper'>
+		<div class="dropdownholder">
+			<div id="dateselect" class="dropdownwrapper" tabindex="1">
+			    <span><%=range.charAt(0).toUpperCase() + range.slice(1)%></span>
+			    <ul class="dropdown">
+		<% 
+			for(var i = 0; i< dates.length; i++){
+		%>
+			        <li id= <%=dates[i]%>> <%=dates[i]%></li>
+		<%
+			}
+		%>
+			    </ul>
+			</div>
+		</div>	
+	</div>
+</div>
+
+<div class='dataWrapper'>
+	<div id='graphWrapper' class='graphWrapper'>
+	</div>
+	<div id='collectionStatus' class='collectionStatus'>
+	</div>
+	<div id='collectionPoint'>
+	</div>
+</div>

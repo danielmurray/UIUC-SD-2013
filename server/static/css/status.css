@@ -76,8 +76,8 @@
 
 .middlepanes > div{
 	height: 100%;
-	width: 28%;
-	margin: 0 1% 2% 3%;
+	width: 301px;
+	margin: 0 1% 2% 2%;
 }
 
 .middlepanes .status-box{
@@ -86,7 +86,7 @@
 }
 
 .bottompanes{
-	height: 23%;
+	height: 27%;
 	width: 100%;
 }
 
@@ -96,7 +96,7 @@
 }
 
 .status-pane.opt{
-	width: 95%;
+	width: 965px;
 }
 
 .status-pane.sched{

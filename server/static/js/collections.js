@@ -1,9 +1,17 @@
 // Collection definitions
 var BaseCollection = CollectionWS.extend({
   model: BaseModel,
+  name: 'voldemort',
   _order_by: 'id',
   _descending: 1,
   valueID: 'value',
+  unit: '',
+  logdata: [],
+  min: 0,
+  max: 0,
+  avg: 0,
+  integral: 0,
+  duration: 0,
   comparator: function(device) {
     return this._descending * device.get(this._order_by);
   },
@@ -73,7 +81,7 @@ var BaseCollection = CollectionWS.extend({
 
     return root
   },
-  formatValue: function(value, unit) {
+  abbreviateNumber: function(value){
     metricPrefixArray = [
       '', 
       'k', //kilo
@@ -85,27 +93,56 @@ var BaseCollection = CollectionWS.extend({
       'Z', //zetta
       'Y'  //yotta
     ]
+    
+    PrefixIndex = 0;
+
+    for(var i=0; i < metricPrefixArray.length; i++){
+      smallValue = value / (Math.pow(1000,i))
+      if( smallValue < 1000 ){
+        PrefixIndex = i;
+        break;
+      }
+    }
+
+    return [
+      smallValue.toPrecision(3),
+      metricPrefixArray[PrefixIndex]
+    ]
+
+  },
+  formatValue: function(value) {
+    
+
+    smallValue = this.abbreviateNumber(value)
+
+    return smallValue[0] + ' ' + smallValue[1] + this.unit
+
+  },
+  fakeHistoryData: function(type, field, start, end, period, group, callback) {
+    var arr = [];
+
+    var now = end * 1000;
+    var then = start * 1000;
+    var size = period/4;
+
+    step = (now-then)/size;
+    arr[0] = [];
+    arr[0][0] = then;
+    arr[0][1] = Math.random() * size;
+
+    for(var i=1; i<size; i++){
+      arr[i] = [];
+      arr[i][0] = then + step *i;
+      
+      arr[i][1] = arr[i-1][1] + (Math.random()*5 - 2.5)
+    }
+
+    this.dataAnalytics(arr)
+    callback(arr)
   },
   historyData: function(type, field, start, end, period, group, callback) {
-    // var arr = [];
 
-    // var now = end;
-    // var then = start;
-    // var size = period;
-
-    // step = (now-then)/size;
-    // arr[0] = [];
-    // arr[0][0] = then;
-    // arr[0][1] = Math.random() * size;
-
-    // for(var i=1; i<size; i++){
-    //   arr[i] = [];
-    //   arr[i][0] = then + step *i;
-      
-    //   arr[i][1] = arr[i-1][1] + (Math.random()*5 - 2.5)
-    // }
-
-    // callback(arr)
+  that = this
 
     $.ajax("/history", {
       data: {
@@ -119,6 +156,8 @@ var BaseCollection = CollectionWS.extend({
       async:'true',
       dataType: "json",
       success: function(data) {
+        that.dataAnalytics(data)
+        that.trigger('change')
         callback(data);
       },
       error: function(err) {
@@ -126,11 +165,110 @@ var BaseCollection = CollectionWS.extend({
         callback(undefined);
       }
     });
+  },
+  dataAnalytics: function(data){
+
+    min = max = data[0][1];
+    integral = weightedIntegral = 0;
+    count = data.length;
+
+    start = data[0][0];
+    end = data[count-1][0];
+    duration = end - start;
+    timecollected = 0
+
+    for(var i = 1; i < count; i++){
+
+      datum = data[i];
+      lastdatum = data[i-1];
+
+      nowTimeStamp = datum[0];
+      lastTimeStamp = lastdatum[0];      
+      deltaTime = nowTimeStamp - lastTimeStamp;
+      deltaHours = (nowTimeStamp - lastTimeStamp)/1000/60/60;
+      timecollected += deltaTime
+
+      value = datum[1];
+      lastvalue = lastdatum[1];
+      avgvalue = (value + lastvalue)/2;
+
+      //Is it the smallest?
+      if(value < min)
+        min = value;
+
+      //Is it the largest?
+      if(value > max)
+        max = value;
+
+      integral += deltaTime * avgvalue;
+      weightedIntegral += deltaHours * avgvalue;
+
+      // console.log(prettyDate(nowTimeStamp), value)
+
+    } 
+
+    average = integral/duration;
+
+    this.min = min;
+    this.max = max;
+    this.avg = average;
+    this.integral = weightedIntegral;
+    
+  },
+  dataStatus: function(){
+    return{
+      min: this.min,
+      max: this.max,
+      avg: this.avg,
+      integral: this.integral
+    }
+  },
+  generateCostModel: function(){
+    costmodel = {};
+    costmodel.name = 'Cost';
+    costmodel.title = 'No Cost Function Generated';
+    costmodel.color = [223,144,1];
+    costmodel.value = '';
+    costmodel.subvalues = []
+
+    return costmodel
+  },
+  getSum: function(){
+    //default sum is the average of all models
+    data = this._homeData(this.valueID)
+    return data.sum / data.count;
+  },
+  columns: function(){
+    return [{
+      name: "name",
+      label: "Zone",
+      cell: "string"
+    }, {
+      name: "val",
+      label: "Value",
+      cell: "string",
+    }]
+  },
+  rawData: function(){
+
+    var rawData = []
+    
+    for(var i=0; i < this.models.length; i++){
+      var model = this.models[i]
+      var object = {
+        id: model.get('id'),
+        val: Number(model.get('val')),
+      }
+      rawData.push(object)
+    }
+
+    return rawData
   }
 })
 
 var LightCollection = BaseCollection.extend({
   model: LightModel,
+  name:'lights',
   url: '/light',
   valueID: 'value',
   zoneData: function(zone){
@@ -151,6 +289,7 @@ var LightCollection = BaseCollection.extend({
 
 var HVACCollection = BaseCollection.extend({
   model: HVACModel,
+  name:'hvac',
   url: '/hvac',
   valueID: 'tar_temp',
   getHistoricalData: function(start,end,density,callback) {
@@ -180,11 +319,12 @@ var HVACCollection = BaseCollection.extend({
 
 var TempCollection = BaseCollection.extend({
   model: SensorModel,
+  name:'temp',
   url: '/temp',
   valueID: 'value',
   getHistoricalData: function(start,end,density,callback) {
     
-    this.historyData("temp", "val", start, end, density, "avg", callback);
+    this.fakeHistoryData("temp", "val", start, end, density, "avg", callback);
 
   },
   avgTemp: function() {
@@ -200,6 +340,7 @@ var TempCollection = BaseCollection.extend({
 
 var WindoorCollection = BaseCollection.extend({
   model: SensorModel,
+  name:'windoor',
   url: '/windoor',
   valueID: 'value',
   zoneData: function(zone){
@@ -220,8 +361,11 @@ var WindoorCollection = BaseCollection.extend({
 
 var PowerCollection = BaseCollection.extend({
   model: SensorModel,
+  name:'power',
   url: '/power',
   valueID: 'power',
+  unit: 'W',
+  rate: 0.0008,
   getHistoricalData: function(start,end,density,callback) {
     
     this.historyData("power", "power", start, end, density, "sum", callback);
@@ -240,13 +384,125 @@ var PowerCollection = BaseCollection.extend({
       unit
     ]
     
+  },
+  generateCostModel: function(range){
+    
+    production = window.PV.dataStatus().integral / 1000;
+    consumption = this.integral / 1000;
+    net = production - consumption
+    cost = (net * this.rate).toFixed(2)
+
+    if( cost > 0 ){
+      title = 'Energy Sold';
+      color = [85, 160, 85];
+      value = '¥' + Math.abs(cost);
+    }else{
+      title = 'Energy Paid';
+      color = [173, 50, 50];
+      value = '¥' + Math.abs(cost);
+    }
+    
+    costmodel = {};
+    costmodel.name = 'Cost';
+    costmodel.title = title;
+    costmodel.color = color;
+    costmodel.value = value;
+    costmodel.subvalues = []
+
+    p = {
+      key: range + 'production',
+      value: this.formatValue(production) + 'h'
+    };
+    c = {
+      key: range + 'consumption',
+      value: this.formatValue(consumption) + 'h'
+    }
+    n = {
+      key: range + 'net',
+      value: this.formatValue(net) + 'h'
+    }
+    costmodel.subvalues.push(p, c, n)
+
+    return costmodel
+  },
+  columns: function(){
+    that = this
+
+    var powerformatter = Backgrid.CellFormatter = function () {};
+    var energyformatter = Backgrid.CellFormatter = function () {};
+    var energywsformatter = Backgrid.CellFormatter = function () {};
+
+    _.extend(powerformatter.prototype, {
+      fromRaw: function (rawData) {
+        number = that.abbreviateNumber(rawData)
+        return number[0] + ' ' + number[1] + 'W' ;
+      }
+    })
+
+    _.extend(energyformatter.prototype, {
+      fromRaw: function (rawData) {
+        number = that.abbreviateNumber(rawData)
+        return number[0] + ' ' + number[1] + 'Wh' ;
+      }
+    })
+
+    _.extend(energywsformatter.prototype, {
+      fromRaw: function (rawData) {
+        number = that.abbreviateNumber(rawData)
+        return number[0] + ' ' + number[1] + 'Ws' ;
+      }
+    })
+
+    return [{
+      name: "id",
+      label: "ID",
+      cell: "string"
+    },{
+      editable: false,
+      name: "power",
+      label: "Power",
+      cell: "number",
+      formatter: powerformatter
+    },{
+      editable: false,
+      name: "energy",
+      label: "Energy",
+      cell: "number",
+      formatter: energyformatter
+    },{
+      editable: false,
+      name: "energyWs",
+      label: "Watt Seconds",
+      cell: "number",
+      formatter: energywsformatter
+    }]
+  },
+  rawData: function(){
+
+    var rawData = []
+    
+    for(var i=0; i < this.models.length; i++){
+      var model = this.models[i]
+      var object = {
+        id: model.get('id'),
+        power: Number(model.get('power')),
+        energy: Number(model.get('energy')),
+        energyWs: Number(model.get('energyWs')),
+      }
+      rawData.push(object)
+    }
+
+    return rawData
   }
 });
 
 var PVCollection = BaseCollection.extend({
   model: PVModel,
+  name:'pv',
   url: '/pv',
   valueID: 'power',
+  unit: 'W',
+  rate: 0.0008,
   getHistoricalData: function(start,end,density,callback) {
     
     this.historyData("pv", "power", start, end, density, "sum", callback);
@@ -258,23 +514,131 @@ var PVCollection = BaseCollection.extend({
   zoneData: function(zone){
     
     value = this._homeData(this.valueID, zone).sum
-    unit = 'W'
 
     return [
       value,
-      unit
+      this.unit
     ]
     
+  },
+  generateCostModel: function(range){
+    
+    production = this.integral / 1000;
+    consumption = window.Power.dataStatus().integral / 1000;
+    net = production - consumption
+    cost = (net * this.rate).toFixed(2)
+
+    if( cost > 0 ){
+      title = 'Energy Sold';
+      color = [85, 160, 85];
+      value = '¥' + Math.abs(cost);
+    }else{
+      title = 'Energy Paid';
+      color = [173, 50, 50];
+      value = '¥' + Math.abs(cost);
+    }
+    
+    costmodel = {};
+    costmodel.name = 'Cost';
+    costmodel.title = title;
+    costmodel.color = color;
+    costmodel.value = value;
+    costmodel.subvalues = []
+
+    p = {
+      key: range + 'production',
+      value: this.formatValue(production) + 'h'
+    };
+    c = {
+      key: range + 'consumption',
+      value: this.formatValue(consumption) + 'h'
+    }
+    n = {
+      key: range + 'net',
+      value: this.formatValue(net) + 'h'
+    }
+    costmodel.subvalues.push(p, c, n)
+
+    return costmodel
+  },
+  columns: function(){
+    that = this
+    
+    var powerformatter = Backgrid.CellFormatter = function () {};
+    var tempformatter = Backgrid.CellFormatter = function () {};
+    var voltageformatter = Backgrid.CellFormatter = function () {};
+
+    _.extend(powerformatter.prototype, {
+      fromRaw: function (rawData) {
+        number = that.abbreviateNumber(rawData)
+        return number[0] + ' ' + number[1] + 'W' ;
+      }
+    })
+
+    _.extend(tempformatter.prototype, {
+      fromRaw: function (rawData) {
+        return rawData +  ' °C' ;
+      }
+    })
+
+    _.extend(voltageformatter.prototype, {
+      fromRaw: function (rawData) {
+        return rawData + 'V' ;
+      }
+    })
+
+    return [{
+      name: "id",
+      label: "ID",
+      cell: "string"
+    }, {
+      editable: false,
+      name: "power",
+      label: "Power",
+      cell: "number",
+      formatter: powerformatter
+    }, {
+      editable: false,
+      name: "temp",
+      label: "Temp",
+      cell: "number",
+      formatter: tempformatter
+    }, {
+      editable: false,
+      name: "voltage",
+      label: "Voltage",
+      cell: "number",
+      formatter: voltageformatter
+    }]
+  },
+  rawData: function(){
+
+    var rawData = []
+    
+    for(var i=0; i < this.models.length; i++){
+      var model = this.models[i]
+      var object = {
+        id: model.get('id'),
+        power: Number(model.get('power')),
+        temp: Number(model.get('temp')),
+        voltage: Number(model.get('voltage'))
+      }
+      rawData.push(object)
+    }
+
+    return rawData
   }
 });
 
 var FlowCollection = BaseCollection.extend({
   model: SensorModel,
+  name:'water',
   url: '/flow',
   valueID: 'val',
+  unit: 'L/s',
   getHistoricalData: function(start,end,density,callback) {
     
-    this.historyData("flow", "val", start, end, density, "sum", callback);
+    this.fakeHistoryData("flow", "val", start, end, density, "sum", callback);
 
   },
   getSum: function(){
@@ -283,7 +647,6 @@ var FlowCollection = BaseCollection.extend({
   zoneData: function(zone){
     
     value = this._homeData(this.valueID, zone) 
-    unit = 'L'
 
     return [
       value,
@@ -293,23 +656,42 @@ var FlowCollection = BaseCollection.extend({
   }
 });
 
-var PyraCollection = CollectionWS.extend({
+var PyraCollection = BaseCollection.extend({
   model: SensorModel,
-  url: '/pyra'
+  name:'sun',
+  url: '/pyra',
+  getHistoricalData: function(start,end,density,callback) {
+    
+    this.fakeHistoryData("value", "val", start, end, density, "avg", callback);
+
+  }
 });
 
-var HumidCollection = CollectionWS.extend({
+var HumidCollection = BaseCollection.extend({
   model: SensorModel,
-  url: '/humid'
+  name:'humid',
+  url: '/humid',
+  getHistoricalData: function(start,end,density,callback) {
+    
+    this.fakeHistoryData("value", "val", start, end, density, "avg", callback);
+
+  }
 });
 
 var Co2Collection = BaseCollection.extend({
   model: SensorModel,
-  url: '/co2'
+  name:'co2',
+  url: '/co2',
+  getHistoricalData: function(start,end,density,callback) {
+    
+    this.fakeHistoryData("value", "val", start, end, density, "avg", callback);
+
+  }
 });
 
 var OptimizerCollection = CollectionWS.extend({
   model: AlertModel,
+  name:'optimizer',
   url: '/optimizer',
   // initialize: function(collections){
   //    this.collections = collections;
