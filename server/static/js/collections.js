@@ -98,14 +98,14 @@ var BaseCollection = CollectionWS.extend({
 
     for(var i=0; i < metricPrefixArray.length; i++){
       smallValue = value / (Math.pow(1000,i))
-      if( smallValue < 10 ){
+      if( smallValue < 1000 ){
         PrefixIndex = i;
         break;
       }
     }
 
     return [
-      smallValue.toFixed(1),
+      smallValue.toPrecision(3),
       metricPrefixArray[PrefixIndex]
     ]
 
@@ -157,6 +157,7 @@ var BaseCollection = CollectionWS.extend({
       dataType: "json",
       success: function(data) {
         that.dataAnalytics(data)
+        that.trigger('change')
         callback(data);
       },
       error: function(err) {
@@ -174,7 +175,8 @@ var BaseCollection = CollectionWS.extend({
     start = data[0][0];
     end = data[count-1][0];
     duration = end - start;
-    
+    timecollected = 0
+
     for(var i = 1; i < count; i++){
 
       datum = data[i];
@@ -184,6 +186,7 @@ var BaseCollection = CollectionWS.extend({
       lastTimeStamp = lastdatum[0];      
       deltaTime = nowTimeStamp - lastTimeStamp;
       deltaHours = (nowTimeStamp - lastTimeStamp)/1000/60/60;
+      timecollected += deltaTime
 
       value = datum[1];
       lastvalue = lastdatum[1];
@@ -223,26 +226,43 @@ var BaseCollection = CollectionWS.extend({
   generateCostModel: function(){
     costmodel = {};
     costmodel.name = 'Cost';
-    costmodel.title = 'Cost';
+    costmodel.title = 'No Cost Function Generated';
     costmodel.color = [223,144,1];
-    costmodel.value = Math.floor(Math.random() * 100);
+    costmodel.value = '';
     costmodel.subvalues = []
 
-    minimum = {
-      key: range + 'production',
-      value: costmodel.value * Math.random()
-    };
-    maximum = {
-      key: range + 'consumption',
-      value: costmodel.value * (Math.random()+1)
-    }
-    average = {
-      key: range + 'net',
-      value: costmodel.value * (Math.random()+1)
-    }
-    costmodel.subvalues.push(minimum, maximum, average)
-
     return costmodel
+  },
+  getSum: function(){
+    //default sum is the average of all models
+    data = this._homeData(this.valueID)
+    return data.sum / data.count;
+  },
+  columns: function(){
+    return [{
+      name: "name",
+      label: "Zone",
+      cell: "string"
+    }, {
+      name: "val",
+      label: "Value",
+      cell: "string",
+    }]
+  },
+  rawData: function(){
+
+    var rawData = []
+    
+    for(var i=0; i < this.models.length; i++){
+      var model = this.models[i]
+      var object = {
+        id: model.get('id'),
+        val: Number(model.get('val')),
+      }
+      rawData.push(object)
+    }
+
+    return rawData
   }
 })
 
@@ -345,7 +365,7 @@ var PowerCollection = BaseCollection.extend({
   url: '/power',
   valueID: 'power',
   unit: 'W',
-  rate: 0.8,
+  rate: 0.0008,
   getHistoricalData: function(start,end,density,callback) {
     
     this.historyData("power", "power", start, end, density, "sum", callback);
@@ -369,31 +389,110 @@ var PowerCollection = BaseCollection.extend({
     
     production = window.PV.dataStatus().integral / 1000;
     consumption = this.integral / 1000;
-    net = production - consumption;
-    cost = Math.round(net * this.rate)
+    net = production - consumption
+    cost = (net * this.rate).toFixed(2)
 
+    if( cost > 0 ){
+      title = 'Energy Sold';
+      color = [85, 160, 85];
+      value = '¥' + Math.abs(cost);
+    }else{
+      title = 'Energy Paid';
+      color = [173, 50, 50];
+      value = '¥' + Math.abs(cost);
+    }
+    
     costmodel = {};
     costmodel.name = 'Cost';
-    costmodel.title = 'Energy Cost';
-    costmodel.color = [223,144,1];
-    costmodel.value = cost +  '¥';
+    costmodel.title = title;
+    costmodel.color = color;
+    costmodel.value = value;
     costmodel.subvalues = []
 
     p = {
       key: range + 'production',
-      value: production
+      value: this.formatValue(production) + 'h'
     };
     c = {
       key: range + 'consumption',
-      value: consumption
+      value: this.formatValue(consumption) + 'h'
     }
     n = {
       key: range + 'net',
-      value: net
+      value: this.formatValue(net) + 'h'
     }
     costmodel.subvalues.push(p, c, n)
 
     return costmodel
+  },
+  columns: function(){
+    that = this
+
+    var powerformatter = Backgrid.CellFormatter = function () {};
+    var energyformatter = Backgrid.CellFormatter = function () {};
+    var energywsformatter = Backgrid.CellFormatter = function () {};
+
+    _.extend(powerformatter.prototype, {
+      fromRaw: function (rawData) {
+        number = that.abbreviateNumber(rawData)
+        return number[0] + ' ' + number[1] + 'W' ;
+      }
+    })
+
+    _.extend(energyformatter.prototype, {
+      fromRaw: function (rawData) {
+        number = that.abbreviateNumber(rawData)
+        return number[0] + ' ' + number[1] + 'Wh' ;
+      }
+    })
+
+    _.extend(energywsformatter.prototype, {
+      fromRaw: function (rawData) {
+        number = that.abbreviateNumber(rawData)
+        return number[0] + ' ' + number[1] + 'Ws' ;
+      }
+    })
+
+    return [{
+      name: "id",
+      label: "ID",
+      cell: "string"
+    },{
+      editable: false,
+      name: "power",
+      label: "Power",
+      cell: "number",
+      formatter: powerformatter
+    },{
+      editable: false,
+      name: "energy",
+      label: "Energy",
+      cell: "number",
+      formatter: energyformatter
+    },{
+      editable: false,
+      name: "energyWs",
+      label: "Watt Seconds",
+      cell: "number",
+      formatter: energywsformatter
+    }]
+  },
+  rawData: function(){
+
+    var rawData = []
+    
+    for(var i=0; i < this.models.length; i++){
+      var model = this.models[i]
+      var object = {
+        id: model.get('id'),
+        power: Number(model.get('power')),
+        energy: Number(model.get('energy')),
+        energyWs: Number(model.get('energyWs')),
+      }
+      rawData.push(object)
+    }
+
+    return rawData
   }
 });
 
@@ -403,7 +502,7 @@ var PVCollection = BaseCollection.extend({
   url: '/pv',
   valueID: 'power',
   unit: 'W',
-  rate: 0.8,
+  rate: 0.0008,
   getHistoricalData: function(start,end,density,callback) {
     
     this.historyData("pv", "power", start, end, density, "sum", callback);
@@ -430,16 +529,18 @@ var PVCollection = BaseCollection.extend({
     cost = (net * this.rate).toFixed(2)
 
     if( cost > 0 ){
+      title = 'Energy Sold';
       color = [85, 160, 85];
-      value = '+ ¥' + Math.abs(cost);
+      value = '¥' + Math.abs(cost);
     }else{
+      title = 'Energy Paid';
       color = [173, 50, 50];
-      value = '- ¥' + Math.abs(cost);
+      value = '¥' + Math.abs(cost);
     }
     
     costmodel = {};
     costmodel.name = 'Cost';
-    costmodel.title = 'Energy Cost';
+    costmodel.title = title;
     costmodel.color = color;
     costmodel.value = value;
     costmodel.subvalues = []
@@ -459,6 +560,73 @@ var PVCollection = BaseCollection.extend({
     costmodel.subvalues.push(p, c, n)
 
     return costmodel
+  },
+  columns: function(){
+    that = this
+    
+    var powerformatter = Backgrid.CellFormatter = function () {};
+    var tempformatter = Backgrid.CellFormatter = function () {};
+    var voltageformatter = Backgrid.CellFormatter = function () {};
+
+    _.extend(powerformatter.prototype, {
+      fromRaw: function (rawData) {
+        number = that.abbreviateNumber(rawData)
+        return number[0] + ' ' + number[1] + 'W' ;
+      }
+    })
+
+    _.extend(tempformatter.prototype, {
+      fromRaw: function (rawData) {
+        return rawData +  ' °C' ;
+      }
+    })
+
+    _.extend(voltageformatter.prototype, {
+      fromRaw: function (rawData) {
+        return rawData + 'V' ;
+      }
+    })
+
+    return [{
+      name: "id",
+      label: "ID",
+      cell: "string"
+    }, {
+      editable: false,
+      name: "power",
+      label: "Power",
+      cell: "number",
+      formatter: powerformatter
+    }, {
+      editable: false,
+      name: "temp",
+      label: "Temp",
+      cell: "number",
+      formatter: tempformatter
+    }, {
+      editable: false,
+      name: "voltage",
+      label: "Voltage",
+      cell: "number",
+      formatter: voltageformatter
+    }]
+  },
+  rawData: function(){
+
+    var rawData = []
+    
+    for(var i=0; i < this.models.length; i++){
+      var model = this.models[i]
+      var object = {
+        id: model.get('id'),
+        power: Number(model.get('power')),
+        temp: Number(model.get('temp')),
+        voltage: Number(model.get('voltage'))
+      }
+      rawData.push(object)
+    }
+
+    return rawData
   }
 });
 

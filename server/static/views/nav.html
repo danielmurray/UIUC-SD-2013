@@ -1,4 +1,5 @@
 <link href="/static/css/nav.css" rel="stylesheet" type="text/css">
+<% dictionary = window.Dictionary %>
 <style>
 	.pagetitle{
 		color: <%=rgbaToString(currpane.color,1)%>;
@@ -6,12 +7,13 @@
 </style>
 <div id="topbar-wrapper">
 	<img class="nav-button home-nav home" src="/static/images/logo.png">
-	<h1 class='pagetitle'><%= currpane.name %> </h1>
+	<h1 class='pagetitle'><%= dictionary.key(currpane.id) %> </h1>
 	<div class="topbar">
 		<ul class="main-nav">
 
 <%
 _.each(panes, function(pane){
+	console.log(currpane.id)
 %>
 
  <style type="text/css">
@@ -30,11 +32,14 @@ _.each(panes, function(pane){
 <%
 });
 %>	
+			<li id=<%= dictionary.currentLanguage()%> class="languageswitch" >
+				<h2> <%= dictionary.key('changelanguage') %> </h2>
+			</li>
+
 		</ul>
+
 	</div>
 </div>
 
 <div id="dashboard-wrapper">
-</div>
-<div id = "shadow">
 </div>

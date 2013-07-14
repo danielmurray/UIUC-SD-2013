@@ -170,4 +170,8 @@ input[type="date"] {
 	background-color: rgba(0,15,30,0.8);
 }
 
+.collectionStatus{
+	height: 200px;
+	margin: 10px 0 0 0;
+}
 

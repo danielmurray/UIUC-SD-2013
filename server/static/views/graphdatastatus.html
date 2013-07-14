@@ -1,0 +1,51 @@
+<link href="/static/css/graphdatastatus.css" rel="stylesheet" type="text/css">
+<ul class="seriesdatalist">
+<% 
+for( var i=0; i<statusArray.length; i++){
+	statusdata = statusArray[i]
+%>
+	<style>
+		.seriesdata.<%=statusdata.name%>{
+			background-color: <%=rgbaToString(statusdata.color, 1)%>;
+		}
+
+		.seriesdata{
+			width: <%=width + 'px'%>;
+		}
+	</style>
+
+
+	<li class="seriesdata <%=statusdata.name%> <%=selected%>">
+		<table class="seriesdatatableheader">
+			<tr>
+				<th class='key'>
+					<%=statusdata.title%>
+				</th>
+				<th class='value'>
+					<%=statusdata.value%>
+				</th>
+			</tr>
+		</table>
+		<table class="seriesdatatable">
+	<% 
+	for( var j=0; j<statusdata.subvalues.length; j++){
+		subvalue = statusdata.subvalues[j]
+	%>
+
+			<tr class='seriesdatatablerow'>
+				<td class='key'>
+					<%=subvalue.key%>
+				</td>
+				<td class='value'>
+					<%=subvalue.value%>
+				</td>
+			</tr>
+	<% 
+	}
+	%>
+		</table>
+	</li>
+<%
+}
+%>
+</ul>

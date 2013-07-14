@@ -1,0 +1,30 @@
+.seriesdatalist{
+
+}
+
+.seriesdata{
+	display: inline;
+	float: left;
+	height: 200px;
+
+	margin: 0 10px 0 0;
+}
+
+.seriesdatalist li:last-child{
+	margin: 0 0 0 0;
+}
+
+.seriesdatatableheader{
+	width: 95%;
+	font-size: 35px;
+}
+
+.seriesdatatable{
+	width: 95%;
+	font-size: 20px;
+
+}
+
+.seriesdata .value{
+	text-align: right;
+}

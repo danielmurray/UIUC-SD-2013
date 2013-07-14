@@ -1,9 +1,10 @@
 <link href="/static/css/status.css" rel="stylesheet" type="text/css">
+<% dictionary = window.Dictionary %>
 <div class='dashboard'>
  			<div class='home-status-wrapper'>
          		<div class='toppanes'>
          			<div class='nav-button status-pane lights'>
-         				<h2>Lights</h2>
+         				<h2><%= dictionary.key('lights') %></h2>
          				<div class="status-box">
          					<h4>
          						<span class='data'><%=Lights.homeData()%></span><br />
@@ -12,7 +13,7 @@
          				</div>
          			</div>
          			<div class='nav-button status-pane hvac'>
-         				<h2>HVAC</h2>
+         				<h2><%= dictionary.key('hvac') %></h2>
          				<div class="status-box">
          					<h4>
          						<span class='notdata'>Inside</span><br />
@@ -29,7 +30,7 @@
          		</div>
          		<div class='middlepanes'>
          			<div class='nav-button status-pane windoor'>
-         				<h2>Windows & Doors</h2>
+         				<h2><%= dictionary.key('windoorlong') %></h2>
                      <div class="status-box">
                         <h4>
                            <span class='data'><%=Windoor.homeData()%></span><br />
@@ -38,7 +39,7 @@
                      </div>
          			</div>
          			<div class='nav-button status-pane power'>
-         				<h2>Power</h2>
+         				<h2><%= dictionary.key('power') %></h2>
          				<div class="status-box">
          					<h4>
                     <span class='notdata'>consumption</span><br />
@@ -53,7 +54,7 @@
          				</div>
          			</div>
          			<div class='nav-button status-pane water'>
-         				<h2>Water</h2>
+         				<h2><%= dictionary.key('water') %></h2>
          				<div class="status-box">
          					<h4>
          						<!--
@@ -67,7 +68,7 @@
          		</div>
          		<div class='bottompanes'>
          			<div class='nav-button status-pane opt'>
-         				<h2>Optimizer</h2>
+         				<h2><%= dictionary.key('opt') %></h2>
          				<!-- <ul class='tips'>
          					<li class='tip-box'>
          						<div class='just-the-tip'>

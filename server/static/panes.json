@@ -4,6 +4,11 @@
 		"name": "Lights",
 		"color": [170, 184, 26]
     },
+    "windoor": {
+        "id": "windoor",
+        "name": "Windoor",
+        "color": [223, 144, 1]
+    },
     "hvac": {
     	"id": "hvac",
 		"name": "HVAC",

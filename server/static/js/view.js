@@ -31,7 +31,8 @@ var BaseView = Backbone.View.extend({
 var HomeView = BaseView.extend({
   el: "#viewport",
   events: {
-    "click .nav-button":  "navigateTo"
+    "click .nav-button":  "navigateTo",
+    "click .languageswitch":  "switchLanguage",
   },
   initialize: function() {
     //IMPORTANT LINE OF CODE 
@@ -42,14 +43,16 @@ var HomeView = BaseView.extend({
     var data = loadData("/static/panes.json");
     this.panes = JSON.parse(data);
     this.currpane = 'home'
+
+    this.dictionary = window.Dictionary;
     
   },
   route: function(part, remaining) {
     
     if (!part) {
-      navigate("home", true); // don't trigger nav inside route
+      navigate("home", false); // don't trigger nav inside route
     }
-  
+
     //id to view map
     var viewMap = {
       'home' : StatusView,
@@ -122,6 +125,22 @@ var HomeView = BaseView.extend({
     if(this.currentpane.id != next){
       navigate(next, false); 
     }
+  },
+  switchLanguage: function(click){
+
+    var currentLanguage = click.currentTarget.id;
+    
+    var nextLanguage;
+
+    if(currentLanguage == 'en'){
+      nextLanguage = 'zh';
+    }else{
+      nextLanguage = 'en';
+    }
+
+    this.dictionary.changeLanguage(nextLanguage)
+
+    rerender();
   }
 });
 
@@ -189,7 +208,12 @@ var LightingView = PageView.extend({
   },
   route: function(part) {
 
-    floorplanview = new FloorPlanView({collection: this.collection});
+    floorplanview = new FloorPlanView({
+      collection: this.collection,
+      height: 620,
+      width: 973
+    });
+
     floorplanview.on('zoneselect', function(zone){
       navigate("lights/"+ zone , false)
     });
@@ -233,7 +257,12 @@ var WindoorView = PageView.extend({
   },
   route: function(part) {
 
-    floorplanview = new FloorPlanView({collection: this.collection});
+    floorplanview = new FloorPlanView({
+      collection: this.collection,
+      height: 620,
+      width: 973
+    });
+
     floorplanview.on('zoneselect', function(zone){
       navigate("windoor/"+ zone , false)
     });
@@ -242,27 +271,6 @@ var WindoorView = PageView.extend({
       "#floorplanwrapper" : floorplanview
     };
 
-    /*
-    if(!part || part == 'home'){
-      floorplanview = new FloorPlanView(this.collection);
-      return{
-        "#floorplanwrapper" : floorplanview
-      };
-    }else{
-      floorplanview = new FloorPlanView(this.collection);
-
-      data = {}
-      data['id'] = part;
-      data.lights = this.collection.getLightsByZone(part);
-
-      //TO DO add detail view
-      //lightcontrolview = new LightControlView(data);
-      return{
-        "#floorplanwrapper" : floorplanview
-        //,"#overlaywrapper" : lightcontrolview
-      };
-    }
-    */
   },
   render: function() {
     PageView.prototype.render.apply(this);
@@ -353,7 +361,7 @@ var LightControlView = BaseView.extend({
     this.renderZoneDimmer();
     $('#shadow').css('display', 'block')
 
-    $('#shadow').click(function(e){  
+    $('.overlay').click(function(e){  
       if( e.target !== this ) 
         return;
       else
@@ -519,7 +527,7 @@ var PowerView = PageView.extend({
     consumptiondatabox = new DataBox({
       id: 'Consumption',
       color: [173,50,50],
-      databoxcontent: 'graphic',
+      databoxcontent: 'table',
       collection: this.collection[1],
       subviews: {
         graphic: {
@@ -840,6 +848,12 @@ var GraphDataView = PageView.extend({
       this.selectedcollections.push(request[i])
     }
 
+    graphstatus = new GraphDataStatus({
+      collections: this.acquirecollections(this.selectedcollections),
+      range: this.range
+    }); 
+
+
     graph = new BigGraphView({
       type:'area',
       range: this.range,
@@ -848,6 +862,7 @@ var GraphDataView = PageView.extend({
     });
 
     return {
+      '#collectionStatus': graphstatus,
       '#graphWrapper': graph
     }
 
@@ -970,22 +985,8 @@ var PageTaskBar = BaseView.extend({
   }
 });
 
-var TaskBarStatus = BaseView.extend({
+var HistoryStatus = BaseView.extend({
   el: 'div',
-  events: {
-    "click .seriesdatalist li":  "accordianselect"
-  },
-  initialize: function(data) {
-    this.template = loadTemplate("/static/views/taskbarstatus.html");
-    this.collections = data.collections;
-    this.range = data.range
-
-    var height = 172;
-    var width = 282;
-    this.taskbarcollapsed = (2*height/3)/(this.collections.length + 1);
-    this.taskbaropen = height - this.collections.length * this.taskbarcollapsed
-    this.accordionselection = this.collections.length;
-  },
   route: function(part) {
     for( var i=0; i<this.collections.length; i++){
       collection = this.collections[i]
@@ -993,28 +994,6 @@ var TaskBarStatus = BaseView.extend({
     }
 
     return {}
-  },
-  render: function() {
-    console.log('rendered this time')
-    var statusArray = this.statusdata();
-    var renderedTemplate = this.template({ 
-      statusArray: statusArray, 
-      taskbarcollapsed: this.taskbarcollapsed,
-      taskbaropen: this.taskbaropen,  
-      accordianselection: this.accordionselection 
-    });
-    this.$el.html(renderedTemplate);
-  },
-  accordianselect: function(click){
-    $('.seriesdatalist li').removeClass('selected')
-    $('.seriesdatalist li .icon').text('+')
-    
-    //selected li index
-    this.accordionselection = $('.seriesdatalist li').index(click.currentTarget)
-    
-    $(click.currentTarget).addClass('selected')
-    $(click.currentTarget).find('.icon').text('-')
-
   },
   statusdata:function(){
     statusarray = [];
@@ -1027,7 +1006,7 @@ var TaskBarStatus = BaseView.extend({
       statusmodel.name = collection.name;
       statusmodel.title = collection.name;
       statusmodel.color = collection.color;
-      statusmodel.value = collection.collection.getSum();
+      statusmodel.value = collection.collection.formatValue(collection.collection.getSum());
       statusmodel.subvalues = []
 
       statusData = collection.collection.dataStatus();
@@ -1054,6 +1033,65 @@ var TaskBarStatus = BaseView.extend({
     return statusarray
   }
 });
+
+var TaskBarStatus = HistoryStatus.extend({
+  el: 'div',
+  events: {
+    "click .seriesdatalist li":  "accordianselect"
+  },
+  initialize: function(data) {
+    this.template = loadTemplate("/static/views/taskbarstatus.html");
+    this.collections = data.collections;
+    this.range = data.range
+
+    var height = 172;
+    var width = 282;
+    this.taskbarcollapsed = (2*height/3)/(this.collections.length + 1);
+    this.taskbaropen = height - this.collections.length * this.taskbarcollapsed
+    this.accordionselection = this.collections.length;
+  },
+  render: function() {
+    var statusArray = this.statusdata();
+    var renderedTemplate = this.template({ 
+      statusArray: statusArray, 
+      taskbarcollapsed: this.taskbarcollapsed,
+      taskbaropen: this.taskbaropen,  
+      accordianselection: this.accordionselection 
+    });
+    this.$el.html(renderedTemplate);
+  },
+  accordianselect: function(click){
+    $('.seriesdatalist li').removeClass('selected')
+    $('.seriesdatalist li .icon').text('+')
+    
+    //selected li index
+    this.accordionselection = $('.seriesdatalist li').index(click.currentTarget)
+    
+    $(click.currentTarget).addClass('selected')
+    $(click.currentTarget).find('.icon').text('-')
+
+  }
+});
+
+var GraphDataStatus = HistoryStatus.extend({
+  el: 'div',
+  initialize: function(data) {
+    this.template = loadTemplate("/static/views/graphdatastatus.html");
+    this.collections = data.collections;
+    this.range = data.range
+
+    var width = 973 - (this.collections.length) * 10;
+    this.statusWidth = width/(this.collections.length + 1)
+  },
+  render: function() {
+    var statusArray = this.statusdata();
+    var renderedTemplate = this.template({ 
+      statusArray: statusArray,
+      width: this.statusWidth
+    });
+    this.$el.html(renderedTemplate);
+  }
+})
 
 var DataBox = BaseView.extend({
   el: 'div',
@@ -1123,11 +1161,15 @@ var GraphView = BaseView.extend({
     var renderedTemplate = this.template();
     this.$el.html(renderedTemplate);
 
-    this.fetchHistoricalData(function() {
-      that.renderChart(that.series);
-    });
+    window.setTimeout(function(){
+      that.fetchHistoricalData(function() {
+        that.renderChart(that.series);
+      })
+    }, 0);
+    
   },
-  fetchHistoricalData: function(callback){    
+  fetchHistoricalData: function(callback){   
+
     var that = this;
     
     this.series = [];
@@ -1184,18 +1226,47 @@ var GraphView = BaseView.extend({
     };
   },
   formatGraphData: function(series){
-    data = []
-    //for each data point create a chart data object "d"
-    for(var i = 0; i < series[0].data.length; i++){
-      d = {}
-      d.date = series[0].data[i][0]
-      for(var j = 0; j < series.length; j++){
-        datum = series[j].data[i]
-        key = "data"+j
-        d[key] = datum[1]
+    
+
+    var counters = zeroedArray(series.length);
+    var lastValues = zeroedArray(series.length);
+
+    var data = []
+
+    while( allCountersLessThanSeries(counters, series) ){
+
+      var smallestTimestamp = smallestValueAtCounters(counters, series)
+
+      var d = {}
+      d.date = smallestTimestamp
+
+      for( var i = 0; i < counters.length; i++){
+
+        var key = "data"+i
+        
+        if( counters[i] < series[i].data.length){
+          
+          var timestamp = series[i].data[counters[i]][0]
+          var value = series[i].data[counters[i]][1]
+
+          if( timestamp <= smallestTimestamp){
+            d[key] = value
+            counters[i]++;
+          }else{
+            d[key] = missingPoint(smallestTimestamp, counters[i], series[i].data)
+          }
+
+        }else{
+
+          d[key] = lastValues[i]
+        }
+        
+        lastValues[i] = d[key]
       }
+
       data.push(d)
     }
+
     return data
   }
 });
@@ -1564,9 +1635,13 @@ var TreeMapView = BaseView.extend({
     this.currentNode = 'home';
   },
   route: function(part) {
+    
+    this.listenTo(this.collection, 'change', this.render);
+
     return {};
   },
   render: function() {
+
     if(this.currentNode == 'home'){
       var renderedTemplate = this.template();
       this.$el.html(renderedTemplate);
@@ -1840,114 +1915,41 @@ var TableView = BaseView.extend({
     this.template = loadTemplate("/static/views/table.html");
     this.name = data.name;
     this.collection = data.collection;
-    this.sortBy = this.value
-    this.collection._sortBy(this.sortBy, true);
 
-  },
-  route: function(part) {
-
-    var that = this;
-
-    //pointers for this view
-    this.tableEntries = {};
-
-    //views to be returned
-    tableEntriesToRendered = {};
-
-    var that = this;
-    _.each(this.collection.models, function(model,i) {
-
-      tableentry = new TableViewEntry(model, that.name, that.value, that.unit);
-      tableEntriesToRendered['#tableEntry'+i] = tableentry;
-      that.tableEntries[model.id] = {};
-      that.tableEntries[model.id].id = model.id;
-      that.tableEntries[model.id].view = tableentry;
-      that.tableEntries[model.id].model = model;
+    var columns = this.collection.columns();
+    
+    // Correctly Formatted Data 
+    var rawData = this.collection.rawData();
+    var model = Backbone.Model.extend({});
+    var collection = Backbone.Collection.extend({
+      model: model
     });
 
-    return tableEntriesToRendered;
-  },
-  render: function() {
-    this.collection._sortBy(this.sortBy, true);
-    var renderedTemplate = this.template({collection: this.collection});
-    this.$el.html(renderedTemplate);
+    var properlyFormattedCollection = new collection(rawData);
 
-  }
-});
-
-var TableViewEntry = BaseView.extend({
-  el: 'div',
-  initialize: function(data, name, value, unit) {
-    this.value = value;
-    this.unit = unit;
-    this.name = name;
-    this.template = loadTemplate("/static/views/tableentry.html");
-    this.model = data;
-  },
-  route: function(part) {
-    return {};
-  },
-  render: function() {
-
-    var renderedTemplate = this.template({model:this.model, name: this.name, value: this.value, unit: this.unit});
-    this.$el.html(renderedTemplate);
-  }
-});
-
-var TableViewOpt = BaseView.extend({
-  el: 'div',
-  initialize: function(data) {
-    this.value = data.value;
-    this.unit = data.unit;
-    this.template = loadTemplate("/static/views/table.html");
-    this.name = data.name;
-    this.collection = data.collection;
-  },
-  route: function(part) {
-    var that = this;
-
-    //pointers for this view
-    this.tableEntries = {};
-
-    //views to be returned
-    tableEntriesToRendered = {};
-
-    var that = this;
-    _.each(this.collection.models, function(model,i) {
-
-      tableentry = new TableViewEntryOpt(model, that.name, that.value, that.unit);
-      tableEntriesToRendered['#tableEntry'+i] = tableentry;
-      that.tableEntries[model.id] = {};
-      that.tableEntries[model.id].id = model.id;
-      that.tableEntries[model.id].view = tableentry;
-      that.tableEntries[model.id].model = model;
+    this.grid = new Backgrid.Grid({
+        columns: columns,
+        collection: properlyFormattedCollection
     });
 
-    return tableEntriesToRendered;
-  },
-  render: function() {
-    var renderedTemplate = this.template({collection: this.collection});
-    this.$el.html(renderedTemplate);
-  }
-});
-
-var TableViewEntryOpt = BaseView.extend({
-  el: 'div',
-  initialize: function(data, name, value, unit) {
-    this.value = value;
-    this.unit = unit;
-    this.name = name;
-    this.template = loadTemplate("/static/views/optviewtable.html");
-    this.model = data;
   },
   route: function(part) {
-    this.listenTo(this.model, 'change', this.render);
+
+    this.listenTo(this.collection, 'change', this.render);
+
     return {};
+  
   },
   render: function() {
 
-    var renderedTemplate = this.template({model:this.model, name: this.name, value: this.value, unit: this.unit});
+    var renderedTemplate = this.template({
+      name: this.name,
+      collection: this.collection
+    });
     this.$el.html(renderedTemplate);
+
+    this.$el.find('#grid').append(this.grid.render().$el);
+
   }
 });
 
@@ -1959,6 +1961,9 @@ var FloorPlanView = BaseView.extend({
     this.collection = data.collection;
     var paths = loadData("/static/paths.json");
     this.floorplanpaths = JSON.parse(paths);
+
+    this.height = data.height;
+    this.width = data.width;
   },
   selectzone: function(zone){
     this.trigger('zoneselect', zone);
@@ -1983,8 +1988,12 @@ var FloorPlanView = BaseView.extend({
 
     var floorplandataoverlayview = new FloorPlanDataOverlay({
       collection: this.collection,
-      paths: this.floorplanpaths
+      paths: this.floorplanpaths,
+      height: this.height,
+      width: this.width
     });
+
+
 
     floorplandataoverlayview.on('zoneselect', function(zone){
       that.selectzone(zone)
@@ -2008,17 +2017,15 @@ var FloorPlanView = BaseView.extend({
     var renderedTemplate = this.template();
     this.$el.html(renderedTemplate);
   
-    setTimeout(function(){
-      that.renderFloorplan()
-    }, 200);
+    that.renderFloorplan()
   },
   renderFloorplan : function(){
     var that  = this;
 
     this.$('#floorplanholder').height('95%');
 
-    h = this.$('#floorplanholder').height();
-    w = this.$('#floorplanholder').width();
+    h = this.height;
+    w = this.width;
 
     var floorplancanvas = new ScaleRaphael( "floorplanholder", 350, 300);
 
@@ -2084,6 +2091,9 @@ var FloorPlanDataOverlay = BaseView.extend({
     this.template = loadTemplate("/static/views/floorplandataoverlay.html");
     this.collection = data.collection;
     this.floorplanpaths = data.paths;
+
+    this.height = data.height;
+    this.width = data.width;
   },
   events: {
     "click .zonecontainer":  "selectzone",
@@ -2112,13 +2122,12 @@ var FloorPlanDataOverlay = BaseView.extend({
     setTimeout(function(){
       that.$el.height($('#floorplanholder').height());
       that.$el.width($('#floorplanholder').width());
-      that.$el.width($('#floorplanholder').width());
       var marginLeft = $('#floorplanholder').css('margin-left');
       that.$el.css("margin-left", marginLeft);
 
       var renderedTemplate = that.template({floorplanpaths: that.floorplanpaths, collection: that.collection});
       that.$el.html(renderedTemplate);
-    }, 300);
+    }, 0);
 
   }
 });

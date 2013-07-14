@@ -16,7 +16,6 @@
 	float:left;
 	height: 300px;
 	margin-top: 20px;
-	background-color: rgba(0,15,30,0.8);
 }
 
 .netwrapper{
@@ -38,6 +37,7 @@
 #thermostatwrapper{
 	float:left;
 	width: 300px;
+	background-color: rgba(0,15,30,0.8);
 }
 
 #weekviewwrapper{
