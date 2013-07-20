@@ -51,6 +51,7 @@ var HomeView = BaseView.extend({
     
     if (!part) {
       navigate("home", false); // don't trigger nav inside route
+      return;
     }
 
     //id to view map
@@ -90,7 +91,6 @@ var HomeView = BaseView.extend({
       viewToBeReturned = new PageView(this.currentpane)
     }
 
-  
     return {
       "#dashboard-wrapper": viewToBeReturned
     };    
@@ -178,19 +178,58 @@ var StatusView = PageView.extend({
     this.on("assign", this.animateIn);
     this.statustemplate = loadTemplate("/static/views/status.html");
     var that = this;
-    _.each(Collections, function(c, i) {
-      c.on("all", that.render, that);
-    });
+
   },
   animateIn: function(){
     PageView.prototype.animateIn.apply(this);
   },
   route: function(part) {
-    //console.log(part)
-    return{};
+    
+    panes = [
+      {
+        id: 'power',
+        collection: PV
+      },
+      {
+        id: 'hvac',
+        collection: HVAC
+      },
+      // {
+      //   id: 'windoor',
+      //   collection: Windoor
+      // },
+      // {
+      //   id: 'lights',
+      //   collection: Lights
+      // },
+      {
+        id: 'water',
+        collection: Flow
+      }
+    ]
+
+    viewsToBeReturned = {}
+    for( var i=0; i < panes.length; i++){
+      pane = panes[i]
+
+      var sliderArgs = {
+        id: pane.id,
+        collection: pane.collection
+      }
+
+      viewsToBeReturned['#status'+pane.id] = new SliderView(sliderArgs)
+    }
+
+    return viewsToBeReturned;
   },
   render: function() {
-    var renderedTemplate = this.statustemplate();
+
+    console.log(this.$el)
+
+    var renderedTemplate = this.statustemplate({
+      panes: this.panes
+    });
+
     this.$el.html(renderedTemplate);
   }
 });
@@ -522,6 +561,7 @@ var PowerView = PageView.extend({
 
     if (!part) {
       navigate("power/today", false); // don't trigger nav inside route
+      return;
     }
 
     consumptiondatabox = new DataBox({
@@ -718,6 +758,7 @@ var HvacView = PageView.extend({
     
     if (!part) {
       navigate("hvac/today", false); // don't trigger nav inside route
+      return;
     }
     
     tempdatabox = new DataBox({
@@ -754,7 +795,6 @@ var HvacView = PageView.extend({
       model: this.model
     });
 
-    console.log(that)
     return {
       '#thermostatwrapper': thermostat
       ,'#weekviewwrapper': tempdatabox
@@ -854,11 +894,13 @@ var GraphDataView = PageView.extend({
     }); 
 
 
-    graph = new BigGraphView({
+    graph = new GraphView({
       type:'area',
       range: this.range,
       series: this.acquirecollections(this.selectedcollections),
-      unit: 'W'
+      unit: 'W',
+      height: 400,
+      width: 973
     });
 
     return {
@@ -957,11 +999,13 @@ var PageTaskBar = BaseView.extend({
       range: this.range
     });
 
-    graph = new SmallGraphView({
+    graph = new GraphView({
       type:'area',
       range: this.range,
       series: this.collections,
-      unit: 'W'
+      unit: 'W',
+      width: 675,
+      height: 183
     });
 
     return {
@@ -1105,9 +1149,7 @@ var DataBox = BaseView.extend({
     this.collection = this.databox.collection
     this.contentdivselector = '#databoxcontentwrapper';
     this.currcontentview = this.databox.databoxcontent; //View to be rendered to the databox
-    this.views = this.databox.subviews;   
-    this.listenTo(this.collection, 'change', this.updatecontentview);
-
+    this.views = this.databox.subviews; 
   },
   changecontent: function(click){
     //acquiring selected view id
@@ -1135,11 +1177,6 @@ var DataBox = BaseView.extend({
     //render and animate
     router.displayPart(0,this.currview,[])
 
-  },
-  updatecontentview: function() {
-    //render and animate
-    router.displayPart(0,this.currview,[])
-
   }
 });
 
@@ -1151,6 +1188,8 @@ var GraphView = BaseView.extend({
     this.unit = graphdata.unit;
     this.series = undefined;
     this.template = loadTemplate("/static/views/graph.html");
+    this.height = graphdata.height;
+    this.width = graphdata.width;
   },
   route: function(part) {
     return{};
@@ -1163,10 +1202,10 @@ var GraphView = BaseView.extend({
 
     window.setTimeout(function(){
       that.fetchHistoricalData(function() {
-        that.renderChart(that.series);
+        that.renderChart(that.series, that.height, that.width);
       })
     }, 0);
-    
+
   },
   fetchHistoricalData: function(callback){   
 
@@ -1186,6 +1225,7 @@ var GraphView = BaseView.extend({
         return function (data) {
           that.series[j] = {
             name: inputdata.name,
+            collection: inputdata,
             type: 'area',
             color: d.color,
             data: data
@@ -1227,7 +1267,6 @@ var GraphView = BaseView.extend({
   },
   formatGraphData: function(series){
     
-
     var counters = zeroedArray(series.length);
     var lastValues = zeroedArray(series.length);
 
@@ -1268,31 +1307,85 @@ var GraphView = BaseView.extend({
     }
 
     return data
-  }
-});
+  },
+  renderChart:function(series, height, width){
 
-var SmallGraphView = GraphView.extend({
-  el:'div',
-  renderChart: function(series){
-
-    $('#graphholder').empty()
-
-    var areaData = this.formatGraphData(series)
+    $('#graphholder').empty();
 
     var margin = {top: 50, right: 0, bottom: 5, left: 0},
-    w = 675 - margin.left - margin.right,
-    h = 183 - margin.top - margin.bottom;
+    w = width - margin.left - margin.right,
+    h = height - margin.top - margin.bottom;
 
-    minDate = series[0].data[0][0]
-    maxDate = series[0].data[series[0].data.length-1][0]
+    this.graph = d3.select("#graphholder").append("svg:svg")
+      .attr("width", w + margin.right + margin.left)
+      .attr("height", h + margin.top + margin.bottom)
+      .append("svg:g")
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    var x = d3.time.scale().domain([minDate, maxDate]).range([0, w]);
-    var y = d3.scale.linear().domain([0, d3.max(series, function(s) { 
 
-      return d3.max(s.data, function(d){ return d[1]; } )
+    multipleRange = this.inputdata.length > 1 &&  this.inputdata[0].collection.unit != this.inputdata[1].collection.unit;
 
-    })]).range([h, 0]);
+    minDate = series[0].data[0][0];
+    maxDate = series[0].data[series[0].data.length-1][0];
 
+    var data = this.xAxisInit(w);
+    var x = data.x;
+    var xaxis = data.axis;
+
+    var y0, y1, yaxis0, yaxis1;
+
+    if(multipleRange){
+      var data = this.yInitTwo(this.series, h);
+      var y = data.y;
+      var yaxis = data.axis;
+    }else{
+      var data = this.yInitOne(this.series, h);
+      var y = data.y;
+      var yaxis = data.axis;
+    }
+
+    var lines = this.line(x, y);
+
+    if(multipleRange){
+
+      for(var i=0; i< this.series.length; i++){
+        this.renderLine(this.series[i], lines[i]);
+      }
+
+      for(var i=0; i< this.series.length; i++){
+        this.renderValues(this.series[i], i, x, y[i]);
+      }
+
+      for(var i=0; i< this.series.length; i++){
+        this.renderYAxis(w*i, yaxis[i], this.series[i]);
+      }
+
+    }else{
+      
+      var area = this.area(x, y[0]);
+
+      this.renderArea(area.area0, area.area1, this.series);
+
+      for(var i=0; i< this.series.length; i++){
+        this.renderLine(this.series[i], lines[0]);
+      }
+
+      for(var i=0; i< this.series.length; i++){
+        this.renderValues(this.series[i], i, x, y[0]);
+      }
+
+      for(var i=0; i< this.series.length; i++){
+        this.renderYAxis(w*i, yaxis[0], this.series[i]);
+      }
+    }
+
+    this.renderXAxis(h, xaxis);
+
+
+  },
+  xAxisInit: function(width){
+
+    var x = d3.time.scale().domain([minDate, maxDate]).range([0, width]);
     var xAxis = d3.svg.axis()
       .scale(x)
       .orient("top")
@@ -1300,32 +1393,129 @@ var SmallGraphView = GraphView.extend({
       .tickSize(0)
       .tickFormat(this.timeFormat());
 
+    return {
+      x: x,
+      axis: xAxis
+    }
+
+  },
+  yInitOne:function(series, height){
+
+    that = this;
+
+    var y0 = d3.scale.linear().domain([0, d3.max(series, function(s) { 
+      return d3.max(s.data, function(d){ return d[1]; } )
+    })]).range([height, 0]);
+
     var yAxis = d3.svg.axis()
-      .scale(y)
+      .scale(y0)
       .orient("right")
       .ticks(5)
       .tickSize(0)
       .tickFormat(function(d){
         if(d != 0){
-          return d
+          return that.inputdata[0].collection.formatValue(d)
         }
       });
 
+    return{
+      y: [ 
+        y0 
+      ],
+      axis: [
+        yAxis
+      ]
+    }
 
-    var line = d3.svg.area()
-      // .interpolate("basis") 
-        // assign the X function to plot our line as we wish
-      .x(function(d, i) {
-        // return the X coordinate where we want to plot this datapoint
-        return x(d[0]); //x(i);
-      })
-      .y(function(d) { 
-        // return the Y coordinate where we want to plot this datapoint
-        return y(d[1]); 
+
+  },
+  yInitTwo:function(series, height){
+
+    that = this;
+
+    var y0 = d3.scale.linear().range([height, 0]);
+    var y1 = d3.scale.linear().range([height, 0]);
+
+    y0.domain([0, d3.max(series[0].data, function(d) { 
+      return Math.max(d[1]); 
+    })]); 
+    
+    y1.domain([0, d3.max(series[1].data, function(d) { 
+      return Math.max(d[1]); 
+    })]);
+
+    var yAxisLeft = d3.svg.axis()
+      .scale(y0)
+      .orient("right")
+      .ticks(5)
+      .tickSize(0)
+      .tickFormat(function(d){
+        if(d != 0){
+          return that.inputdata[0].collection.formatValue(d)
+        }
       });
 
+    var yAxisRight = d3.svg.axis()
+      .scale(y1)
+      .orient("left")
+      .ticks(5)
+      .tickSize(0)
+      .tickFormat(function(d){
+        if(d != 0){
+          return that.inputdata[1].collection.formatValue(d)
+        }
+      });
+
+    return {
+      y:[
+        y0,
+        y1
+      ],
+      axis: [
+        yAxisLeft,
+        yAxisRight
+      ]
+    }
+
+  },
+  line: function(x, ys){
+
+    var line0 = d3.svg.area()
+        .interpolate("basis") 
+          // assign the X function to plot our line as we wish
+        .x(function(d, i) {
+          // return the X coordinate where we want to plot this datapoint
+          return x(d[0]);
+        })
+        .y(function(d) { 
+          // return the Y coordinate where we want to plot this datapoint
+          return ys[0](d[1]); 
+        });
+
+    if( ys.length > 1 ){
+      var line1 = d3.svg.line()
+        .interpolate("basis") 
+        .x(function(d) { 
+          // return the X coordinate where we want to plot this datapoint
+          return x(d[0]); 
+        })
+        .y(function(d) { 
+          // return the Y coordinate where we want to plot this datapoint
+          return ys[1](d[1]); 
+        }); // <== y1
+    }
+      
+
+    return [
+      line0,
+      line1
+    ]
+   
+  },
+  area: function(x,y){
     //when collection 0 is greater than collection 1
     var area0 = d3.svg.area()
+      .interpolate("basis") 
       .x(function(d, i) {
         // return the X coordinate where we want to plot this datapoint
         return x(d.date); //x(i);
@@ -1346,6 +1536,7 @@ var SmallGraphView = GraphView.extend({
 
     //when collection1 is greater than colleciton0
     var area1 = d3.svg.area()
+      .interpolate("basis") 
       .x(function(d, i) {
         // return the X coordinate where we want to plot this datapoint
         return x(d.date); //x(i);
@@ -1362,267 +1553,120 @@ var SmallGraphView = GraphView.extend({
         return y(d.data1); 
       });
 
-    var graph = d3.select("#graphholder").append("svg:svg")
-      .attr("width", w + margin.right + margin.left)
-      .attr("height", h + margin.top + margin.bottom)
-      .append("svg:g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    var xx = function(e) { return x(e[0]); };
-    var yy = function(e) { return y(e[1]); };
-
-    // Draw Y-axis grid lines
-    // graph.selectAll("line.y")
-    //   .data(y.ticks(5))
-    //   .enter().append("line")
-    //   .attr("class", "y")
-    //   .attr("x1", 0)
-    //   .attr("x2", w)
-    //   .attr("y1", y)
-    //   .attr("y2", y)
-    //   .style("stroke", "rgba(245,245,245,0.2)")
-    //   .style("stroke-dasharray", "10,20");
-
-    
-
-    //rendering areas
-    if(series.length == 1){
-
-      graph.datum(areaData);
-
-      graph.append("path")
-        .attr("d", area0)
-        .attr("class", "area below")
-        .attr("fill", rgbaToString(series[0].color,0.95));
-
-    }else if (series.length == 2) {
-
-      graph.datum(areaData);
-
-      graph.append("path")
-        .attr("d", area0)
-        .attr("class", "area below")
-        .attr("fill", rgbaToString(series[0].color,0.95));
-
-      graph.append("path")
-        .attr("d", area1)
-        .attr("class", "area below")
-        .attr("fill", rgbaToString(series[1].color,0.95));
-
+    return{
+      area0: area0,
+      area1: area1
     }
 
-    for(var i=0; i<series.length; i++){
-      serie = series[i]
-
-      graph.datum(serie.data)
-      
-      graph.append("svg:path")
-        .attr("d", line)
-        .attr("class", "graphline")
-        .attr("stroke", rgbaToString(serie.color,1))
-        .attr("fill", rgbaToString(serie.color,1));
-
-      // console.log(serie)
-      // graph.selectAll("circle"+i)
-      //   .data(serie.data)
-      //   .enter()
-      //   .append("circle")
-      //   .attr("fill", rgbaToString(serie.color,1) )
-      //   .attr("r", 5)
-      //   .attr("cx", xx)
-      //   .attr("cy", yy)
-
-    }
-
-    graph.append('g')
-      .attr('class', 'x-axis')
-      .attr('transform', 'translate(0, ' + h + ')')
-      .call(xAxis);
-
-    // graph.append("g")
-    //   .attr("class", "y-axis")
-    //   .call(yAxis)
-    //   .selectAll('text')
-    //   .attr("y", "-10");
   },
-});
-
-var BigGraphView = GraphView.extend({
-  el:'div',
-  renderChart: function(series){
-
-    $('#graphholder').empty()
+  renderArea: function(area0, area1, series){
 
     var areaData = this.formatGraphData(series)
 
-    var margin = {top: 50, right: 0, bottom: 5, left: 0},
-    w = 973 - margin.left - margin.right,
-    h = 400 - margin.top - margin.bottom;
-
-    minDate = series[0].data[0][0]
-    maxDate = series[0].data[series[0].data.length-1][0]
-
-    console.log(minDate, maxDate)
-
-    var x = d3.time.scale().domain([minDate, maxDate]).range([0, w]);
-    var y = d3.scale.linear().domain([0, d3.max(series, function(s) { 
-
-      return d3.max(s.data, function(d){ return d[1]; } )
-
-    })]).range([h, 0]);
-
-    var xAxis = d3.svg.axis()
-      .scale(x)
-      .orient("top")
-      .ticks(7)
-      .tickSize(0)
-      .tickFormat(this.timeFormat());
-
-    var yAxis = d3.svg.axis()
-      .scale(y)
-      .orient("right")
-      .ticks(5)
-      .tickSize(0)
-      .tickFormat(function(d){
-        if(d != 0){
-          return d
-        }
-      });
-
-
-    var line = d3.svg.area()
-      // .interpolate("basis") 
-        // assign the X function to plot our line as we wish
-      .x(function(d, i) {
-        // return the X coordinate where we want to plot this datapoint
-        return x(d[0]); //x(i);
-      })
-      .y(function(d) { 
-        // return the Y coordinate where we want to plot this datapoint
-        return y(d[1]); 
-      });
-
-    //when collection 0 is greater than collection 1
-    var area0 = d3.svg.area()
-      .x(function(d, i) {
-        // return the X coordinate where we want to plot this datapoint
-        return x(d.date); //x(i);
-      })
-      .y0(function(d){
-        if(!d.data1){
-          return y(0)
-        }else if(d.data1 < d.data0){
-          return y(d.data1); 
-        }else{
-          return y(d.data0)
-        } 
-      })
-      .y1(function(d) { 
-        // return the Y coordinate where we want to plot this datapoint
-        return y(d.data0); 
-      });
-
-    //when collection1 is greater than colleciton0
-    var area1 = d3.svg.area()
-      .x(function(d, i) {
-        // return the X coordinate where we want to plot this datapoint
-        return x(d.date); //x(i);
-      })
-      .y0(function(d){
-        if(d.data0 < d.data1){
-          return y(d.data0); 
-        }else{
-          return y(d.data1)
-        }
-      })
-      .y1(function(d) { 
-        // return the Y coordinate where we want to plot this datapoint
-        return y(d.data1); 
-      });
-
-    var graph = d3.select("#graphholder").append("svg:svg")
-      .attr("width", w + margin.right + margin.left)
-      .attr("height", h + margin.top + margin.bottom)
-      .append("svg:g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    var xx = function(e) { return x(e[0]); };
-    var yy = function(e) { return y(e[1]); };
-
-    // Draw Y-axis grid lines
-    // graph.selectAll("line.y")
-    //   .data(y.ticks(5))
-    //   .enter().append("line")
-    //   .attr("class", "y")
-    //   .attr("x1", 0)
-    //   .attr("x2", w)
-    //   .attr("y1", y)
-    //   .attr("y2", y)
-    //   .style("stroke", "rgba(245,245,245,0.2)")
-    //   .style("stroke-dasharray", "10,20");
-
-    
-
     //rendering areas
     if(series.length == 1){
 
-      graph.datum(areaData);
+      this.graph.datum(areaData);
 
-      graph.append("path")
+      this.graph.append("path")
         .attr("d", area0)
         .attr("class", "area below")
         .attr("fill", rgbaToString(series[0].color,0.95));
 
     }else if (series.length == 2) {
 
-      graph.datum(areaData);
+      this.graph.datum(areaData);
 
-      graph.append("path")
+      this.graph.append("path")
         .attr("d", area0)
         .attr("class", "area below")
         .attr("fill", rgbaToString(series[0].color,0.95));
 
-      graph.append("path")
+      this.graph.append("path")
         .attr("d", area1)
         .attr("class", "area below")
         .attr("fill", rgbaToString(series[1].color,0.95));
 
     }
+  },
+  renderLine: function(serie, line){
 
-    for(var i=0; i<series.length; i++){
-      serie = series[i]
+    this.graph.datum(serie.data)
+    
+    this.graph.append("svg:path")
+      .attr("d", line)
+      .attr("class", "graphline"+serie.name)
+      .attr("stroke", rgbaToString(serie.color,1))
+      .attr("stroke-width", 2)
+      .attr("fill", rgbaToString([240,240,240],0));
 
-      graph.datum(serie.data)
+  },
+  renderValues:function(serie, index, x, y){
+    var valueCount = 6;
+    var increment = serie.data.length/valueCount;
+
+    for(var i = (1.5+index/2) ; i < valueCount; i++){
+
+      var startIndex = Math.floor(increment * (i - 1) )
+      var endIndex = Math.floor(increment * i );
       
-      graph.append("svg:path")
-        .attr("d", line)
-        .attr("class", "graphline")
-        .attr("stroke", rgbaToString(serie.color,1))
-        .attr("fill", rgbaToString(serie.color,1));
+      var arraySplice = serie.data.slice(startIndex,endIndex)
 
-      // console.log(serie)
-      // graph.selectAll("circle"+i)
-      //   .data(serie.data)
-      //   .enter()
-      //   .append("circle")
-      //   .attr("fill", rgbaToString(serie.color,1) )
-      //   .attr("r", 5)
-      //   .attr("cx", xx)
-      //   .attr("cy", yy)
+      var max = arrayMax(arraySplice, function(d){
+        return d[1];
+      })
 
+      startTime = serie.data[startIndex][0];
+      endTime = serie.data[endIndex][0];
+      midTime = (endTime + startTime)/2
+
+      timestamp = (midTime + max[0])/2
+
+      date = prettyDate(timestamp);
+      // console.log(date)
+      value = max[1];
+      // console.log(value)
+      // console.log("--------------")
+
+      this.graph.append("text")
+        .attr("stroke", rgbaToString(serie.color,1) )
+        .text(function(){
+          return serie.collection.collection.formatValue(value/10);
+        })
+        .attr("x", x(timestamp))
+        .attr("y", y(value) - 10)
+        .attr("stroke-width", 2);
     }
-
-    graph.append('g')
+  },
+  renderXAxis:function(h, xAxis){
+    
+    this.graph.append('g')
       .attr('class', 'x-axis')
       .attr('transform', 'translate(0, ' + h + ')')
       .call(xAxis);
 
-    // graph.append("g")
-    //   .attr("class", "y-axis")
-    //   .call(yAxis)
-    //   .selectAll('text')
-    //   .attr("y", "-10");
   },
+  renderYAxis: function(w, yaxisfunctor, serie){
+
+    // this.graph.append("g")
+    //   .attr("class", "y-axis"+serie.name)
+    //   .attr("transform", "translate(" + w + " ,0)")   
+    //   .call(yaxisfunctor)
+    //   .selectAll('text')
+    //   .attr("y", "-10")
+    //   .attr("stroke", rgbaToString([240,240,240],1))
+    //   .attr("stroke-width", 10);
+
+    // this.graph.append("g")
+    //   .attr("class", "y-axis"+serie.name)
+    //   .attr("transform", "translate(" + w + " ,0)")   
+    //   .call(yaxisfunctor)
+    //   .selectAll('text')
+    //   .attr("y", "-10")
+    //   .attr("stroke", rgbaToString(serie.color,1))
+    //   .attr("stroke-width", 1);
+
+  }
 });
 
 var TreeMapView = BaseView.extend({
@@ -2127,7 +2171,7 @@ var FloorPlanDataOverlay = BaseView.extend({
 
       var renderedTemplate = that.template({floorplanpaths: that.floorplanpaths, collection: that.collection});
       that.$el.html(renderedTemplate);
-    }, 0);
+    }, 100);
 
   }
 });
@@ -2180,5 +2224,181 @@ var PVGraphicView = BaseView.extend({
   render: function() {
     //var renderedTemplate = this.template();
     //this.$el.html(renderedTemplate);
+  }
+});
+
+var SliderView = BaseView.extend({
+  el: 'div',
+  initialize: function(data) {
+    this.template = loadTemplate("/static/views/slider.html");
+    this.collection = data.collection;
+
+  },
+  initValues: function(data) {
+
+    this.sliderId = data.id;
+    this.height = data.height;
+    this.width = data.width; 
+    this.sliderheight = data.sliderheight;
+    this.sliderwidth = data.sliderwidth;
+
+    this.min = data.min;
+    this.max = data.max;
+
+    this.slidervalue = data.slider;
+    this.slidersubvalues = data.slidervalues;
+
+    this.barvalues = data.barvalues;
+
+  },
+  route: function(part) {
+
+    this.listenTo(this.collection, 'change', this.render);
+    
+    return {};
+  },
+  render: function() {
+
+    this.initValues( this.collection.sliderArguments() );
+
+    var renderedTemplate = this.template({
+      id: this.sliderId,
+      collection: this.collection,
+      height: this.height,
+      width: this.width,
+      max: this.max,
+      min: this.min,
+      sliderwidth: this.sliderwidth,
+      sliderheight:this.sliderheight,
+      slider: this.slidervalue,
+      slidersubvalues: this.slidersubvalues,
+      bardimensions: this.barDimensions()
+    });
+    this.$el.html(renderedTemplate);
+
+    this.renderSlider();
+    this.placeSlider();
+  },
+  renderSlider: function(){
+    var that = this;
+
+    this.slider = this.$el.find( "#customhandle" ).draggable({ 
+      containment: this.$el.find("#slider"),
+      axis: "y",
+      drag: function(event, ui){
+        that.moveSlider(event, ui, that);
+      }
+    });
+
+  },
+  moveSlider: function(event, ui, view){
+
+    var height = view.height;
+    var sliderheight = view.sliderheight;
+    var min = this.min;
+    var max = this.max;
+
+    var pixelsFromTop = Number($(event.target).css('top').remove('px'));
+
+    var ratioFromTop = pixelsFromTop/(height - sliderheight);
+
+    var currValue = max - (max-min) * ratioFromTop;
+
+    view.changeSliderValue(currValue);
+    view.renderPointer( currValue );
+  },
+  placeSlider: function(){ 
+
+    var height = this.height;
+    var sliderheight = this.sliderheight;
+    var min = this.min;
+    var max = this.max;
+
+    var currValue = this.sliderLocation();
+
+    var ratioFromTop = (max - currValue)/(max-min);
+
+    var pixelsFromTop = (height-sliderheight) * ratioFromTop;
+
+    this.slider.css('top', pixelsFromTop);
+
+    this.renderPointer( currValue );
+
+  },
+  sliderLocation: function(){
+    var sliderobj = this.slidervalue;
+    return sliderobj.value;
+  },
+  barDimensions: function(){
+    var height = this.height;
+    var min = this.min;
+    var max = this.max;
+
+    var greater, lesser;
+
+    if(this.barvalues.length <= 1){
+      var greaterValue = this.barvalues[0].value;
+      var lesserValue = 0;
+
+      greater = this.barvalues[0]
+
+    }else{
+
+      var greaterIndex
+      if( this.barvalues[0].value < this.barvalues[1].value){
+        
+        var lesserIndex = 0;
+        var greaterIndex = 1;
+        lesser = this.barvalues[0];
+        greater = this.barvalues[1];
+
+      }else{
+
+        var lesserIndex = 1;
+        var greaterIndex = 0;
+        lesser = this.barvalues[1];
+        greater = this.barvalues[0];
+
+      }
+
+      var lesserValue = this.barvalues[lesserIndex].value;
+      var greaterValue = this.barvalues[greaterIndex].value;
+
+    }
+
+    var ratioFromTop = (max - greaterValue)/(max-min);
+    var pixelsFromTop = height * ratioFromTop;
+
+    var ratioBarHeight = (greaterValue-lesserValue)/(max-min);
+    var barHeight =   height * ratioBarHeight;
+
+
+    return {
+      top: pixelsFromTop,
+      height: barHeight,
+      greater: greater,
+      lesser: lesser
+    }
+  },
+  changeSliderValue: function(value){
+    this.slidervalue.value = value;
+    this.$el.find('.slidervalue .value').text(value.toFixed(0));
+  },
+  renderPointer: function( value ){
+    
+    var pointer = this.$el.find('#pointer')
+
+    var height = this.height;
+    var arrowheight = 20;
+    var min = this.min;
+    var max = this.max;
+
+    var currValue = value;
+
+    var ratioFromTop = (max - currValue)/(max-min);
+
+    var pixelsFromTop = (height-arrowheight) * ratioFromTop;
+
+    pointer.css('top', pixelsFromTop);
   }
 });

@@ -1,0 +1,156 @@
+<link href="/static/css/slider.css" rel="stylesheet" type="text/css">
+<style type="text/css">
+	#<%=id%>slider.sliderbarwrapper{
+	    height: <%= height%>px;
+	    width: <%= width %>px; 
+	}
+
+	#<%=id%>slider .bargraphwrapper{
+	    height: <%= height%>px;
+	    width: <%= width - sliderwidth %>px; 
+	}
+
+	#<%=id%>slider .sliderwrapper{
+	    height: <%= height%>px;
+	    width: <%= sliderwidth %>px; 
+	}
+
+	#<%=id%>slider #customhandle{
+		height: <%= sliderheight %>px;
+	}
+
+	#<%=id%>slider .slidervalue{
+		height: <%= sliderheight / 2 %>px;
+	}
+
+	#<%=id%>slider .rangebartext{
+		height: <%= bardimensions.height %>px;
+		line-height: <%= bardimensions.height %>px;
+
+		background-color: <%=rgbaToString(bardimensions.greater.color, 1) %>;
+		border-top: 2px solid <%=rgbaToString(bardimensions.greater.color, 1)%>;
+	}
+
+	#<%=id%>slider .barvalue .id{
+		right: <%= 330 - sliderwidth %>px;
+
+	}
+
+	#<%=id%>slider .greatervaluewrapper{
+		color:<%=rgbaToString(bardimensions.greater.color, 1) %>;
+		height: <%= bardimensions.top %>px;
+
+	}
+</style>
+
+<div id=<%=id + 'slider' %> class='sliderbarwrapper'>
+	<% if( sliderwidth != 0 ) { %> 
+	<div class='sliderwrapper'>
+		<div id='slider'>
+			<div id='customhandle'>
+				<div class='sliderdatawrapper'>
+					<div class='slidervalue'>
+						<span class='id'> <%= slider.id %> </span>
+						<span class='value'><%= slider.value + slider.unit %> </span>
+					</div>
+					<div class='slidersubvaluewrapper'>
+					<% 
+					for (var i =0; i < slidersubvalues.length; i++) {
+						slidersubvalue = slidersubvalues[i];
+					%>
+					<div class='slidersubvalue'>
+						<span class='id'><%= slidersubvalue.id %> </span>
+						<span class='value'><%= slidersubvalue.value + slidersubvalue.unit %> </span>
+					</div>
+					<%
+					}
+					%>
+					</div>
+				</div>	
+			</div>
+		</div>
+	</div>
+	<% } %> 
+	<div id='bargraphwrapper' class='bargraphwrapper'>
+		<div id='pointer' class='pointer'>
+		</div>
+		<div id='backgroundticks' class='backgroundticks'>
+
+		<%
+			tickcount = 4
+			tickheight = height/(tickcount*2);
+		%>
+
+		<style type="text/css">
+			#<%=id%>slider .tickboxspacer{
+				height: <%= tickheight %>px;
+			}
+		</style>
+
+		<%
+			increment = (max - min)/(tickcount)
+		for (var i = 0; i < tickcount; i++) {
+			value = max - increment * (i+1);
+			midvalue = value + increment/2;
+			
+		%>
+
+			<div class='smallspacer tickboxspacer'>
+				<div><%= collection.formatValue(midvalue)%> </div>
+				<div class='tick'></div>
+			</div>
+
+			<div class='bigspacer tickboxspacer'>
+				<div><%= collection.formatValue(value)%> 
+				</div>
+				<div class='tick'></div>
+			</div>
+
+		<%
+		}
+		%>
+
+		</div>
+		<div id='barwrapper' class='barwrapper'>
+			<div class='greatervaluewrapper barvaluewrapper'>
+				<div class='greatervalue barvalue'>
+					<span class='id'>
+						<%= bardimensions.greater.id %> 
+					</span>
+					<span class='value'>
+						<%= bardimensions.greater.formatvalue %> 
+					</span>
+				</div>
+			</div>
+			<div id='rangebar' class='rangebar'>
+				<div class='rangebartext'>
+					<%= bardimensions.greater.status %>
+				</div>
+
+				<% if(bardimensions.lesser){ %>
+				<style>
+					#<%=id%>slider .lesservalue{
+						color:<%=rgbaToString(bardimensions.lesser.color, 1) %>;
+					}
+
+					#<%=id%>slider .rangebar{
+						border-bottom: 5px solid <%=rgbaToString(bardimensions.lesser.color, 1)%>;
+					}
+				</style>
+				<div class='lesservaluewrapper barvaluewrapper'>
+					<div class='lesservalue barvalue'>
+						<span class='id'>
+							<%= bardimensions.lesser.id %> 
+						</span>
+						<span class='value'>
+							<%= bardimensions.lesser.formatvalue %>
+						</span>
+					</div>
+				</div>
+				<% } %>
+
+			</div>
+			
+		</div>
+	</div>
+</div>

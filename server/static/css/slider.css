@@ -1,0 +1,201 @@
+.sliderbarwrapper{
+	float: right;
+}
+
+.sliderwrapper{
+	position: absolute;
+	right:0;
+
+	z-index: 10;
+}
+
+#slider{
+	background: rgba(0,0,0,0);
+	width: 100%;
+	height: 100%;
+}
+
+#customhandle{
+	width: 100%;
+	background-color: #ADACAC;
+}
+
+.sliderdatawrapper{
+	position: relative;
+
+	height: 100%;
+	width: 100%;
+
+	color: rgba(40,40,40,1);
+	font-family: 'Lato-light'
+}
+
+.slidervalue,
+.slidersubvalue{
+	width: 100%;
+}
+
+.slidervalue{
+	position: relative;
+}
+
+.slidervalue .id{
+	position: absolute;
+	top: 0;
+	left: 5px;
+}
+
+.slidervalue .value{
+	font-size: 50px;
+
+	position: absolute;
+	bottom: 0;
+	right: 5px;
+}
+
+.slidersubvaluewrapper{
+	position: absolute;
+	bottom: 5px;
+	width: 100%;
+}
+
+.slidersubvalue{
+	position: relative;
+	height: 20px;
+
+	font-size: 20px;
+}
+
+.slidersubvalue .id {
+	position: absolute;
+	left: 5px;
+}
+
+.slidersubvalue .value {
+	position: absolute;
+	right: 5px;
+}
+
+.bargraphwrapper{
+	position: relative;
+}
+
+.barwrapper{
+	float: left;
+	position: absolute;
+	top:0;
+	left:0;
+
+	height:100%;
+	width:100%;
+	
+	font-family: 'Lato-light'
+
+}
+
+.pointer{
+	width: 0; 
+	height: 0; 
+	border-top: 10px solid transparent;
+	border-bottom: 10px solid transparent; 
+	
+	border-right:20px solid #ADACAC;
+
+	position: absolute;
+	right: 0;
+	top: 150px;
+
+	z-index: 10;
+}
+
+.backgroundticks{
+	color: rgba(240,240,240,1);
+	position: absolute;
+	top:0;
+	left:0;
+
+	width: 100%;
+	z-index: 2;
+}
+
+.tickboxspacer{
+	position: relative;
+}
+
+.tickboxspacer div{
+	position: absolute;
+	right:0;
+	bottom:0;
+}
+
+.bigspacer .tick{
+	border-bottom: 2px solid;
+	width: 45px;
+
+	color: rgba(240,240,240,1);
+}
+
+.smallspacer .tick{
+	border-bottom: 2px solid;
+	width: 30px;
+}
+
+.rangebar{
+	width: 100%; 
+
+	position: relative;
+
+	color: whitesmoke;
+	font-size: 20px;
+
+	z-index: 3;
+}
+
+.rangebartext{
+	height:100%;
+	width:100%;
+
+	text-align: left;
+}
+
+.greatervaluewrapper{
+	width: 100%; 
+
+	position: relative;
+	z-index: 2;
+
+}
+
+.lesservaluewrapper{
+	width: 100%; 
+	z-index: 2;
+}
+
+.greatervalue span{ 
+	position: absolute;
+	bottom: 0;
+}
+
+
+.lesservalue span{
+	position: absolute;
+	bottom: 0;
+}
+
+.barvalue span{
+	bottom: -5px;
+}
+
+.barvalue .id{
+	font-size: 25px;
+	
+	position: absolute;
+	left: 5px;
+}
+
+.barvalue .value{
+	font-size: 40px;
+
+	position: absolute;
+	right: 60px;
+}

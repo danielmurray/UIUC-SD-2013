@@ -77,7 +77,6 @@ var randomArray = function(start, end, size, seed){
     arr[i][1] = arr[i-1][1] + (Math.random()*2 - 1)
   }
 
-  console.log(arr);
   return arr;
 }
 
@@ -104,7 +103,7 @@ var stringToUTC = function(timeperiod){
         var then = now - 28*24*60*60;
         break;
       default:
-        var then = now - 24*60*60;
+        var then = Math.round((new Date()).setHours(0,0,0,0)/1000);;
     }
 
   return {
@@ -438,9 +437,33 @@ var calculateMidPoint = function(midX, startX, startY, endX, endY ){
 
 }
 
+var arrayMax = function(array, func){
+  //Cycles through an array and returns the
+  //object with the largest value specified by
+  // the functor
+
+  if(!func){
+    func = function(d){
+      return d;
+    }
+  }
+
+  var largestIndex = Math.floor(array.length/2);
+  var largestValue = 0;
+
+  for(var i=0; i < array.length; i++){
+    arrayObj = array[i];
+
+    var value = func(arrayObj);
+
+    if( Math.abs(value) > largestValue){
+      largestIndex = i;
+      largestValue = value;
+    }
 
 
+  }
 
-
-
+  return array[largestIndex]
+}
 
