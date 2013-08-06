@@ -107,7 +107,8 @@ class PVController(BackboneCollection):
       return {}
     table = tables[0]
     panels = {}
-    rows = table.tbody('tr')
+    print table   ##################
+    rows = table('tr')
     rows.pop(0)
     for row in rows:
       tds = row('td')
