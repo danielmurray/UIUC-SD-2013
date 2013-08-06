@@ -1,12 +1,13 @@
 light_mapping = [ 
   {
     "UUIDs":{
-      "action_up":"8208bb0c-9197-11e0-806c9f19214c414c",
-      "action_down":"8208bb0c-9197-11e0-806c9f19214c414c",
-      "state":"632ba1d8-76df-11e2-8b0a82650d05814e",
+      "action_up":"245e5768-fb95-11e2-a75490cba3e0c554",
+      "action_down":"245e5768-fb95-11e2-a75490cba3e0c554",
+      #"state":"7fae2da9-fc5a-11e2-860aa88724b2eb45",
+      "state":"245e5769-fb95-11e2-a75b90cba3e0c554",
     },
-    "id":"Light_2-1",
-    "name":"Board Mount",
+    "id":"ML1",
+    "name":"Chandelier",
     "type":"analog",
     "bounds":{
       "state_low":0,

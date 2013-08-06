@@ -3,7 +3,7 @@ import gevent
 from autobahn.websocket import WebSocketClientFactory, WebSocketClientProtocol, connectWS
 import requests, random, hmac, hashlib, base64, json
 
-LOX_ADDR = '10.1.18.78'
+LOX_ADDR = '192.168.1.110'
 LOX_USER = 'admin'
 LOX_PASS = 'sd-piface'
 PING_TIME = 10
