@@ -3,7 +3,7 @@ light_mapping = [
     "UUIDs":{
       "action_up":"245e5768-fb95-11e2-a75490cba3e0c554",
       "action_down":"245e5768-fb95-11e2-a75490cba3e0c554",
-      "state":"245e5768-fb95-11e2-a75490cba3e0c554",
+      "state":"245e5769-fb95-11e2-a75b90cba3e0c554",
     },
     "id":"ML1",
     "name":"Chandelier",

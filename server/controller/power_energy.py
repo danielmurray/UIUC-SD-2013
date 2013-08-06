@@ -100,7 +100,7 @@ class PVController(BackboneCollection):
     return a[0] if len(a) > 0 else 0
 
   def parse_aps_data(self):
-    html = BeautifulSoup(self.make_request('http://solardecathlon.web.cs.illinois.edu/APS-ECU/parameters.php',None))
+    html = BeautifulSoup(self.make_request('http://192.168.1.102/cgi-bin/parameters',None))
     tables = html.findAll('table')
     if len(tables) == 0:
       print "APS: No data table found"
