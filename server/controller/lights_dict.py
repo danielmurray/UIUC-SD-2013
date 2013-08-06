@@ -1,6 +1,40 @@
 light_mapping = [ 
   {
     "UUIDs":{
+      "action_up":"a1ba4264-fc4e-11e2-ad73a0fd40bc0ccc",
+      "action_down":"a1ba4264-fc4e-11e2-ad73a0fd40bc0ccc",
+      "state":"a1ba4265-fc4e-11e2-ad7aa0fd40bc0ccc",
+    },
+    "id":"L1",
+    "name":"bedroom",
+    "type":"analog",
+    "bounds":{
+      "state_low":0,
+      "state_high":100,
+      "action_low":0,
+      "action_high":100,
+    },
+    "zone":"bedroom",
+  },
+  {
+    "UUIDs":{
+      "action_up":"90b626d0-f875-11e2-a219bb2007a1dc09",
+      "action_down":"90b626d0-f875-11e2-a219bb2007a1dc09",
+      "state":"90b626d1-f875-11e2-a220bb2007a1dc09",
+    },
+    "id":"L6",
+    "name":"Kitchen Rails",
+    "type":"analog",
+    "bounds":{
+      "state_low":0,
+      "state_high":100,
+      "action_low":0,
+      "action_high":100,
+    },
+    "zone":"kitchen",
+  },
+  {
+    "UUIDs":{
       "action_up":"245e5768-fb95-11e2-a75490cba3e0c554",
       "action_down":"245e5768-fb95-11e2-a75490cba3e0c554",
       "state":"245e5769-fb95-11e2-a75b90cba3e0c554",
@@ -14,6 +48,40 @@ light_mapping = [
       "action_low":0,
       "action_high":100,
     },
-    "zone":"kitchen",
+    "zone":"hallway",
+  },
+  {
+    "UUIDs":{
+      "action_up":"b5db217d-fb93-11e2-95d790cba3e0c554",
+      "action_down":"b5db217d-fb93-11e2-95d790cba3e0c554",
+      "state":"b5db217e-fb93-11e2-95de90cba3e0c554",
+    },
+    "id":"WL1",
+    "name":"Livingroom",
+    "type":"analog",
+    "bounds":{
+      "state_low":0,
+      "state_high":100,
+      "action_low":0,
+      "action_high":100,
+    },
+    "zone":"livingroom",
+  },
+  {
+    "UUIDs":{
+      "action_up":"34414640-fcd9-11e2-915fa88724b2eb45",
+      "action_down":"34414640-fcd9-11e2-915fa88724b2eb45",
+      "state":"34414641-fcd9-11e2-9166a88724b2eb45",
+    },
+    "id":"L10",
+    "name":"Mech",
+    "type":"analog",
+    "bounds":{
+      "state_low":0,
+      "state_high":100,
+      "action_low":0,
+      "action_high":100,
+    },
+    "zone":"mechanical",
   }
 ]
