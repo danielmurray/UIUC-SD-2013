@@ -12,6 +12,7 @@ var BaseCollection = CollectionWS.extend({
   avg: 0,
   integral: 0,
   duration: 0,
+  precision: 3,
   comparator: function(device) {
     return this._descending * device.get(this._order_by);
   },
@@ -105,7 +106,7 @@ var BaseCollection = CollectionWS.extend({
     }
 
     return [
-      smallValue.toPrecision(3),
+      smallValue.toPrecision(this.precision),
       metricPrefixArray[PrefixIndex]
     ]
 
@@ -130,7 +131,7 @@ var BaseCollection = CollectionWS.extend({
     arr[0][0] = then;
     arr[0][1] = Math.random() * size;
 
-    for(var i=1; i<size; i++){
+    for(var i=1; i<=size; i++){
       arr[i] = [];
       arr[i][0] = then + step *i;
       
@@ -284,6 +285,30 @@ var LightCollection = BaseCollection.extend({
   },
   homeData:function(){
     return this._homeData(this.valueID).count;
+  },
+  sliderArguments: function(){
+    return {
+      id: 'lights',
+      height: 206,
+      width: 302,
+      sliderwidth: 50,
+      sliderheight: 80,
+      min: 0,
+      max: 12,
+      slider:{
+        id: '',
+        value: 3,
+        unit: ''
+      },
+      slidervalues: [],
+      barvalues:[{
+        id: '',
+        value: 3,
+        unit: '',
+        color: [170,184,26],
+        status: ''
+      }]
+    }
   }
 });
 
@@ -292,6 +317,8 @@ var HVACCollection = BaseCollection.extend({
   name:'hvac',
   url: '/hvac',
   valueID: 'tar_temp',
+  unit: '°C',
+  precision: 2,
   getHistoricalData: function(start,end,density,callback) {
     
     this.historyData("hvac", "tar_temp", start, end, density, "sum", callback);
@@ -314,6 +341,46 @@ var HVACCollection = BaseCollection.extend({
   getSum: function(){
     data = this._homeData(this.valueID)
     return data.sum/data.count;
+  },
+  sliderArguments: function(){
+    return {
+      id: 'hvac',
+      height: 235,
+      width: 461,
+      sliderwidth: 140,
+      sliderheight: 115,
+      min: 15,
+      max: 32,
+      slider:{
+        id: 'set',
+        value: 22,
+        unit: '°C'
+      },
+      slidervalues: [{
+        id: 'power',
+        value: 798,
+        unit: 'W'
+      },{
+        id: 'cost',
+        value: 1.80,
+        unit: '¥'
+      }],
+      barvalues:[{
+        id: 'out',
+        value: 27,
+        formatvalue: this.formatValue(27),
+        unit: '°C',
+        color: [84,175,226],
+        status: 'cooling'
+      },{
+        id: 'in',
+        value: 23,
+        formatvalue: this.formatValue(23),
+        unit: '°C',
+        color: [173,50,50],
+        status: 'heating'
+      }]
+    }
   }
 });
 
@@ -356,6 +423,28 @@ var WindoorCollection = BaseCollection.extend({
   },
   homeData: function() {
     return this._homeData(this.valueID).count;
+  },
+  sliderArguments: function(){
+    return {
+      id: 'windoor',
+      height: 206,
+      width: 301,
+      sliderwidth: 0,
+      sliderheight: 115,
+      min: 0,
+      max: 8,
+      slider:{
+        id: ''
+      },
+      slidervalues: [],
+      barvalues:[{
+        id: '',
+        value: 1,
+        unit: 'Door Open',
+        color: [223,144,1],
+        status: ''
+      }]
+    }
   }
 });
 
@@ -627,6 +716,41 @@ var PVCollection = BaseCollection.extend({
     }
 
     return rawData
+  },
+  sliderArguments: function(){
+
+    production = this.getSum();
+    consumption = Power.getSum();
+
+    max = 1.25 * Math.max(production, consumption,3000)
+
+    return {
+      id: 'power',
+      height: 235,
+      width: 461,
+      sliderwidth: 0,
+      sliderheight: 115,
+      min: 0,
+      max: max,
+      slider:{
+        id: '',
+        value: Math.max(production, consumption),
+      },
+      slidervalues: [],
+      barvalues:[{
+        id: '+',
+        value: production,
+        formatvalue: this.formatValue(production),
+        color: [85,160,85],
+        status: 'producing'
+      },{
+        id: '-',
+        value: consumption,
+        formatvalue: this.formatValue(consumption),
+        color: [173,50,50],
+        status: 'consuming'
+      }]
+    }
   }
 });
 
@@ -635,7 +759,7 @@ var FlowCollection = BaseCollection.extend({
   name:'water',
   url: '/flow',
   valueID: 'val',
-  unit: 'L/s',
+  unit: 'L',
   getHistoricalData: function(start,end,density,callback) {
     
     this.fakeHistoryData("flow", "val", start, end, density, "sum", callback);
@@ -653,6 +777,30 @@ var FlowCollection = BaseCollection.extend({
       unit
     ]
     
+  },
+  sliderArguments: function(){
+    return {
+      id: 'water',
+      height: 206,
+      width: 301,
+      sliderwidth: 0,
+      sliderheight: 115,
+      min: 0,
+      max: 30,
+      slider:{
+        id: '',
+        value: 15
+      },
+      slidervalues: [],
+      barvalues:[{
+        id: '',
+        value: 15,
+        formatvalue: this.formatValue(15),
+        unit: 'L',
+        color: [84,175,226],
+        status: ''
+      }]
+    }
   }
 });
 

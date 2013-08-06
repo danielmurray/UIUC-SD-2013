@@ -24,12 +24,21 @@
 	margin: 0 0 2px 10px;
 	position: absolute;
 	bottom: 0;
+
+	color:whitesmoke;
+	z-index: 5;
 }
 
 .status-box{
 	height: 100%;
-	padding: 0 0 0 5px;
 	text-align: right;
+}
+
+.status-box img{
+	height: 147px;
+	margin: 15px;
+	background-color: rgba(255, 255, 255, 0.64);
+	border-radius: 100px;
 }
 
 .status-box .notdata{
@@ -65,8 +74,8 @@
 }
 
 .toppanes .status-box{
-	width: 80%;
-	margin: 0 0 0 19%;
+	width: 373px;
+	margin: 0 0 0 88px;
 }
 
 .middlepanes{
@@ -81,7 +90,7 @@
 }
 
 .middlepanes .status-box{
-	width: 65%;
+	width: 199px;
 	margin: 0 0 0 34%;
 }
 

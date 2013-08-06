@@ -3,9 +3,9 @@ import gevent
 from autobahn.websocket import WebSocketClientFactory, WebSocketClientProtocol, connectWS
 import requests, random, hmac, hashlib, base64, json
 
-LOX_ADDR = '192.168.89.7'
+LOX_ADDR = '10.1.18.78'
 LOX_USER = 'admin'
-LOX_PASS = 'admin'
+LOX_PASS = 'sd-piface'
 PING_TIME = 10
 
 class EchoIncoming(WebSocketClientProtocol):
