@@ -1,8 +1,10 @@
 <link href="/static/css/graphdatastatus.css" rel="stylesheet" type="text/css">
+<% dictionary = window.Dictionary %>
 <ul class="seriesdatalist">
 <% 
 for( var i=0; i<statusArray.length; i++){
 	statusdata = statusArray[i]
+	console.log(statusdata)
 %>
 	<style>
 		.seriesdata.<%=statusdata.name%>{
@@ -19,7 +21,7 @@ for( var i=0; i<statusArray.length; i++){
 		<table class="seriesdatatableheader">
 			<tr>
 				<th class='key'>
-					<%=statusdata.title%>
+					<%= dictionary.key(statusdata.id+'name') %>
 				</th>
 				<th class='value'>
 					<%=statusdata.value%>
@@ -34,7 +36,7 @@ for( var i=0; i<statusArray.length; i++){
 
 			<tr class='seriesdatatablerow'>
 				<td class='key'>
-					<%=subvalue.key%>
+					<%= dictionary.key(statusdata.range) + dictionary.key('possessive') + ' ' + dictionary.key(subvalue.key)  %>
 				</td>
 				<td class='value'>
 					<%=subvalue.value%>

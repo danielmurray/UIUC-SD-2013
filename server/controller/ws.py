@@ -26,6 +26,7 @@ class BackboneCollectionInstance(BaseNamespace):
     """
     Websocket fetch event from client.
     """
+    print args
     self.emit(args["tid"], {"success": True, "data": self.collection.fetch()})
 
   def on_save(self, args):
@@ -99,6 +100,7 @@ class BackboneCollection:
       client.do_update(name, data)
 
   def save(self, data):
+    print self
     self.models[data["id"]] = data
     self.do_save(data)
 

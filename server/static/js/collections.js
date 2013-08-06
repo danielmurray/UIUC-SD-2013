@@ -482,32 +482,34 @@ var PowerCollection = BaseCollection.extend({
     cost = (net * this.rate).toFixed(2)
 
     if( cost > 0 ){
-      title = 'Energy Sold';
+      title = 'energysold';
       color = [85, 160, 85];
       value = '¥' + Math.abs(cost);
     }else{
-      title = 'Energy Paid';
+      title = 'energypaid';
       color = [173, 50, 50];
       value = '¥' + Math.abs(cost);
     }
     
     costmodel = {};
-    costmodel.name = 'Cost';
+    costmodel.id = title;
+    costmodel.name = 'cost';
     costmodel.title = title;
     costmodel.color = color;
     costmodel.value = value;
+    costmodel.range = range;
     costmodel.subvalues = []
 
     p = {
-      key: range + 'production',
+      key: 'production',
       value: this.formatValue(production) + 'h'
     };
     c = {
-      key: range + 'consumption',
+      key: 'consumption',
       value: this.formatValue(consumption) + 'h'
     }
     n = {
-      key: range + 'net',
+      key: 'net',
       value: this.formatValue(net) + 'h'
     }
     costmodel.subvalues.push(p, c, n)
@@ -515,7 +517,7 @@ var PowerCollection = BaseCollection.extend({
     return costmodel
   },
   columns: function(){
-    that = this
+    var view = this
 
     var powerformatter = Backgrid.CellFormatter = function () {};
     var energyformatter = Backgrid.CellFormatter = function () {};
@@ -523,21 +525,21 @@ var PowerCollection = BaseCollection.extend({
 
     _.extend(powerformatter.prototype, {
       fromRaw: function (rawData) {
-        number = that.abbreviateNumber(rawData)
+        number = view.abbreviateNumber(rawData)
         return number[0] + ' ' + number[1] + 'W' ;
       }
     })
 
     _.extend(energyformatter.prototype, {
       fromRaw: function (rawData) {
-        number = that.abbreviateNumber(rawData)
+        number = view.abbreviateNumber(rawData)
         return number[0] + ' ' + number[1] + 'Wh' ;
       }
     })
 
     _.extend(energywsformatter.prototype, {
       fromRaw: function (rawData) {
-        number = that.abbreviateNumber(rawData)
+        number = view.abbreviateNumber(rawData)
         return number[0] + ' ' + number[1] + 'Ws' ;
       }
     })
@@ -618,32 +620,34 @@ var PVCollection = BaseCollection.extend({
     cost = (net * this.rate).toFixed(2)
 
     if( cost > 0 ){
-      title = 'Energy Sold';
+      title = 'energysold';
       color = [85, 160, 85];
       value = '¥' + Math.abs(cost);
     }else{
-      title = 'Energy Paid';
+      title = 'energypaid';
       color = [173, 50, 50];
       value = '¥' + Math.abs(cost);
     }
     
     costmodel = {};
-    costmodel.name = 'Cost';
+    costmodel.id = title;
+    costmodel.name = 'cost';
     costmodel.title = title;
     costmodel.color = color;
     costmodel.value = value;
+    costmodel.range = range;
     costmodel.subvalues = []
 
     p = {
-      key: range + 'production',
+      key: 'production',
       value: this.formatValue(production) + 'h'
     };
     c = {
-      key: range + 'consumption',
+      key: 'consumption',
       value: this.formatValue(consumption) + 'h'
     }
     n = {
-      key: range + 'net',
+      key: 'net',
       value: this.formatValue(net) + 'h'
     }
     costmodel.subvalues.push(p, c, n)
@@ -651,7 +655,7 @@ var PVCollection = BaseCollection.extend({
     return costmodel
   },
   columns: function(){
-    that = this
+    var view = this
     
     var powerformatter = Backgrid.CellFormatter = function () {};
     var tempformatter = Backgrid.CellFormatter = function () {};
@@ -659,7 +663,7 @@ var PVCollection = BaseCollection.extend({
 
     _.extend(powerformatter.prototype, {
       fromRaw: function (rawData) {
-        number = that.abbreviateNumber(rawData)
+        number = view.abbreviateNumber(rawData)
         return number[0] + ' ' + number[1] + 'W' ;
       }
     })
@@ -722,7 +726,7 @@ var PVCollection = BaseCollection.extend({
     production = this.getSum();
     consumption = Power.getSum();
 
-    max = 1.25 * Math.max(production, consumption,3000)
+    max = 1.25 * Math.max(production, consumption)
 
     return {
       id: 'power',

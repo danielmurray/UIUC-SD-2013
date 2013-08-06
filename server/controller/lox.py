@@ -3,7 +3,7 @@ import gevent
 from autobahn.websocket import WebSocketClientFactory, WebSocketClientProtocol, connectWS
 import requests, random, hmac, hashlib, base64, json
 
-LOX_ADDR = '10.1.18.78'
+LOX_ADDR = '192.168.1.110'
 LOX_USER = 'admin'
 LOX_PASS = 'sd-piface'
 PING_TIME = 10
@@ -27,9 +27,9 @@ class EchoIncoming(WebSocketClientProtocol):
     def onMessage(self,msg, binary):
         '''relay any message received to all the listners'''
         msg = self.parseMessage(msg) #parse it first based on the spec
-        print "\nLOX::Incoming--------"
-        print msg
-        print "LOX------------------\n"
+        # print "\nLOX::Incoming--------"
+        # print msg
+        # print "LOX------------------\n"
         for each in self.listners:
             each(msg) #call each listner with the message
 
@@ -162,7 +162,7 @@ class LoxoneDevice(object):
                 return
             self.initialized = True
             while not self.isClosed:
-                print random.choice(["(>'.')>", "<('.'<)", ":)", ":(", "XD","oo","||","u"])
+                # print random.choice(["(>'.')>", "<('.'<)", ":)", ":(", "XD","oo","||","u"])
                 gevent.sleep(1) # don't block event loop
             gevent.sleep(1)
             print "End: create_socket"

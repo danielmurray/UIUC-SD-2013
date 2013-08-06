@@ -7,7 +7,7 @@ conn = sqlite3.connect('data.sqlite')
 conn.row_factory = sqlite3.Row
 try:
   result = conn.execute("SELECT COUNT(*) FROM sensor_history")
-  print("History database contains %s rows" % result.fetchone()[0])
+  # print("History database contains %s rows" % result.fetchone()[0])
 except sqlite3.OperationalError:
   schema = """
   CREATE TABLE sensor_history
@@ -45,7 +45,7 @@ class History:
       typ = collection.typ
       for id, model in collection.models.iteritems():
         data.append((t, str(typ), str(id), json.dumps(model)))
-    print("Saving history for %d models" % len(data))
+    # print("Saving history for %d models" % len(data))
     c = conn.cursor()
     c.executemany(insert_history, data)
     conn.commit()
@@ -107,7 +107,7 @@ class History:
         group = []
         cur_time = time
       field_data = json.loads(row["data"])
-      print(field_data)
+      # print(field_data)
       for part in field_parts:
         field_data = field_data[part]
       group.append(float(field_data))

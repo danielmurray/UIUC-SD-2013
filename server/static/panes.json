@@ -1,32 +1,26 @@
 {
 	"lights": {
 		"id": "lights",
-		"name": "Lights",
 		"color": [170, 184, 26]
     },
     "windoor": {
         "id": "windoor",
-        "name": "Windoor",
         "color": [223, 144, 1]
     },
     "hvac": {
     	"id": "hvac",
-		"name": "HVAC",
 		"color": [173, 50, 50]
     },
     "power": {
     	"id": "power",
-		"name": "Power",
 		"color": [85, 160, 85]
     },
     "water": {
     	"id": "water",
-		"name": "Water",
 		"color": [84, 175, 226]
     },
     "graphdata": {
     	"id": "graphdata",
-		"name": "Data",
 		"color": [150, 111, 150]
     }
 }

@@ -15,3 +15,4 @@ window.Power = new PowerCollection();
 
 window.Optimizer = new OptimizerCollection();
 
+console.log(window.Lights)

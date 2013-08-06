@@ -52,8 +52,16 @@
 
 .collectionwrapper{
 	display: inline-block;
-	padding: 16px;
+	padding: 12px;
 	font-family: 'lato-bold';
+}
+
+.collectionwrapper .en{
+	font-size: 20px;
+}
+
+.collectionwrapper .zh{
+	font-size: 15px;
 }
 
 .collectionwrapper.notselected{

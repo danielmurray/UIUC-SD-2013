@@ -55,7 +55,7 @@ class HvacController(BackboneCollection):
                     hvac_uuids["tar_temp"] = each["v"]
                     self.update(hvac_uuids)
             elif hvac_uuids["avg_temp_n"] == each["n"]:
-                print "avg temp"
+                #print "avg temp"
                 if hvac_uuids["avg_temp"] != each["v"]:
                     hvac_uuids["avg_temp"] = each["v"]
                     self.update(hvac_uuids)
@@ -66,7 +66,7 @@ class HvacController(BackboneCollection):
                 if not hvac_uuids["hvac_state_uuid"]["heating"] and not hvac_uuids["hvac_state_uuid"]["cooling"]:
                     hvac_uuids["hvac_state"] = "Off"
             self.update(hvac_uuids)
-            print "HVAC::State:",hvac_uuids['hvac_state']
+            #print "HVAC::State:",hvac_uuids['hvac_state']
 
 
     def on_temp_change(self, avg_temp):
@@ -76,7 +76,7 @@ class HvacController(BackboneCollection):
             return False
         hvac_uuids["avg_temp"] = avg_temp
         sock_str = "jdev/sps/io/"+hvac_uuids["avg_temp_uuid"]+"/"+str(int(avg_temp))
-        print "HVAC:: Avg Temperature:", avg_temp
+        #print "HVAC:: Avg Temperature:", avg_temp
         #on change of average temp make sure to relay the change to both the loxone and the client
         self.sock.send_message(sock_str)
         self.update(hvac_uuids)        
@@ -88,5 +88,5 @@ class HvacController(BackboneCollection):
             return
         hvac_uuids["tar_temp"] = data["tar_temp"]
         sock_str = "jdev/sps/io/"+hvac_uuids["tar_temp_uuid"]+"/"+str(int(hvac_uuids["tar_temp"]))
-        print "HVAC:: setting temperature:", data['tar_temp']
+        #print "HVAC:: setting temperature:", data['tar_temp']
         self.sock.send_message(sock_str)

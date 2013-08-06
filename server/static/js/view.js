@@ -51,7 +51,6 @@ var HomeView = BaseView.extend({
     
     if (!part) {
       navigate("home", false); // don't trigger nav inside route
-      return;
     }
 
     //id to view map
@@ -223,8 +222,6 @@ var StatusView = PageView.extend({
     return viewsToBeReturned;
   },
   render: function() {
-
-    console.log(this.$el)
 
     var renderedTemplate = this.statustemplate({
       panes: this.panes
@@ -622,11 +619,13 @@ var PowerView = PageView.extend({
       color: [85,160,85],
       collections:[
         {
+          id:'production',
           name:'Production',
           color: [85,160,85],
           collection: this.collection[0]
         },
         {
+          id:'consumption',
           name:'Consumption',
           color: [173,50,50],
           collection: this.collection[1]
@@ -1041,32 +1040,35 @@ var HistoryStatus = BaseView.extend({
   },
   statusdata:function(){
     statusarray = [];
-    range = this.range + '\'s '
+    range = this.range;
 
     //Cycle through all of the page's collections
     for(var i =0; i < this.collections.length; i++){
       var collection = this.collections[i];
       statusmodel = {};
+      statusmodel.id = collection.id;
       statusmodel.name = collection.name;
       statusmodel.title = collection.name;
       statusmodel.color = collection.color;
+      statusmodel.range = range;
       statusmodel.value = collection.collection.formatValue(collection.collection.getSum());
       statusmodel.subvalues = []
 
       statusData = collection.collection.dataStatus();
 
       minimum = {
-        key: range + 'minimum',
+        key: 'minimum',
         value: collection.collection.formatValue(statusData.min)
       };
       maximum = {
-        key: range + 'maximum',
+        key: 'maximum',
         value: collection.collection.formatValue(statusData.max)
       }
       average = {
-        key: range + 'average',
+        key: 'average',
         value: collection.collection.formatValue(statusData.avg)
       }
+
       statusmodel.subvalues.push(minimum, maximum, average)
       statusarray.push(statusmodel)
     }
@@ -2136,6 +2138,7 @@ var FloorPlanDataOverlay = BaseView.extend({
     this.collection = data.collection;
     this.floorplanpaths = data.paths;
 
+    console.log(this.collection)
     this.height = data.height;
     this.width = data.width;
   },

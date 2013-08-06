@@ -28,7 +28,7 @@ var DictionaryCollection = CollectionWS.extend({
 				return span(words, this.language);
 			}
 		}else{
-			return "<(' '<)";
+			return "*" + key + "*";
 		}
 	},
 	currentLanguage: function(){

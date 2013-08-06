@@ -20,7 +20,7 @@ import args
 
 args.init({
   "port": 8000,
-  "debug": True
+  "debug": False
 })
 if args.get("debug"):
   logging.basicConfig(level=logging.DEBUG)

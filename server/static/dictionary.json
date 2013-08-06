@@ -54,133 +54,137 @@
     "zh": "内"
   },
   {
-    "id": "on",
-    "en": "on",
-    "zh": "内"
+    "id": "table",
+    "en": "Table",
+    "zh": "桌子"
   },
   {
-    "id": "out",
-    "en": "out",
-    "zh": "外"
+    "id": "graphic",
+    "en": "Graphic",
+    "zh": "图形"
   },
   {
-    "id": "off",
-    "en": "off",
-    "zh": "内"
+    "id": "pvname",
+    "en": "PV",
+    "zh": "光伏"
   },
   {
-    "id": "kitchen",
-    "en": "kitchen",
-    "zh": "厨房"
+    "id": "pyraname",
+    "en": "Pyra",
+    "zh": "图形"
   },
   {
-    "id": "kitchenaccent",
-    "en": "accent",
-    "zh": "色灯"
+    "id": "powername",
+    "en": "Appliances",
+    "zh": "图形"
   },
   {
-    "id": "kitchencounter",
-    "en": "counter",
-    "zh": "对抗"
+    "id": "flowname",
+    "en": "Flow",
+    "zh": "流量"
   },
   {
-    "id": "kitchentrack",
-    "en": "track",
-    "zh": "天花板"
+    "id": "tempname",
+    "en": "Temp",
+    "zh": "温度"
   },
   {
-    "id": "kitchenpendant",
-    "en": "pendant",
-    "zh": "垂饰"
+    "id": "co2name",
+    "en": "CO2"
   },
   {
-    "id": "bathroom",
-    "en": "bathroom",
-    "zh": "浴室"
+    "id": "humidname",
+    "en": "Humidity",
+    "zh": "湿度"
   },
   {
-    "id": "bathroomsconces",
-    "en": "sconces",
-    "zh": "壁灯"
+    "id": "pick2",
+    "en": "Pick 2",
+    "zh": "选择 2"
   },
   {
-    "id": "bathroomtrack",
-    "en": "track",
-    "zh": "天花板"
+    "id": "today",
+    "en": "Today",
+    "zh": "今天"
   },
   {
-    "id": "mechanical",
-    "en": "tobereplaced",
-    "zh": "tobereplaced"
+    "id": "last24",
+    "en": "Last 24",
+    "zh": "过去 24"
   },
   {
-    "id": "washer",
-    "en": "tobereplaced",
-    "zh": "tobereplaced"
+    "id": "thisweek",
+    "en": "This Week",
+    "zh": "本星期"
   },
   {
-    "id": "bedroom",
-    "en": "tobereplaced",
-    "zh": "tobereplaced"
+    "id": "last7",
+    "en": "Last 7",
+    "zh": "最后 7"
   },
   {
-    "id": "bedroomaccent",
-    "en": "tobereplaced",
-    "zh": "tobereplaced"
+    "id": "thismonth",
+    "en": "This Month",
+    "zh": "这个月"
   },
   {
-    "id": "bedroomsconces",
-    "en": "tobereplaced",
-    "zh": "tobereplaced"
+    "id": "last28",
+    "en": "Last 28",
+    "zh": "过去 28"
   },
   {
-    "id": "hallway",
-    "en": "tobereplaced",
-    "zh": "tobereplaced"
+    "id": "possessive",
+    "en": "'s",
+    "zh": "的"
   },
   {
-    "id": "hallwaytrack",
-    "en": "track",
-    "zh": "天花板"
+    "id": "minimum",
+    "en": "Minimum",
+    "zh": "极少"
   },
   {
-    "id": "hallwayfixture",
-    "en": "tobereplaced",
-    "zh": "tobereplaced"
+    "id": "maximum",
+    "en": "Maximum",
+    "zh": "最大"
   },
   {
-    "id": "livingroom",
-    "en": "tobereplaced",
-    "zh": "tobereplaced"
+    "id": "average",
+    "en": "Average",
+    "zh": "平均"
   },
   {
-    "id": "livingroomaccent",
-    "en": "tobereplaced",
-    "zh": "tobereplaced"
+    "id": "production",
+    "en": "Production",
+    "zh": "生产"
   },
   {
-    "id": "livingroomtrack",
-    "en": "track",
-    "zh": "天花板"
+    "id": "consumption",
+    "en": "Consumption",
+    "zh": "消费"
   },
   {
-    "id": "closet",
-    "en": "closet",
-    "zh": "壁橱"
+    "id": "net",
+    "en": "Net",
+    "zh": "消费"
   },
   {
-    "id": "master",
-    "en": "tobereplaced",
-    "zh": "tobereplaced"
+    "id": "energysold",
+    "en": "Sold",
+    "zh": "卖能源"
   },
   {
-    "id": "masteraccent",
-    "en": "tobereplaced",
-    "zh": "tobereplaced"
+    "id": "energypaid",
+    "en": "Bought",
+    "zh": "买能源"
   },
   {
-    "id": "mastersconces",
-    "en": "tobereplaced",
-    "zh": "tobereplaced"
+    "id": "energysoldname",
+    "en": "Energy Sold",
+    "zh": "卖能源"
+  },
+  {
+    "id": "energypaidname",
+    "en": "Energy Bought",
+    "zh": "买能源"
   }
 ]

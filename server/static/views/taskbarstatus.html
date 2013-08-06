@@ -1,4 +1,5 @@
 <link href="/static/css/taskbarstatus.css" rel="stylesheet" type="text/css">
+<% dictionary = window.Dictionary %>
 <style>
 	.seriesdatalist li{
 		height: <%=taskbarcollapsed + 'px'%>;
@@ -34,7 +35,7 @@ for( var i=0; i<statusArray.length; i++){
 					<%=icon%>
 				</td>
 				<th class='key'>
-					<%=statusdata.title%>
+					<%= dictionary.key(statusdata.id)%>
 				</th>
 				<th class='value'>
 					<%=statusdata.value%>
@@ -49,7 +50,7 @@ for( var i=0; i<statusArray.length; i++){
 
 			<tr class='seriesdatatablerow'>
 				<td class='key'>
-					<%=subvalue.key%>
+					<%= dictionary.key(statusdata.range) + dictionary.key('possessive') + ' ' + dictionary.key(subvalue.key)%>
 				</td>
 				<td class='value'>
 					<%=subvalue.value%>

@@ -3,7 +3,9 @@
 <div class="dataPickers">
 	<div class='seriesPickerWapper'>
 		<div class="seriesPickerHeaderWrapper">
-			<h3 class="seriesPickerHeader">Pick 2</h3>
+			<h3 class="seriesPickerHeader">
+				<%= dictionary.key('pick2')%> 
+			</h3>
 		</div>
 		<div class="collectionPicker">
 			<ul class="collectionList">
@@ -41,7 +43,9 @@
 					<div class="collectionbutton">
 						<table><tr>
 							<td>
-								<h4><%=collection.name%></h4>
+								<h4>
+									<%= dictionary.key(collection.id+'name') %>
+								</h4>
 							</td>
 							<td>
 								<img id="<%=collection.id%>" class="collectionexit" src="static/images/newicons/exit.png"></img>
@@ -59,12 +63,14 @@
 	<div class='datePickerWapper'>
 		<div class="dropdownholder">
 			<div id="dateselect" class="dropdownwrapper" tabindex="1">
-			    <span><%=range.charAt(0).toUpperCase() + range.slice(1)%></span>
+			    <span><%= dictionary.key(range) %></span>
 			    <ul class="dropdown">
 		<% 
 			for(var i = 0; i< dates.length; i++){
 		%>
-			        <li id= <%=dates[i]%>> <%=dates[i]%></li>
+			        <li id= <%=dates[i]%>> 
+			        	<%= dictionary.key(dates[i])%>
+			        </li>
 		<%
 			}
 		%>

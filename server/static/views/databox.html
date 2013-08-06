@@ -1,4 +1,5 @@
 <link href="/static/css/databox.css" rel="stylesheet" type="text/css">
+<% dictionary = window.Dictionary %>
 <style>
 	.header.<%=databox.id%>{
 		background-color: <%=rgbaToString(databox.color, 1)%>;
@@ -29,7 +30,9 @@
 		
 		>
 		</input>
-		<label for="<%=subview.id+'/'+databox.id%>"><%=subview.id%></label>
+		<label for="<%=subview.id+'/'+databox.id%>">
+			<%= dictionary.key(subview.id) %>
+		</label>
 		</span>
 
 		<%
