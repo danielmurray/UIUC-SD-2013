@@ -90,14 +90,18 @@ class PVController(BackboneCollection):
     latest_data = self.parse_aps_data()
     self.update_client(latest_data)
 
-  def update_client(self, data_dict):
-    for k,v in data_dict.items():
+  def update_client(self, panel_list):
+    for v in panel_list:
       self.update(v)
 
   def getVal(self,i):
-    s = i.string if i.string else ''
+    s = i.contents[0] if i.contents[0] else ''
     a = re.findall(r'\d+',s)
     return a[0] if len(a) > 0 else 0
+
+  def getAllContents(self,i):
+    s = i.contents[0] if i.contents[0] else ''
+    return s
 
   def parse_aps_data(self):
     html = BeautifulSoup(self.make_request('http://192.168.1.102/cgi-bin/parameters',None))
@@ -106,19 +110,19 @@ class PVController(BackboneCollection):
       print "APS: No data table found"
       return {}
     table = tables[0]
-    panels = {}
+    panels = []
     rows = table('tr')
     rows.pop(0)
     for row in rows:
       tds = row('td')
-      panels[self.getVal(tds[0])] = {
-        'id':self.getVal(tds[0]),
+      panels.append({
+        'id':self.getAllContents(tds[0]),
         'power':self.getVal(tds[1]),
         'fq':self.getVal(tds[2]),
         'voltage':self.getVal(tds[3]),
         'temp':self.getVal(tds[4]),
-        'date':self.getVal(tds[5])
-      }
+        'date':self.getAllContents(tds[5])
+      })
     return panels
 
   def make_request(self,url, data):
