@@ -39,9 +39,9 @@ div.light{
 	background: rgba(145,145,145,0.5);
 }
 
-/*.sliderholder .ui-slider-handle {
+.sliderholder .ui-slider-handle {
     display:none;
-}*/
+}
 
 .sliderholder.ui-corner-all{
    	border-radius: 0px;
