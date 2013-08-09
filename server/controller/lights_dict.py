@@ -52,6 +52,23 @@ light_mapping = [
   },
   {
     "UUIDs":{
+      "action_up":"e92e7547-fd47-11e2-b541a88724b2eb45",
+      "action_down":"e92e7547-fd47-11e2-b541a88724b2eb45",
+      "state":"e92e7548-fd47-11e2-b548a88724b2eb45",
+    },
+    "id":"ML2",
+    "name":"Rails",
+    "type":"analog",
+    "bounds":{
+      "state_low":0,
+      "state_high":100,
+      "action_low":0,
+      "action_high":100,
+    },
+    "zone":"hallway",
+  },
+  {
+    "UUIDs":{
       "action_up":"b5db217d-fb93-11e2-95d790cba3e0c554",
       "action_down":"b5db217d-fb93-11e2-95d790cba3e0c554",
       "state":"b5db217e-fb93-11e2-95de90cba3e0c554",
