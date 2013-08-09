@@ -1,0 +1,61 @@
+<link href="/static/css/pvgraphic.css" rel="stylesheet" type="text/css">
+
+<style>
+	
+	#pvtable{
+		height: <%=height%>px;
+		width: <%=width%>px;
+	}
+
+	.pvbox{
+		width: <%=width/6%>px;
+		color: whitesmoke;
+		text-align: center;
+		z-index:4;
+	}
+
+	.pvbar{
+		background-color: rgba( 224, 211, 26, 1);
+	}
+
+</style>
+
+<table id='pvtable'>
+<% 
+	panels = this.collection.models
+	for(var i=0; i < 6; i++){
+%>
+		<tr>
+<%
+		for(var j=0; j<7; j++){
+			panel = panels[i*6 + j]
+%>
+
+<style>
+	#pv<%=i%><%=j%>{
+		position: relative;
+		background-color: rgba(0,15,30,0.8);
+	}
+
+	#pv<%=i%><%=j%> .pvbar{
+		position: absolute;
+		bottom: 0;
+		height: <%= panel.get('power')/2.50 %>%;
+		width: 100%;
+		z-index:-1;
+	}
+</style>
+
+		<td id='pv<%=i%><%=j%>' class='pvbox'>
+			<%= collection.formatValue(panel.get('power')) %>
+			<div class='pvbar'>
+			</div>
+		</td>
+<%
+	}
+%>
+	</tr>
+<%
+}
+%>
+</table>

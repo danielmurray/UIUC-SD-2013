@@ -496,7 +496,7 @@ var LightView = BaseView.extend({
 
     });
 
-    this.$('.sliderholder').slider({
+    dimmer = this.$('.sliderholder').slider({
       range: "min",
       min: 0,
       max: 100,
@@ -591,12 +591,12 @@ var PowerView = PageView.extend({
     generationtdatabox = new DataBox({
       id: 'Generation',
       color: [85,160,85],
-      databoxcontent: 'table',
+      databoxcontent: 'graphic',
       collection: this.collection[0],
       subviews: {
         graphic: {
           id: 'graphic',
-          view: TreeMapView,
+          view: PVGraphicView,
           args: {
             color: [85,160,85],
             collection: this.collection[0]
@@ -2218,15 +2218,25 @@ var Thermostat = BaseView.extend({
 var PVGraphicView = BaseView.extend({
   el: 'div',
   initialize: function(data) {
-    //this.template = loadTemplate("/static/views/databox.html");
+    this.template = loadTemplate("/static/views/pvgraphic.html");
     this.model = null;
+    this.colllection = data.collection;
+    this.height = 385;
+    this.width = 482;
   },
   route: function(part) {
+    
+    this.listenTo(this.collection, 'change', this.render);
+
     return {};
   },
   render: function() {
-    //var renderedTemplate = this.template();
-    //this.$el.html(renderedTemplate);
+    var renderedTemplate = this.template({
+      collection: this.collection,
+      height: this.height,
+      width: this.width
+    });
+    this.$el.html(renderedTemplate);
   }
 });
 
