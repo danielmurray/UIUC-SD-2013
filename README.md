@@ -1,7 +1,7 @@
 SD2013-UIUC
 ===========
 
-Peking Solar Decathlon 2013 - UIUC
+UIUC's Smart Home App for the China's First Solar Decathlon in 2013
 
 ## Setup
 
